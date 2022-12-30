@@ -1,0 +1,60 @@
+<main>
+	<lesson>Модели и моделирование.jpg</lesson>
+	
+	<exercise>
+		<title>Модель есть замещение изучаемого объекта другим объектом, который отражает:</title>
+		<questions>
+			<type>radiobutton</type>
+			<question>все стороны данного объекта</question>
+			<question>некоторые стороны данного объекта</question>
+			<question>существенные стороны данного объекта</question>
+			<question>несущественные стороны данного объекта</question>
+		</questions>
+		<answers>
+			<answer>существенные стороны данного объекта</answer>
+		</answers>
+	</exercise>
+
+	<exercise>
+		<title>Какая из моделей не является знаковой</title>
+		<questions>
+			<type>radiobutton</type>
+			<question>схема</question>
+			<question>музыкальная тема</question>
+			<question>график</question>
+			<question>рисунок</question>
+		</questions>
+		<answers>
+			<answer>рисунок</answer>
+		</answers>
+	</exercise>
+
+	<exercise>
+		<title>Что НЕ отражает модель</title>
+		<questions>
+			<type>checkbox</type>
+			<question>все существующие признаки объекта</question>
+			<question>некоторые из всех существующих</question>
+			<question>существенные признаки в соответствии с целью моделирования</question>
+			<question>некоторые существенные признаки объекта</question>
+			<question>все существенные признаки</question>
+		</questions>
+		<answers>
+			<answer>все существующие признаки объекта</answer>
+			<answer>некоторые из всех существующих</answer>
+			<answer>некоторые существенные признаки объекта</answer>
+			<answer>все существенные признаки</answer>
+		</answers>
+	</exercise>
+
+	<exercise>
+		<title>Сколько места в памяти надо выделить для харанения 8-цветного рисунка размером 8 на 8 пикселя? Ответ запишите в байтах.</title>
+		<questions>
+			<type>input</type>
+		</questions>
+		<answers>
+			<settings including_space = "False" type = "number"/>
+			<answer>24</answer>
+		</answers>
+	</exercise>
+</main>
