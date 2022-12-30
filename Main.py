@@ -43,12 +43,14 @@ class DataLoggin:
 class Main(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setObjectName("main_window")
-        self.setWindowTitle("IT Master")
 
         self.init_variables()
 
+        self.setObjectName("main_window")
+        self.setWindowTitle("IT Master")
         self.setWindowIcon(QtGui.QIcon(self.path_image_logo))
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
         # создание страницы входа
         self.current_stack = StackLogin.StackLogin(path_cources = self.path_cources, path_imgs = self.path_imgs, data_theme = self.data_theme["stack_login"], func_start = self.open_lesson, func_table_results = self.open_table_result)
@@ -257,7 +259,7 @@ if __name__ == "__main__":
 
     window_main = Main()
 
-    # window_main.showMaximized()
-    window_main.showFullScreen()
+    window_main.showMaximized()
+    # window_main.showFullScreen()
 
     sys.exit(app.exec_())
