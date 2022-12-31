@@ -8,8 +8,8 @@
 Приложение написано на языке программирования Python**  
 
 **Если вы хотите запустить приложение напрямую, убедитесь, что у вас установлены модули:  
-`ttkthemes` -> pip install PyQt5  
-`tkinter` -> pip install PyQtChart**
+`PyQt5` -> pip install PyQt5  
+`PyQtChart` -> pip install PyQtChart**
 
 **Структура:**  
 
