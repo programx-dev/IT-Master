@@ -64,20 +64,20 @@ class LessonGraphicsView(QtWidgets.QGraphicsView):
     def wheelEvent(self, event):
         if event.modifiers() & QtCore.Qt.ControlModifier:
             current_zoom = self.zoom
-            if event.angleDelta().y() > 0:
+            if event.angleDelta().y() > 0 and self.zoom < self.max_zoom:
                 factor = 1.25
                 self.zoom *= factor
                 if self.zoom > self.max_zoom:
                     self.zoom = self.max_zoom
                     factor = self.zoom / current_zoom
-            else:
+                self.scale(factor, factor)
+            elif  event.angleDelta().y() < 0 and self.zoom > self.min_zoom:
                 factor = 0.8
                 self.zoom *= factor
                 if self.zoom < self.min_zoom:
                     self.zoom = self.min_zoom
                     factor = self.zoom / current_zoom
-
-            self.scale(factor, factor)
+                self.scale(factor, factor)
         else:
             super().wheelEvent(event)
 
@@ -106,7 +106,7 @@ class LessonGraphicsView(QtWidgets.QGraphicsView):
             border: none;
             background: none;
         }
-        QScrollBar::sub-line:vertical:hover,QScrollBar::sub-line:vertical:on {
+        QScrollBar::sub-line:vertical:hover, QScrollBar::sub-line:vertical:on {
             border: none;
             background: none;
         }
@@ -122,10 +122,10 @@ class LessonGraphicsView(QtWidgets.QGraphicsView):
         } """ % self.data_theme["scrollbar"])
 
 class StackLesson(QtWidgets.QWidget):
-    def __init__(self, path_course: str, func: callable, data_theme: dict):
+    def __init__(self, path_lesson: str, func: callable, data_theme: dict):
         super().__init__()
 
-        self.path_course = path_course
+        self.path_lesson = path_lesson
         self.func = func
         self.data_theme = data_theme
         
@@ -136,24 +136,26 @@ class StackLesson(QtWidgets.QWidget):
         self.grid_layout_main.setSpacing(0)
         self.grid_layout_main.setContentsMargins(0, 0, 0, 0)
         self.grid_layout_main.setColumnStretch(0, 0)
+        self.grid_layout_main.setColumnStretch(1, 1)
         self.grid_layout_main.setColumnStretch(2, 0)
         self.grid_layout_main.setRowStretch(0, 0)
+        self.grid_layout_main.setRowStretch(1, 1)
         self.grid_layout_main.setRowStretch(2, 0)
 
         self.setLayout(self.grid_layout_main)
 
-         # главная рамка
+        # главная рамка
         self.frame_main = QtWidgets.QFrame()
         self.frame_main.setObjectName("frame_main")
 
         self.grid_layout_main.addWidget(self.frame_main, 1, 1)
 
         # главный макет
-        self.vbox_layout_main = QtWidgets.QVBoxLayout()
-        self.vbox_layout_main.setSpacing(0)
-        self.vbox_layout_main.setContentsMargins(0, 0, 0, 0)
+        self.vbox_layout_internal = QtWidgets.QVBoxLayout()
+        self.vbox_layout_internal.setSpacing(0)
+        self.vbox_layout_internal.setContentsMargins(0, 0, 0, 0)
 
-        self.frame_main.setLayout(self.vbox_layout_main)
+        self.frame_main.setLayout(self.vbox_layout_internal)
 
         # метка заголовка
         self.label_header = QtWidgets.QLabel()
@@ -161,22 +163,22 @@ class StackLesson(QtWidgets.QWidget):
         self.label_header.setObjectName("label_header")
         self.label_header.setText("Теоретическая часть")
         self.label_header.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
-        self.label_header.setMinimumHeight(self.min_height_label_header)
-        self.label_header.setContentsMargins(10, 0, 10, 0)
+        self.label_header.setFixedHeight(self.fixed_height_label_header)
 
-        self.vbox_layout_main.addWidget(self.label_header)
+        self.vbox_layout_internal.addWidget(self.label_header)
 
         # виджет просмотра изображений
         self.lesson_viewer = LessonGraphicsView(path_lesson = self.path_lesson, data_theme = self.data_theme["lesson_graphics_view"])
 
-        self.vbox_layout_main.addWidget(self.lesson_viewer)
+        self.vbox_layout_internal.addWidget(self.lesson_viewer)
 
         # рамка панели инстументов
         self.frame_tools = QtWidgets.QFrame()
         self.frame_tools.setObjectName("frame_tools")
         
-        self.vbox_layout_main.addWidget(self.frame_tools)
+        self.vbox_layout_internal.addWidget(self.frame_tools)
 
+        # макет панели инструментов
         self.hbox_layout_tools = QtWidgets.QHBoxLayout()
         self.hbox_layout_tools.setSpacing(0)
         self.hbox_layout_tools.setContentsMargins(20, 10, 20, 10)
@@ -190,8 +192,9 @@ class StackLesson(QtWidgets.QWidget):
         self.push_button_start.setObjectName("push_button_start")
         self.push_button_start.clicked.connect(self.func)
         self.push_button_start.setFont(self.font_push_button_start)
-        self.push_button_start.setMinimumHeight(self.min_height)
+        self.push_button_start.setFixedHeight(self.fixed_height)
         self.push_button_start.setText("Начать тест")
+        self.push_button_start.setFocusPolicy(QtCore.Qt.NoFocus)
 
         self.hbox_layout_tools.addWidget(self.push_button_start)
         self.hbox_layout_tools.addStretch(1)
@@ -202,13 +205,8 @@ class StackLesson(QtWidgets.QWidget):
         self.lesson_viewer.set_image()
 
     def init_variables(self):
-        self.tree = ET.parse(self.path_course)
-        self.root = self.tree.getroot()
-
-        self.path_lesson = os.path.join(os.path.split(self.path_course)[0], self.root.find("lesson").text).replace("\\", "/")
-
-        self.min_height = 42
-        self.min_height_label_header = 54
+        self.fixed_height = 42
+        self.fixed_height_label_header = 54
         self.font_push_button_start = QtGui.QFont("Segoe UI", 14)
         self.font_label_header = QtGui.QFont("Segoe UI", 17, weight = QtGui.QFont.Bold)
 

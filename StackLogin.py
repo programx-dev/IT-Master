@@ -10,12 +10,12 @@ class DataPassage:
     path_course: str
 
 class PushButtonCourse(QtWidgets.QWidget):
-    def __init__(self, path_imgs: str, data_theme: dict, func: callable):
+    clicked_choose_course = QtCore.pyqtSignal()
+    def __init__(self, path_imgs: str, data_theme: dict):
         super().__init__()
 
         self.path_imgs = path_imgs
         self.data_theme = data_theme
-        self.func = func
 
         self.init_variables()
 
@@ -29,64 +29,64 @@ class PushButtonCourse(QtWidgets.QWidget):
         # кнопка с название курса
         self.push_button_title = QtWidgets.QPushButton()
         self.push_button_title.setObjectName("push_button_title")
-        self.push_button_title.clicked.connect(self.press_push_button)
-        self.push_button_title.setText("Выбрать курс")
+        self.push_button_title.clicked.connect(self.press_choose_course)
+        self.push_button_title.setText("Выбрать урок")
         self.push_button_title.setFont(self.font_widgets)
-        self.push_button_title.setMinimumHeight(self.height_push_button)
+        self.push_button_title.setFixedHeight(self.fixed_height)
         self.push_button_title.setFocusPolicy(QtCore.Qt.NoFocus)
 
         self.hbox_layout_main.addWidget(self.push_button_title)
 
-        # кнопка выбора курса
+        # кнопка со значком выбора курса
         self.push_button_download = QtWidgets.QPushButton()
         self.push_button_download.setObjectName("push_button_download")
-        self.push_button_download.clicked.connect(self.press_push_button)
+        self.push_button_download.clicked.connect(self.press_choose_course)
         self.push_button_download.setFont(self.font_widgets)
-        self.push_button_download.setFixedSize(self.height_push_button, self.height_push_button)
+        self.push_button_download.setFixedSize(self.fixed_width, self.fixed_height)
+        self.push_button_download.setFocusPolicy(QtCore.Qt.NoFocus)
 
         self.hbox_layout_main.addWidget(self.push_button_download)
 
         self.set_style_sheet()
 
-    def change_text(self, text: str):
+    def change_title(self, text: str):
         self.push_button_title.setText(text)
 
-    def press_push_button(self):
-        self.func()
+    def press_choose_course(self):
+        self.clicked_choose_course.emit()
 
     def init_variables(self):
-        self.height_push_button = 42
+        self.fixed_width = 42
+        self.fixed_height = 42
         self.font_widgets = QtGui.QFont("Segoe UI", 12)
 
         self.img_download = QtGui.QIcon(os.path.join(self.path_imgs, "download.png"))
 
     def set_style_sheet(self):
         # кнопка с название курса
-        self.data_theme["padding"] = self.height_push_button
-
+        self.data_theme["padding_left"] = self.fixed_width
         self.push_button_title.setStyleSheet("""
-        #push_button_title{ 
+        #push_button_title { 
             outline: 0;
             border-top-left-radius: 7px; 
-            border-bottom-left-radius: 7px; 
-            padding-left :%(padding)s; 
+            border-bottom-left-radius: 7px;
+            padding-left: %(padding_left)s;
             background-color: %(background)s;
-            color: %(color)s;}""" 
-        % self.data_theme)
+            color: %(color)s;
+        } """ % self.data_theme)
 
-        # кнопка выбора курса
-        temp_data_theme = self.data_theme["push_button_download"]
+        # кнопка со значком выбора курса
         self.push_button_download.setStyleSheet("""
-        #push_button_download{
+        #push_button_download {
             outline: 0;
             border-top-right-radius: 7px; 
             border-bottom-right-radius: 7px; 
             background-color: %(background)s; 
-            color: %(color)s;}"""
-        % self.data_theme)
+            color: %(color)s;
+        } """ % self.data_theme)
         
         self.push_button_download.setIcon(self.img_download)
-        self.push_button_download.setIconSize(QtCore.QSize(self.height_push_button - 14, self.height_push_button - 14))
+        self.push_button_download.setIconSize(QtCore.QSize(self.fixed_width - 14, self.fixed_height - 14))
 
 class StackLogin(QtWidgets.QWidget):
     def __init__(self, path_cources: str, path_imgs: str, data_theme: dict, func_start: callable, func_table_results: callable, name: str = None, surname: str = None, class_name: str = None):
@@ -109,8 +109,10 @@ class StackLogin(QtWidgets.QWidget):
         self.grid_layout_main.setSpacing(0)
         self.grid_layout_main.setContentsMargins(0, 0, 0, 0)
         self.grid_layout_main.setColumnStretch(0, 0)
+        self.grid_layout_main.setColumnStretch(1, 1)
         self.grid_layout_main.setColumnStretch(2, 0)
         self.grid_layout_main.setRowStretch(0, 0)
+        self.grid_layout_main.setRowStretch(1, 1)
         self.grid_layout_main.setRowStretch(2, 0)
 
         self.setLayout(self.grid_layout_main)
@@ -122,43 +124,45 @@ class StackLogin(QtWidgets.QWidget):
         self.grid_layout_main.addWidget(self.frame_main, 1, 1)
 
         # внутренняя сетка
-        self.grid_layout_data = QtWidgets.QGridLayout()
-        self.grid_layout_data.setSpacing(0)
-        self.grid_layout_data.setContentsMargins(0, 0, 0, 0)
-        self.grid_layout_data.setColumnStretch(0, 1)
-        self.grid_layout_data.setColumnStretch(2, 1)
-        self.grid_layout_data.setRowStretch(0, 1)
-        self.grid_layout_data.setRowStretch(2, 1)
+        self.grid_layout_internal = QtWidgets.QGridLayout()
+        self.grid_layout_internal.setSpacing(0)
+        self.grid_layout_internal.setContentsMargins(0, 0, 0, 0)
+        self.grid_layout_internal.setColumnStretch(0, 1)
+        self.grid_layout_internal.setColumnStretch(1, 0)
+        self.grid_layout_internal.setColumnStretch(2, 1)
+        self.grid_layout_internal.setRowStretch(0, 1)
+        self.grid_layout_internal.setRowStretch(1, 0)
+        self.grid_layout_internal.setRowStretch(2, 1)
 
-        self.frame_main.setLayout(self.grid_layout_data)
+        self.frame_main.setLayout(self.grid_layout_internal)
 
         # внутренняя рамка формы
-        self.frame_data = QtWidgets.QFrame()
-        self.frame_data.setObjectName("frame_data")
-        self.frame_data.setMinimumWidth(360)
+        self.frame_internal = QtWidgets.QFrame()
+        self.frame_internal.setObjectName("frame_internal")
+        self.frame_internal.setFixedWidth(360)
 
-        self.grid_layout_data.addWidget(self.frame_data, 1, 1)
+        self.grid_layout_internal.addWidget(self.frame_internal, 1, 1)
 
-         # главный макет
-        self.vbox_layout_main = QtWidgets.QVBoxLayout()
-        self.vbox_layout_main.setSpacing(0)
-        self.vbox_layout_main.setContentsMargins(0, 0, 0, 0)
+        # макет внутри внутренней рамки
+        self.vbox_layout_internal = QtWidgets.QVBoxLayout()
+        self.vbox_layout_internal.setSpacing(0)
+        self.vbox_layout_internal.setContentsMargins(0, 0, 0, 0)
 
-        self.frame_data.setLayout(self.vbox_layout_main)
+        self.frame_internal.setLayout(self.vbox_layout_internal)
 
-        # макет для полей и кнопок
+        # макет для полей ввода и кнопок
         self.vbox_layout_data = QtWidgets.QVBoxLayout()
         self.vbox_layout_data.setSpacing(0)
         self.vbox_layout_data.setContentsMargins(20, 20, 20, 0)
 
-        self.vbox_layout_main.addLayout(self.vbox_layout_data)
+        self.vbox_layout_internal.addLayout(self.vbox_layout_data)
 
         # метка заголовка
         self.label_header = QtWidgets.QLabel()
         self.label_header.setFont(self.font_label_header)
         self.label_header.setObjectName("label_header")
         self.label_header.setText("Вход")
-        self.label_header.setAlignment(QtCore.Qt.AlignHCenter)
+        self.label_header.setAlignment(QtCore.Qt.AlignCenter)
 
         self.vbox_layout_data.addWidget(self.label_header)
         self.vbox_layout_data.addSpacing(10)
@@ -168,7 +172,7 @@ class StackLogin(QtWidgets.QWidget):
         self.line_edit_surname.setObjectName("line_edit_surname")
         self.line_edit_surname.setFont(self.font_widgets)
         self.line_edit_surname.setPlaceholderText("Фамилия")
-        self.line_edit_surname.setMinimumHeight(self.min_height)
+        self.line_edit_surname.setFixedHeight(self.fixed_height)
 
         if self.surname != None:
             self.line_edit_surname.insert(self.surname)
@@ -181,7 +185,7 @@ class StackLogin(QtWidgets.QWidget):
         self.line_edit_name.setObjectName("line_edit_name")
         self.line_edit_name.setFont(self.font_widgets)
         self.line_edit_name.setPlaceholderText("Имя")
-        self.line_edit_name.setMinimumHeight(self.min_height)
+        self.line_edit_name.setFixedHeight(self.fixed_height)
 
         if self.name != None:
             self.line_edit_name.insert(self.name)
@@ -194,7 +198,7 @@ class StackLogin(QtWidgets.QWidget):
         self.line_edit_class.setObjectName("line_edit_class")
         self.line_edit_class.setFont(self.font_widgets)
         self.line_edit_class.setPlaceholderText("Класс")
-        self.line_edit_class.setMinimumHeight(self.min_height)
+        self.line_edit_class.setFixedHeight(self.fixed_height)
 
         if self.class_name != None:
             self.line_edit_class.insert(self.class_name)
@@ -203,7 +207,8 @@ class StackLogin(QtWidgets.QWidget):
         self.vbox_layout_data.addSpacing(5)
 
         # кнопка выбора курса
-        self.push_button_course = PushButtonCourse(path_imgs = self.path_imgs, data_theme = self.data_theme["push_button_cource"], func = self.get_path_course)
+        self.push_button_course = PushButtonCourse(path_imgs = self.path_imgs, data_theme = self.data_theme["push_button_cource"])
+        self.push_button_course.clicked_choose_course.connect(self.choose_course)
 
         self.vbox_layout_data.addWidget(self.push_button_course)
         self.vbox_layout_data.addSpacing(5)
@@ -215,40 +220,59 @@ class StackLogin(QtWidgets.QWidget):
         self.push_button_enter.clicked.connect(self.start_test)
         self.push_button_enter.setFont(self.font_widgets)
         self.push_button_enter.setText("Войти")
-        self.push_button_enter.setMinimumHeight(self.min_height)
+        self.push_button_enter.setFixedHeight(self.fixed_height)
+        self.push_button_enter.setFocusPolicy(QtCore.Qt.NoFocus)
 
         self.vbox_layout_data.addWidget(self.push_button_enter)
 
-        # кнопка посмотреть таблицу результатов
-        self.vbox_layout_main.addSpacing(10)
+        self.vbox_layout_internal.addSpacing(10)
 
+        # кнопка посмотреть таблицу результатов
         self.push_button_table_results = QtWidgets.QPushButton()
         self.push_button_table_results.setObjectName("push_button_table_results")
-        self.push_button_table_results.clicked.connect(self.func_table_results)
+        self.push_button_table_results.clicked.connect(self.open_table_result)
         self.push_button_table_results.setFont(self.font_widgets)
         self.push_button_table_results.setText("Таблица результатов")
-        self.push_button_table_results.setMinimumHeight(self.min_height)
+        self.push_button_table_results.setFixedHeight(self.fixed_height)
+        self.push_button_table_results.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        self.vbox_layout_main.addWidget(self.push_button_table_results)
+        self.vbox_layout_internal.addWidget(self.push_button_table_results)
 
-        # валидация ввода данных
+        # проверка ввода данных
         self.line_edit_surname.textChanged.connect(self.check_data)
         self.line_edit_name.textChanged.connect(self.check_data)
         self.line_edit_class.textChanged.connect(self.check_data)
 
         self.set_style_sheet()
 
+    def init_variables(self):
+        self.max_len_title_course = 19
+        self.path_course = None
+        self.fixed_height = 42
+        self.font_widgets = QtGui.QFont("Segoe UI", 12)
+        self.font_label_header = QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Bold)
+
     def start_test(self):
-        data_dict = DataPassage(
+        data_passage = DataPassage(
             name = self.line_edit_name.text(),
             surname = self.line_edit_surname.text(),
             class_name = self.line_edit_class.text(),
             path_course = self.path_course
         )
 
-        self.func_start(data = data_dict)
+        self.func_start(data = data_passage)
 
-    def get_path_course(self):
+    def open_table_result(self):
+        data_passage = DataPassage(
+            name = text if (text := self.line_edit_name.text()) != 0 else None,
+            surname = text if (text := self.line_edit_surname.text()) != 0 else None,
+            class_name = text if (text := self.line_edit_class.text()) != 0 else None,
+            path_course = self.path_course
+        )
+
+        self.func_table_results(data_passage)
+
+    def choose_course(self):
         # диалог выбора файла с курсом
         path_file_course = QtWidgets.QFileDialog.getOpenFileName(self, "Выбор курса", self.path_cources, "XML Файл (*.xml)")[0]
 
@@ -258,8 +282,9 @@ class StackLogin(QtWidgets.QWidget):
             self.check_data()
             
             name_course = os.path.splitext(os.path.basename(self.path_course))[0]
-            name_course = (name_course[:self.max_len] + "…") if len(name_course) > self.max_len else name_course
-            self.push_button_course.change_text(name_course)
+            name_course = (name_course[:self.max_len_title_course] + "…") if len(name_course) > self.max_len_title_course else name_course
+
+            self.push_button_course.change_title(name_course)
             self.push_button_course.choosed = True
 
     def check_data(self):
@@ -270,13 +295,6 @@ class StackLogin(QtWidgets.QWidget):
         else:
             self.push_button_enter.setEnabled(False)
 
-    def init_variables(self):
-        self.max_len = 19
-        self.path_course = None
-        self.min_height = 42
-        self.font_widgets = QtGui.QFont("Segoe UI", 12)
-        self.font_label_header = QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Bold)
-
     def set_style_sheet(self):
         # главная рамка
         self.frame_main.setStyleSheet("""
@@ -285,10 +303,10 @@ class StackLogin(QtWidgets.QWidget):
         } """ % self.data_theme)
 
         # внутренняя рамка формы
-        self.frame_data.setStyleSheet("""
-        #frame_data {
+        self.frame_internal.setStyleSheet("""
+        #frame_internal {
             border-radius: 14px;
-            background-color: %(background_frame)s;
+            background-color: %(background_frame_internal)s;
         } """ % self.data_theme)
 
         # метка заголовка
@@ -300,13 +318,15 @@ class StackLogin(QtWidgets.QWidget):
         
         temp_data_theme_not_focus = self.data_theme["line_edit"]["not_focus"]
         temp_data_theme_focus = self.data_theme["line_edit"]["focus"]
+
         temp_data_theme = {
             "color_border_not_focus": temp_data_theme_not_focus["color_border"],
             "background_not_focus": temp_data_theme_not_focus["background"], 
             "color_not_focus": temp_data_theme_not_focus["color"], 
             "color_border_focus": temp_data_theme_focus["color_border"],
             "background_focus": temp_data_theme_focus["background"], 
-            "color_focus": temp_data_theme_focus["color"]}
+            "color_focus": temp_data_theme_focus["color"]
+        }
         
         # строка ввода фамилии
         self.line_edit_surname.setStyleSheet("""
@@ -359,7 +379,7 @@ class StackLogin(QtWidgets.QWidget):
             color: %(color)s;
         } 
         #push_button_enter::pressed {
-            background-color: %(background_active)s; 
+            background-color: %(background_pressed)s; 
             color: %(color)s;
         }
         #push_button_enter::disabled {

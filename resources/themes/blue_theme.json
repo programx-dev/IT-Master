@@ -1,8 +1,7 @@
 {
-  "name": "синий (по умолчанию)",
   "stack_login": {
     "background_frame_main": "rgb(90, 153, 255)",
-    "background_frame": "rgb(255, 255, 255)",
+    "background_frame_internal": "rgb(255, 255, 255)",
     "label_header": {
       "background": "rgb(255, 255, 255)",
       "color": "rgb(0, 0, 0)"
@@ -21,23 +20,38 @@
     },
     "push_button_cource": {
       "background": "rgb(244, 243, 248)",
-      "background_active": "rgb(0, 74, 173)",
-      "color": "rgb(0, 0, 0)",
-      "push_button_download": {
-        "background": "rgb(244, 243, 248)",
-        "background_active": "rgb(0, 74, 173)",
-        "color": "rgb(0, 0, 0)"
-      }
+      "color": "rgb(0, 0, 0)"
     },
     "push_button_enter": {
       "background": "rgb(3, 123, 251)",
       "background_disabled": "rgb(149, 200, 255)",
-      "background_active": "rgb(0, 74, 173)",
+      "background_pressed": "rgb(0, 74, 173)",
       "color": "rgb(255, 255, 255)"
     },
     "push_button_table_results": {
       "background": "rgb(232, 232, 239)",
       "color": "rgb(0, 0, 0)"
+    }
+  },
+  "stack_lesson": {
+    "background_frame_main": "rgb(140, 140, 140)",
+    "label_header": {
+      "background": "rgb(90, 153, 255)",
+      "color": "rgb(255, 255, 255)"
+    },
+    "frame_tools": {
+      "background": "rgb(90, 153, 255)",
+      "push_button_start": {
+        "background": "rgb(3, 123, 251)",
+        "color": "rgb(255, 255, 255)"
+      }
+    },
+    "lesson_graphics_view": {
+      "background": "rgb(140, 140, 140)",
+      "scrollbar": {
+        "background": "rgb(140, 140, 140)",
+        "background_handle": "rgb(3, 123, 255)"
+      }
     }
   },
   "stack_test": {
@@ -112,7 +126,10 @@
     "label_header": {
       "color": "rgb(0, 0, 0)"
     },
-    "label_text": {
+    "label_version": {
+      "color": "rgb(0, 0, 0)"
+    },
+    "label_text_info": {
       "color": "rgb(0, 0, 0)"
     },
     "push_button_ok": {
@@ -133,27 +150,6 @@
     "pushbutton_to_main": {
       "background": "rgb(3, 123, 251)",
       "color": "rgb(255, 255, 255)"
-    }
-  },
-  "stack_lesson": {
-    "background_frame_main": "rgb(140, 140, 140)",
-    "label_header": {
-      "background": "rgb(90, 153, 255)",
-      "color": "rgb(255, 255, 255)"
-    },
-    "frame_tools": {
-      "background": "rgb(90, 153, 255)",
-      "push_button_start": {
-        "background": "rgb(3, 123, 251)",
-        "color": "rgb(255, 255, 255)"
-      }
-    },
-    "lesson_graphics_view": {
-      "background": "rgb(140, 140, 140)",
-      "scrollbar": {
-        "background": "transparent",
-        "background_handle": "rgb(3, 123, 255)"
-      }
     }
   },
   "stack_table_result": {
@@ -179,7 +175,7 @@
       "color_item2_table": "rgb(0, 0, 0)",
       "color_border": "rgb(100, 100, 100)",
       "scrollbar": {
-        "background": "transparent",
+        "background": "rgb(255, 255, 255)",
         "background_handle": "rgb(3, 123, 255)"
       }
     }

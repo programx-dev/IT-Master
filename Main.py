@@ -53,7 +53,16 @@ class Main(QtWidgets.QMainWindow):
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
         # создание страницы входа
-        self.current_stack = StackLogin.StackLogin(path_cources = self.path_cources, path_imgs = self.path_imgs, data_theme = self.data_theme["stack_login"], func_start = self.open_lesson, func_table_results = self.open_table_result)
+        self.current_stack = StackLogin.StackLogin(
+            path_cources = self.path_cources, 
+            path_imgs = self.path_imgs, 
+            data_theme = self.data_theme["stack_login"], 
+            func_start = self.start, 
+            func_table_results = self.open_table_result, 
+            surname = self.data_loggin.surname, 
+            name = self.data_loggin.name,
+            class_name = self.data_loggin.class_name
+        )
 
         # виджет стеков для страниц
         self.stacked_widget = QtWidgets.QStackedWidget()
@@ -74,7 +83,7 @@ class Main(QtWidgets.QMainWindow):
 
         self.path_theme = self.data["path_theme"]
 
-        # получение настроек темы
+        # получение настроек цветовой темы
         with open(self.path_theme, "r", encoding = "utf-8") as file:
             self.data_theme = json.load(file)
 
@@ -83,9 +92,14 @@ class Main(QtWidgets.QMainWindow):
         self.path_database = self.data["path_database"]
         self.path_image_logo = os.path.join(self.path_imgs, r"logo.png")
 
-        self.data_loggin = None
+        self.data_loggin = DataLoggin(
+            name = None,
+            surname = None,
+            class_name = None,
+            path_course = None
+        )
 
-        # создание БД
+        # создание БД если её нет
         with sqlite3.connect(self.path_database) as db:
             cursor = db.cursor()
 
@@ -109,7 +123,7 @@ class Main(QtWidgets.QMainWindow):
         with sqlite3.connect(self.path_database) as db:
             cursor = db.cursor()
 
-            cursor.execute("""SELECT * FROM users""")
+            cursor.execute("""SELECT date_end FROM users""")
             amount_rows = i if (i := len(cursor.fetchall()) - 100) > 0 else 0
 
             cursor.execute("""DELETE FROM users WHERE date_end IN (SELECT date_end FROM users ORDER BY date_end ASC LIMIT ?)""", (amount_rows, ))
@@ -176,7 +190,7 @@ class Main(QtWidgets.QMainWindow):
         # удаление старого окна
         self.stacked_widget.removeWidget(self.current_stack)
 
-        # создание и упаковка нового окна
+        # создание и упаковка окна результата выполнения
         self.current_stack = StackResult.StackResult(data = data_result, data_theme = self.data_theme["stack_result"], func = self.to_main)
 
         self.stacked_widget.addWidget(self.current_stack)
@@ -186,23 +200,30 @@ class Main(QtWidgets.QMainWindow):
         # удаление старого окна
         self.stacked_widget.removeWidget(self.current_stack)
 
-        # создание и упаковка нового окна
+        # создание и упаковка окна с тестом
         self.current_stack = StackTest.StackTest(func = self.finish_test, path_imgs = self.path_imgs, data_theme = self.data_theme["stack_test"], path_course = self.data_loggin.path_course)
 
         self.stacked_widget.addWidget(self.current_stack)
         self.stacked_widget.setCurrentWidget(self.current_stack)
 
-    def open_table_result(self):
-         # удаление старого окна
+    def open_table_result(self, data: StackLogin.DataPassage):
+        self.data_loggin = DataLoggin(
+            name = data.name,
+            surname = data.surname,
+            class_name = data.class_name,
+            path_course = data.path_course
+        )
+
+        # удаление старого окна
         self.stacked_widget.removeWidget(self.current_stack)
 
-        # создание и упаковка нового окна
+        # создание и упаковка окна с таблицей результатов
         self.current_stack = StackTableResults.StackTableResults(path_database = self.path_database, func = self.to_main, data_theme = self.data_theme["stack_table_result"])
 
         self.stacked_widget.addWidget(self.current_stack)
         self.stacked_widget.setCurrentWidget(self.current_stack)
 
-    def open_lesson(self, data: StackLogin.DataPassage):
+    def start(self, data: StackLogin.DataPassage):
         self.data_loggin = DataLoggin(
             name = data.name,
             surname = data.surname,
@@ -215,28 +236,42 @@ class Main(QtWidgets.QMainWindow):
         root = tree.getroot()
 
         if root.find("lesson") != None:
-            # удаление старого окна
-            self.stacked_widget.removeWidget(self.current_stack)
-
-            # создание и упаковка нового окна
-            self.current_stack = StackLesson.StackLesson(path_course = self.data_loggin.path_course, data_theme = self.data_theme["stack_lesson"], func = self.start_test)
-
-            self.stacked_widget.addWidget(self.current_stack)
-            self.stacked_widget.setCurrentWidget(self.current_stack)
-
-            self.current_stack.load_lesson()
+            self.open_lesson()
         else:
             self.start_test()
 
+    def open_lesson(self):
+        # удаление старого окна
+        self.stacked_widget.removeWidget(self.current_stack)
+
+        tree = ET.parse(self.data_loggin.path_course)
+        root = tree.getroot()
+        path_lesson = os.path.join(os.path.split(self.data_loggin.path_course)[0], root.find("lesson").text).replace("\\", "/")
+
+        # создание и упаковка окна урока
+        self.current_stack = StackLesson.StackLesson(path_lesson = path_lesson, data_theme = self.data_theme["stack_lesson"], func = self.start_test)
+
+        self.stacked_widget.addWidget(self.current_stack)
+        self.stacked_widget.setCurrentWidget(self.current_stack)
+
+        # показать урок
+        self.current_stack.load_lesson()
+        
     def to_main(self):
         # удаление старого окна
         self.stacked_widget.removeWidget(self.current_stack)
 
-         # создание и упаковка нового окна
-        if self.data_loggin != None:
-            self.current_stack = StackLogin.StackLogin(path_cources = self.path_cources, path_imgs = self.path_imgs, data_theme = self.data_theme["stack_login"], func_start = self.open_lesson, func_table_results = self.open_table_result, name = self.data_loggin.name, surname = self.data_loggin.surname, class_name = self.data_loggin.class_name)
-        else:
-            self.current_stack = StackLogin.StackLogin(path_cources = self.path_cources, path_imgs = self.path_imgs, data_theme = self.data_theme["stack_login"], func_start = self.open_lesson, func_table_results = self.open_table_result)
+        # создание и упаковка окна входа
+        self.current_stack = StackLogin.StackLogin(
+            path_cources = self.path_cources, 
+            path_imgs = self.path_imgs, 
+            data_theme = self.data_theme["stack_login"], 
+            func_start = self.start, 
+            func_table_results = self.open_table_result, 
+            surname = self.data_loggin.surname, 
+            name = self.data_loggin.name,
+            class_name = self.data_loggin.class_name
+        )
 
         self.stacked_widget.addWidget(self.current_stack)
         self.stacked_widget.setCurrentWidget(self.current_stack)
@@ -245,13 +280,16 @@ class Main(QtWidgets.QMainWindow):
         if event.key() == QtCore.Qt.Key_Escape:
             self.open_dialog_menu()
 
+    def exit_app(self):
+        sys.exit()
+
     def open_dialog_info(self):
         dialog = Dialogs.DialogInfo(data_theme = self.data_theme["dialog_info"], path_logo = self.path_image_logo, parent = self)
 
     def open_dialog_menu(self):
         dialog = Dialogs.DialogMenu(data_theme = self.data_theme["dialog_menu"], parent = self)
 
-        dialog.clicked_exit.connect(sys.exit)
+        dialog.clicked_exit.connect(self.exit_app)
         dialog.clicked_info.connect(self.open_dialog_info)
 
 if __name__ == "__main__":

@@ -27,8 +27,10 @@ class DialogMenu(QtWidgets.QDialog):
         self.grid_layout_main.setSpacing(0)
         self.grid_layout_main.setContentsMargins(0, 0, 0, 0)
         self.grid_layout_main.setRowStretch(0, 0)
+        self.grid_layout_main.setRowStretch(1, 1)
         self.grid_layout_main.setRowStretch(2, 0)
         self.grid_layout_main.setColumnStretch(0, 0)
+        self.grid_layout_main.setColumnStretch(1, 1)
         self.grid_layout_main.setColumnStretch(2, 0)
 
         self.setLayout(self.grid_layout_main)
@@ -42,11 +44,11 @@ class DialogMenu(QtWidgets.QDialog):
         self.grid_layout_main.addWidget(self.frame_main, 1, 1)
 
         # внутренний макет
-        self.vbox_layout = QtWidgets.QVBoxLayout()
-        self.vbox_layout.setSpacing(0)
-        self.vbox_layout.setContentsMargins(0, 0, 0, 0)
+        self.vbox_layout_internal = QtWidgets.QVBoxLayout()
+        self.vbox_layout_internal.setSpacing(0)
+        self.vbox_layout_internal.setContentsMargins(0, 0, 0, 0)
 
-        self.frame_main.setLayout(self.vbox_layout)
+        self.frame_main.setLayout(self.vbox_layout_internal)
 
         # метка меню
         self.label_header = QtWidgets.QLabel()
@@ -55,41 +57,43 @@ class DialogMenu(QtWidgets.QDialog):
         self.label_header.setText("Меню")
         self.label_header.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.vbox_layout.addWidget(self.label_header)
-        self.vbox_layout.addSpacing(20)
+        self.vbox_layout_internal.addWidget(self.label_header)
+        self.vbox_layout_internal.addSpacing(20)
 
         # кнопка отменить
         self.push_button_cancel = QtWidgets.QPushButton()
         self.push_button_cancel.setObjectName("push_button_cancel")
         self.push_button_cancel.clicked.connect(self.clicked_push_button_cancel)
         self.push_button_cancel.setFont(self.font_widgets)
-        self.push_button_cancel.setMinimumHeight(self.min_height)
+        self.push_button_cancel.setFixedHeight(self.fixed_height)
         self.push_button_cancel.setText("Отмена")
+        self.push_button_cancel.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        self.vbox_layout.addWidget(self.push_button_cancel)
-        self.vbox_layout.addSpacing(15)
+        self.vbox_layout_internal.addWidget(self.push_button_cancel)
+        self.vbox_layout_internal.addSpacing(15)
 
         # кнопка о программе
         self.push_button_info = QtWidgets.QPushButton()
         self.push_button_info.setObjectName("push_button_info")
         self.push_button_info.clicked.connect(self.clicked_push_button_info)
         self.push_button_info.setFont(self.font_widgets)
-        self.push_button_info.setMinimumHeight(self.min_height)
+        self.push_button_info.setFixedHeight(self.fixed_height)
         self.push_button_info.setText("О программе")
+        self.push_button_info.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        self.vbox_layout.addWidget(self.push_button_info)
-        self.vbox_layout.addSpacing(15)
+        self.vbox_layout_internal.addWidget(self.push_button_info)
+        self.vbox_layout_internal.addSpacing(15)
 
         # кнопка выход
         self.push_button_exit = QtWidgets.QPushButton()
         self.push_button_exit.setObjectName("push_button_exit")
         self.push_button_exit.clicked.connect(self.clicked_push_button_exit)
         self.push_button_exit.setFont(self.font_widgets)
-        self.push_button_exit.setMinimumHeight(self.min_height)
-        self.push_button_exit.setDefault(True)
+        self.push_button_exit.setFixedHeight(self.fixed_height)
         self.push_button_exit.setText("Выйти")
+        self.push_button_exit.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        self.vbox_layout.addWidget(self.push_button_exit)
+        self.vbox_layout_internal.addWidget(self.push_button_exit)
 
         self.set_style_sheet()
 
@@ -110,7 +114,7 @@ class DialogMenu(QtWidgets.QDialog):
         self.clicked_cancel.emit()
 
     def init_variables(self):
-        self.min_height = 42
+        self.fixed_height = 42
         self.font_widgets = QtGui.QFont("Segoe UI", 14)
         self.font_label_header = QtGui.QFont("Segoe UI", 24, weight = QtGui.QFont.Bold)
 
@@ -161,7 +165,7 @@ class DialogMenu(QtWidgets.QDialog):
         } """ % self.data_theme["push_button_exit"])
 
 class DialogInfo(QtWidgets.QDialog):
-    clicked_cancel = QtCore.pyqtSignal()
+    clicked_ok = QtCore.pyqtSignal()
     def __init__(self, data_theme: dict, path_logo: str, parent = None):
         self.parent = parent
 
@@ -186,8 +190,10 @@ class DialogInfo(QtWidgets.QDialog):
         self.grid_layout_main.setSpacing(0)
         self.grid_layout_main.setContentsMargins(0, 0, 0, 0)
         self.grid_layout_main.setRowStretch(0, 0)
+        self.grid_layout_main.setRowStretch(1, 1)
         self.grid_layout_main.setRowStretch(2, 0)
         self.grid_layout_main.setColumnStretch(0, 0)
+        self.grid_layout_main.setColumnStretch(1, 1)
         self.grid_layout_main.setColumnStretch(2, 0)
 
         self.setLayout(self.grid_layout_main)
@@ -195,24 +201,24 @@ class DialogInfo(QtWidgets.QDialog):
         # главная рамка
         self.frame_main = QtWidgets.QFrame()
         self.frame_main.setObjectName("frame_main")
-        self.frame_main.setContentsMargins(30, 30, 30, 30)
-        self.frame_main.setMinimumWidth(1000)
+        self.frame_main.setContentsMargins(0, 0, 0, 0)
+        self.frame_main.setFixedWidth(550)
 
         self.grid_layout_main.addWidget(self.frame_main, 1, 1)
 
-        # главный макет
-        self.hbox_layout = QtWidgets.QHBoxLayout()
-        self.hbox_layout.setSpacing(0)
-        self.hbox_layout.setContentsMargins(0, 0, 0, 0)
+        # внутренний макет
+        self.vbox_layout_internal = QtWidgets.QVBoxLayout()
+        self.vbox_layout_internal.setSpacing(0)
+        self.vbox_layout_internal.setContentsMargins(30, 30, 30, 30)
 
-        self.frame_main.setLayout(self.hbox_layout)
+        self.frame_main.setLayout(self.vbox_layout_internal)
 
-        # макет метки с логотипом
-        self.vbox_layout_logo = QtWidgets.QVBoxLayout()
-        self.vbox_layout_logo.setSpacing(0)
-        self.vbox_layout_logo.setContentsMargins(30, 30, 30, 30)
+        # макет логотипа и меток заголовка с версией
+        self.hbox_layout_header = QtWidgets.QHBoxLayout()
+        self.hbox_layout_header.setSpacing(0)
+        self.hbox_layout_header.setContentsMargins(0, 0, 0, 0)
 
-        self.hbox_layout.addLayout(self.vbox_layout_logo)
+        self.vbox_layout_internal.addLayout(self.hbox_layout_header)
 
         # метка с логотипом
         self.label_logo = QtWidgets.QLabel()
@@ -220,19 +226,21 @@ class DialogInfo(QtWidgets.QDialog):
         self.label_logo.setAlignment(QtCore.Qt.AlignCenter)
 
         self.logo = QtGui.QPixmap(self.path_logo)
-        self.logo = self.logo.scaled(200, 200)
+        self.logo = self.logo.scaled(110, 110)
 
         self.label_logo.setPixmap(self.logo)
         self.label_logo.setFixedSize(self.logo.width(), self.logo.height())
 
-        self.vbox_layout_logo.addWidget(self.label_logo)
+        self.hbox_layout_header.addWidget(self.label_logo)
 
-        # макет для текста
-        self.vbox_layout_text = QtWidgets.QVBoxLayout()
-        self.vbox_layout_text.setSpacing(0)
-        self.vbox_layout_text.setContentsMargins(0, 0, 0, 0)
+        # макет меток заголовка и версии
+        self.vbox_layout_text_header = QtWidgets.QVBoxLayout()
+        self.vbox_layout_text_header.setSpacing(0)
+        self.vbox_layout_text_header.setContentsMargins(0, 0, 0, 0)
 
-        self.hbox_layout.addLayout(self.vbox_layout_text)
+        self.hbox_layout_header.addLayout(self.vbox_layout_text_header)
+
+        self.vbox_layout_text_header.addStretch(1)
 
         # метка заголовка
         self.label_header = QtWidgets.QLabel()
@@ -241,38 +249,49 @@ class DialogInfo(QtWidgets.QDialog):
         self.label_header.setText("IT Master")
         self.label_header.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
-        self.vbox_layout_text.addWidget(self.label_header)
-        self.vbox_layout_text.addSpacing(30)
+        self.vbox_layout_text_header.addWidget(self.label_header)
+        self.vbox_layout_text_header.addSpacing(10)
 
-        # метка с текстом
-        self.label_text = QtWidgets.QLabel()
-        self.label_text.setFont(self.font_label_text)
-        self.label_text.setObjectName("label_text")
-        self.label_text.setText(self.info_test)
-        self.label_text.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        self.label_text.setWordWrap(True)
+        # метка версии
+        self.label_version = QtWidgets.QLabel()
+        self.label_version.setFont(self.font_label_version)
+        self.label_version.setObjectName("label_version")
+        self.label_version.setText("Версия 2.2")
+        self.label_version.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
-        self.vbox_layout_text.addWidget(self.label_text)
-        self.vbox_layout_text.addSpacing(30)
+        self.vbox_layout_text_header.addWidget(self.label_version)
+        self.vbox_layout_text_header.addStretch(1)
+
+        self.vbox_layout_internal.addSpacing(10)
+
+        # метка с текстом с информацией
+        self.label_text_info = QtWidgets.QLabel()
+        self.label_text_info.setFont(self.font_label_text)
+        self.label_text_info.setObjectName("label_text_info")
+        self.label_text_info.setWordWrap(True)
+        self.label_text_info.setText(self.info_test)
+        self.label_text_info.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+
+        self.vbox_layout_internal.addWidget(self.label_text_info)
+        self.vbox_layout_internal.addSpacing(20)
 
         # макет инстументов
         self.hbox_layout_tools = QtWidgets.QHBoxLayout()
         self.hbox_layout_tools.setSpacing(0)
         self.hbox_layout_tools.setContentsMargins(0, 0, 0, 0)
 
-        self.vbox_layout_text.addLayout(self.hbox_layout_tools)
+        self.vbox_layout_internal.addLayout(self.hbox_layout_tools)
 
         self.hbox_layout_tools.addStretch(1)
 
         # кнопка ок
         self.push_button_ok = QtWidgets.QPushButton()
         self.push_button_ok.setObjectName("push_button_ok")
-        self.push_button_ok.clicked.connect(self.clicked_push_button_cancel)
+        self.push_button_ok.clicked.connect(self.clicked_push_button_ok)
         self.push_button_ok.setFont(self.font_widgets)
-        self.push_button_ok.setMinimumHeight(self.min_height)
-        self.push_button_ok.setMinimumWidth(self.min_width)
-        self.push_button_ok.setDefault(True)
-        self.push_button_ok.setText("ОК")
+        self.push_button_ok.setFixedSize(self.fixed_width, self.fixed_height)
+        self.push_button_ok.setText("Оk")
+        self.push_button_ok.setFocusPolicy(QtCore.Qt.NoFocus)
 
         self.hbox_layout_tools.addWidget(self.push_button_ok)
 
@@ -283,20 +302,20 @@ class DialogInfo(QtWidgets.QDialog):
         self.move(QtCore.QPoint(self.parent.geometry().getCoords()[0], self.parent.geometry().getCoords()[1]) + self.parent.rect().center() - self.rect().center())
        
     def init_variables(self):
-        self.min_height = 42
-        self.min_width = 142
+        self.fixed_width = 142
+        self.fixed_height = 42
         self.font_widgets = QtGui.QFont("Segoe UI", 12)
+        self.font_label_version = QtGui.QFont("Segoe UI", 11)
         self.font_label_header = QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Bold)
-        self.font_label_text = QtGui.QFont("Segoe UI", 12)
+        self.font_label_text = QtGui.QFont("Segoe UI", 11)
 
-        self.info_test = """Версия 2.1
+        self.info_test = """IT Master - это школьный предметный тренажёр по информатике, позволяющий изучить материал урока и закрепить полученные знания, выполнив тест\n
 Ведущий программист - Смирнов Н. А., 9 класс, ГБОУ школа №1370\n
-IT Master - это школьный предметный тренажёр по информатике, позволяющий прочитать урок по теме и закрепить полученные знания, выполнив тест\n
 Приложение написано на языке программирования Python"""
 
-    def clicked_push_button_cancel(self):
+    def clicked_push_button_ok(self):
         self.close()
-        self.clicked_cancel.emit()
+        self.clicked_ok.emit()
 
     def set_style_sheet(self):
         # главная рамка
@@ -314,11 +333,17 @@ IT Master - это школьный предметный тренажёр по �
             color: %(color)s;
         } """ % self.data_theme["label_header"])
 
-        # метка с текстом
-        self.label_text.setStyleSheet("""
-        #label_text {
+        # метка версии
+        self.label_version.setStyleSheet("""
+        #label_version {
             color: %(color)s;
-        } """ % self.data_theme["label_text"])
+        } """ % self.data_theme["label_version"])
+
+        # метка с текстом с информацией
+        self.label_text_info.setStyleSheet("""
+        #label_text_info {
+            color: %(color)s;
+        } """ % self.data_theme["label_text_info"])
 
         # кнопка ок
         self.push_button_ok.setStyleSheet("""
