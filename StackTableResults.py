@@ -144,7 +144,7 @@ class StackTableResults(QtWidgets.QWidget):
                 list_table_items = []
 
                 # время начала
-                list_table_items.append(data[0])
+                list_table_items.append(datetime.datetime.strptime(data[0], r"%Y.%m.%d %H:%M").strftime(r"%d.%m.%Y %H:%M"))
 
                 # время прохождения
                 date_start = datetime.datetime.strptime(data[0], r"%Y.%m.%d %H:%M")
