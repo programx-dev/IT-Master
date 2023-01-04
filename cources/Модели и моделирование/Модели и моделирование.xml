@@ -4,7 +4,7 @@
 	<exercise>
 		<title>Описания предметов, ситуаций, событий, процессов на естественных языках – это:</title>
 		<questions>
-			<type>radiobutton</type>
+			<type>radio_button</type>
 			<question>логические модели</question>
 			<question>алгебраические модели</question>
 			<question>геометрические модели</question>
@@ -18,21 +18,21 @@
 	<exercise>
 		<title>Замена реального объекта его формальным описанием – это:</title>
 		<questions>
-			<type>radiobutton</type>
+			<type>radio_button</type>
 			<question>моделирование</question>
 			<question>анализ</question>
 			<question>формализация</question>
 			<question>алгоритмизация</question>
 		</questions>
 		<answers>
-			<answer>моделирование</answer>
+			<answer>формализация</answer>
 		</answers>
 	</exercise>
 
 	<exercise>
 		<title>Выберите знаковую модель:</title>
 		<questions>
-			<type>radiobutton</type>
+			<type>radio_button</type>
 			<question>таблица</question>
 			<question>формула</question>
 			<question>рисунок</question>
@@ -46,7 +46,7 @@
 	<exercise>
 		<title>Выберите элемент информационной модели учащегося, существенный для выставления ему оценки за контрольную работу по информатике:</title>
 		<questions>
-			<type>radiobutton</type>
+			<type>radio_button</type>
 			<question>Время, затраченное на выполнение контрольной работы</question>
 			<question>Наличие компьютера</question>
 			<question>Количество правильно выполненных заданий</question>
@@ -59,7 +59,7 @@
 	<exercise>
 		<title>Файловая система персонального компьютера наиболее адекватно может быть описана в виде:</title>
 		<questions>
-			<type>radiobutton</type>
+			<type>radio_button</type>
 			<question>иерархической модели</question>
 			<question>табличной модели</question>
 			<question>натурной модели</question>
@@ -72,7 +72,7 @@
 	<exercise>
 		<title>Модели, реализованные с помощью систем программирования, электронных таблиц, специализированных математических пакетов и программных средств для моделирования, называются:</title>
 		<questions>
-			<type>radiobutton</type>
+			<type>radio_button</type>
 			<question>имитационными моделями</question>
 			<question>экономическими моделями</question>
 			<question>математическими моделями</question>
@@ -86,7 +86,7 @@
 	<exercise>
 		<title>База данных – это:</title>
 		<questions>
-			<type>radiobutton</type>
+			<type>radio_button</type>
 			<question>набор данных, собранных на одной дискете</question>
 			<question>таблица, позволяющая хранить и обрабатывать данные и формулы</question>
 			<question>совокупность данных, организованных по определённым правилам, предназначенная для хранения во внешней памяти компьютера и постоянного применения</question>
@@ -99,7 +99,7 @@
 	<exercise>
 		<title>Строка таблицы, содержащая информацию об одном конкретном объекте, – это</title>
 		<questions>
-			<type>radiobutton</type>
+			<type>radio_button</type>
 			<question>ключ</question>
 			<question>отчет</question>
 			<question>запись</question>
@@ -113,7 +113,7 @@
 	<exercise>
 		<title>Столбец таблицы, содержащий определенную характеристику объекта – это:</title>
 		<questions>
-			<type>radiobutton</type>
+			<type>radio_button</type>
 			<question>поле</question>
 			<question>запись</question>
 			<question>ключ</question>
@@ -127,7 +127,7 @@
 	<exercise>
 		<title>Графической моделью иерархической системы является:</title>
 		<questions>
-			<type>radiobutton</type>
+			<type>radio_button</type>
 			<question>цепь</question>
 			<question>сеть</question>
 			<question>дерево</question>

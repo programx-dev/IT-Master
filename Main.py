@@ -1,9 +1,13 @@
+__version_app__ = "2.4"
+__name_app__ = "IT Master"
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 import StackLogin
 import StackLesson
 import StackTest
 import StackResult
 import StackTableResults
+import Window
 import Dialogs
 import os
 import sys
@@ -40,22 +44,24 @@ class DataLoggin:
     class_name: str
     path_course: str   
 
-class Main(QtWidgets.QMainWindow):
+class Main(Window.Window):
     def __init__(self):
-        super().__init__()
-
         self.init_variables()
 
-        self.setObjectName("main_window")
-        self.setWindowTitle("IT Master")
+        super().__init__(data_theme = self.data_theme["titlebar"])
+
+        self.setWindowTitle(__name_app__)
         self.setWindowIcon(QtGui.QIcon(self.path_image_logo))
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
+        self.set_title(__name_app__)
+        self.set_icon(QtGui.QPixmap(self.path_image_logo))
+
+        self.open_info.connect(self.open_dialog_info)
 
         # создание страницы входа
         self.current_stack = StackLogin.StackLogin(
             path_cources = self.path_cources, 
-            path_imgs = self.path_imgs, 
+            path_images = self.path_images, 
             data_theme = self.data_theme["stack_login"], 
             func_start = self.start, 
             func_table_results = self.open_table_result, 
@@ -68,14 +74,20 @@ class Main(QtWidgets.QMainWindow):
         self.stacked_widget = QtWidgets.QStackedWidget()
         self.stacked_widget.setObjectName("stacked_widget")
 
-        self.setCentralWidget(self.stacked_widget)
+        self.add_widget(self.stacked_widget)
 
         # добавление страницы входа в виджет стеков
         self.stacked_widget.addWidget(self.current_stack)
         self.stacked_widget.setCurrentWidget(self.current_stack)
 
     def init_variables(self):
+        self.text_info = f"""{__name_app__} - это школьный предметный тренажёр по информатике, позволяющий изучить материал урока и закрепить полученные знания, выполнив тест\n
+Ведущий разрабочик - Смирнов Н. А., 9 класс, ГБОУ школа №1370\n
+Приложение написано на языке программирования Python"""
+
         self.path_settings = r"settings.json"
+
+        self.test_started = False
 
         # получение настроек
         with open(self.path_settings, "r", encoding = "utf-8") as file:
@@ -88,9 +100,9 @@ class Main(QtWidgets.QMainWindow):
             self.data_theme = json.load(file)
 
         self.path_cources = self.data["path_cources"]
-        self.path_imgs = self.data["path_imgs"]
+        self.path_images = self.data["path_images"]
         self.path_database = self.data["path_database"]
-        self.path_image_logo = os.path.join(self.path_imgs, r"logo.png")
+        self.path_image_logo = os.path.join(self.path_images, r"logo.png")
 
         self.data_loggin = DataLoggin(
             name = None,
@@ -134,8 +146,8 @@ class Main(QtWidgets.QMainWindow):
             cursor = db.cursor()
 
             values = (
-                data.date_start.strftime(r"%d.%m.%Y %H:%M"),
-                data.date_end.strftime(r"%d.%m.%Y %H:%M"),
+                data.date_start.strftime(r"%Y.%m.%d %H:%M"),
+                data.date_end.strftime(r"%Y.%m.%d %H:%M"),
                 data.name,
                 data.surname,
                 data.class_name,
@@ -164,6 +176,8 @@ class Main(QtWidgets.QMainWindow):
         self.delete_old_record()
 
     def finish_test(self, data: StackTest.DataPassage):
+        self.test_started = False
+
         # получение данных о прохождении
         data_save = DataSave(
             name = self.data_loggin.name,
@@ -197,11 +211,13 @@ class Main(QtWidgets.QMainWindow):
         self.stacked_widget.setCurrentWidget(self.current_stack)
 
     def start_test(self):
+        self.test_started = True
+
         # удаление старого окна
         self.stacked_widget.removeWidget(self.current_stack)
 
         # создание и упаковка окна с тестом
-        self.current_stack = StackTest.StackTest(func = self.finish_test, path_imgs = self.path_imgs, data_theme = self.data_theme["stack_test"], path_course = self.data_loggin.path_course)
+        self.current_stack = StackTest.StackTest(func = self.finish_test, path_images = self.path_images, data_theme = self.data_theme["stack_test"], path_course = self.data_loggin.path_course)
 
         self.stacked_widget.addWidget(self.current_stack)
         self.stacked_widget.setCurrentWidget(self.current_stack)
@@ -264,7 +280,7 @@ class Main(QtWidgets.QMainWindow):
         # создание и упаковка окна входа
         self.current_stack = StackLogin.StackLogin(
             path_cources = self.path_cources, 
-            path_imgs = self.path_imgs, 
+            path_images = self.path_images, 
             data_theme = self.data_theme["stack_login"], 
             func_start = self.start, 
             func_table_results = self.open_table_result, 
@@ -276,28 +292,36 @@ class Main(QtWidgets.QMainWindow):
         self.stacked_widget.addWidget(self.current_stack)
         self.stacked_widget.setCurrentWidget(self.current_stack)
 
-    def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Escape:
-            self.open_dialog_menu()
-
-    def exit_app(self):
-        sys.exit()
-
     def open_dialog_info(self):
-        dialog = Dialogs.DialogInfo(data_theme = self.data_theme["dialog_info"], path_logo = self.path_image_logo, parent = self)
+        dialog = Dialogs.DialogInfo(
+            data_theme = self.data_theme["dialog_info"],
+            version = f"Версия {__version_app__}",
+            name = __name_app__,
+            text_info = self.text_info,
+            path_logo = self.path_image_logo,
+            parent = self
+        )
 
-    def open_dialog_menu(self):
-        dialog = Dialogs.DialogMenu(data_theme = self.data_theme["dialog_menu"], parent = self)
+    def exit_test(self):
+        self.test_started = False
 
-        dialog.clicked_exit.connect(self.exit_app)
-        dialog.clicked_info.connect(self.open_dialog_info)
+        self.to_main()
+
+    def close_window(self):
+        if self.test_started:
+            dialog = Dialogs.DialogExit(
+                data_theme = self.data_theme["dialog_exit"],
+                parent = self
+            )
+
+            dialog.push_button_clicked_exit.connect(self.exit_test)
+        else:
+            super().close_window()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
     window_main = Main()
-
-    window_main.showMaximized()
-    # window_main.showFullScreen()
+    window_main.show()
 
     sys.exit(app.exec_())

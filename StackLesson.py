@@ -86,6 +86,7 @@ class LessonGraphicsView(QtWidgets.QGraphicsView):
         self.setBackgroundBrush(self.background)
 
         # полоса прокрутки
+        self.data_theme["scrollbar"]["background_handle"] = self.data_theme["scrollbar"]["handle"]["background"]
         self.setStyleSheet("""
         QScrollBar:vertical {
             background-color: %(background)s;
@@ -128,8 +129,6 @@ class StackLesson(QtWidgets.QWidget):
         self.path_lesson = path_lesson
         self.func = func
         self.data_theme = data_theme
-        
-        self.init_variables()
 
         # главная сетка
         self.grid_layout_main = QtWidgets.QGridLayout()
@@ -157,18 +156,33 @@ class StackLesson(QtWidgets.QWidget):
 
         self.frame_main.setLayout(self.vbox_layout_internal)
 
+        # рамка заголовка
+        self.frame_header = QtWidgets.QFrame()
+        self.frame_header.setObjectName("frame_header")
+
+        self.vbox_layout_internal.addWidget(self.frame_header)
+
+        # макет заголовка
+        self.hbox_layout_header = QtWidgets.QHBoxLayout()
+        self.hbox_layout_header.setSpacing(0)
+        self.hbox_layout_header.setContentsMargins(20, 10, 20, 10)
+
+        self.frame_header.setLayout(self.hbox_layout_header)
+
+        self.hbox_layout_header.addStretch(1)
+
         # метка заголовка
         self.label_header = QtWidgets.QLabel()
-        self.label_header.setFont(self.font_label_header)
+        self.label_header.setFont(QtGui.QFont("Segoe UI", 17, weight = QtGui.QFont.Bold))
         self.label_header.setObjectName("label_header")
         self.label_header.setText("Теоретическая часть")
         self.label_header.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
-        self.label_header.setFixedHeight(self.fixed_height_label_header)
 
-        self.vbox_layout_internal.addWidget(self.label_header)
+        self.hbox_layout_header.addWidget(self.label_header)
+        self.hbox_layout_header.addStretch(1)
 
         # виджет просмотра изображений
-        self.lesson_viewer = LessonGraphicsView(path_lesson = self.path_lesson, data_theme = self.data_theme["lesson_graphics_view"])
+        self.lesson_viewer = LessonGraphicsView(path_lesson = self.path_lesson, data_theme = self.data_theme["frame_main"]["lesson_graphics_view"])
 
         self.vbox_layout_internal.addWidget(self.lesson_viewer)
 
@@ -191,8 +205,8 @@ class StackLesson(QtWidgets.QWidget):
         self.push_button_start = QtWidgets.QPushButton()
         self.push_button_start.setObjectName("push_button_start")
         self.push_button_start.clicked.connect(self.func)
-        self.push_button_start.setFont(self.font_push_button_start)
-        self.push_button_start.setFixedHeight(self.fixed_height)
+        self.push_button_start.setFont(QtGui.QFont("Segoe UI", 12))
+        self.push_button_start.setFixedHeight(42)
         self.push_button_start.setText("Начать тест")
         self.push_button_start.setFocusPolicy(QtCore.Qt.NoFocus)
 
@@ -204,27 +218,26 @@ class StackLesson(QtWidgets.QWidget):
     def load_lesson(self):
         self.lesson_viewer.set_image()
 
-    def init_variables(self):
-        self.fixed_height = 42
-        self.fixed_height_label_header = 54
-        self.font_push_button_start = QtGui.QFont("Segoe UI", 14)
-        self.font_label_header = QtGui.QFont("Segoe UI", 17, weight = QtGui.QFont.Bold)
-
     def set_style_sheet(self):
         # главная рамка
         self.frame_main.setStyleSheet("""
         #frame_main {
-            background-color: %(background_frame_main)s;
-        } """ % self.data_theme)
+            background-color: %(background)s;
+        } """ % self.data_theme["frame_main"])
+
+        # рамка заголовка
+        self.frame_header.setStyleSheet("""
+        #frame_header {
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            background-color: %(background)s;
+        } """ % self.data_theme["frame_main"]["frame_header"])
 
         # метка заголовка
         self.label_header.setStyleSheet("""
         #label_header {
-            border-bottom-left-radius: 40px;
-            border-bottom-right-radius: 40px;
-            background-color: %(background)s;
             color: %(color)s;
-        } """ % self.data_theme["label_header"])
+        } """ % self.data_theme["frame_main"]["frame_header"]["label_header"])
 
         # рамка панели инстументов
         self.frame_tools.setStyleSheet("""
@@ -232,7 +245,7 @@ class StackLesson(QtWidgets.QWidget):
             border-top-left-radius: 40px;
             border-top-right-radius: 40px;
             background-color: %(background)s;
-        } """ % self.data_theme["frame_tools"])
+        } """ % self.data_theme["frame_main"]["frame_tools"])
 
         # кнопка начать тест
         self.push_button_start.setStyleSheet("""
@@ -243,4 +256,4 @@ class StackLesson(QtWidgets.QWidget):
             padding-right: 10px;
             background-color: %(background)s; 
             color: %(color)s;
-        } """ % self.data_theme["frame_tools"]["push_button_start"])
+        } """ % self.data_theme["frame_main"]["frame_tools"]["push_button_start"])

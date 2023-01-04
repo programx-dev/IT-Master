@@ -1,11 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sqlite3
 import datetime 
-import string
 import re
-
-class DeltaTemplate(string.Template):
-    delimiter = "%"
 
 class StackTableResults(QtWidgets.QWidget):
     def __init__(self, path_database: str, func: callable, data_theme: dict):
@@ -22,8 +18,10 @@ class StackTableResults(QtWidgets.QWidget):
         self.grid_layout_main.setSpacing(0)
         self.grid_layout_main.setContentsMargins(0, 0, 0, 0)
         self.grid_layout_main.setColumnStretch(0, 0)
+        self.grid_layout_main.setColumnStretch(1, 1)
         self.grid_layout_main.setColumnStretch(2, 0)
         self.grid_layout_main.setRowStretch(0, 0)
+        self.grid_layout_main.setRowStretch(1, 1)
         self.grid_layout_main.setRowStretch(2, 0)
 
         self.setLayout(self.grid_layout_main)
@@ -34,42 +32,56 @@ class StackTableResults(QtWidgets.QWidget):
 
         self.grid_layout_main.addWidget(self.frame_main, 1, 1)
 
-        # главный макет
-        self.vbox_layout_main = QtWidgets.QVBoxLayout()
-        self.vbox_layout_main.setSpacing(0)
-        self.vbox_layout_main.setContentsMargins(0, 0, 0, 0)
+        # внутренний макет
+        self.vbox_layout_internal = QtWidgets.QVBoxLayout()
+        self.vbox_layout_internal.setSpacing(0)
+        self.vbox_layout_internal.setContentsMargins(0, 0, 0, 0)
 
-        self.frame_main.setLayout(self.vbox_layout_main)
+        self.frame_main.setLayout(self.vbox_layout_internal)
+
+        # рамка заголовка
+        self.frame_header = QtWidgets.QFrame()
+        self.frame_header.setObjectName("frame_header")
+
+        self.vbox_layout_internal.addWidget(self.frame_header)
+
+        # макет заголовка
+        self.hbox_layout_header = QtWidgets.QHBoxLayout()
+        self.hbox_layout_header.setSpacing(0)
+        self.hbox_layout_header.setContentsMargins(20, 10, 20, 10)
+
+        self.frame_header.setLayout(self.hbox_layout_header)
+
+        self.hbox_layout_header.addStretch(1)
 
         # метка заголовка
         self.label_header = QtWidgets.QLabel()
-        self.label_header.setFont(self.font_label_header)
+        self.label_header.setFont(QtGui.QFont("Segoe UI", 17, weight = QtGui.QFont.Bold))
         self.label_header.setObjectName("label_header")
-        self.label_header.setText("Таблица результатов")
-        self.label_header.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
-        self.label_header.setMinimumHeight(self.min_height_label_header)
-        self.label_header.setContentsMargins(10, 0, 10, 0)
+        self.label_header.setText("Теоретическая часть")
+        self.label_header.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.vbox_layout_main.addWidget(self.label_header)
+        self.hbox_layout_header.addWidget(self.label_header)
+        self.hbox_layout_header.addStretch(1)
 
         # таблица результатов
         self.table_results = QtWidgets.QTableWidget()
         self.table_results.setObjectName("table_results")
         self.table_results.setColumnCount(10)
         self.table_results.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.table_results.setFont(QtGui.QFont("Segoe UI", 12))
+        self.table_results.horizontalHeader().setFont(QtGui.QFont("Segoe UI", 12))
+        self.table_results.verticalHeader().setFont(QtGui.QFont("Segoe UI", 12))
 
-        self.table_results.setFont(self.font_table_results)
-        self.table_results.horizontalHeader().setFont(self.font_table_results)
-        self.table_results.verticalHeader().setFont(self.font_table_results)
-
-        self.vbox_layout_main.addWidget(self.table_results)
+        self.vbox_layout_internal.addWidget(self.table_results)
 
         # рамка панели инстументов
         self.frame_tools = QtWidgets.QFrame()
         self.frame_tools.setObjectName("frame_tools")
         
-        self.vbox_layout_main.addWidget(self.frame_tools)
+        self.vbox_layout_internal.addWidget(self.frame_tools)
 
+        # макет панели инструментов
         self.hbox_layout_tools = QtWidgets.QHBoxLayout()
         self.hbox_layout_tools.setSpacing(0)
         self.hbox_layout_tools.setContentsMargins(20, 10, 20, 10)
@@ -82,8 +94,8 @@ class StackTableResults(QtWidgets.QWidget):
         self.push_button_to_main = QtWidgets.QPushButton()
         self.push_button_to_main.setObjectName("push_button_to_main")
         self.push_button_to_main.clicked.connect(self.func)
-        self.push_button_to_main.setFont(self.font_push_button_to_main)
-        self.push_button_to_main.setMinimumHeight(self.min_height)
+        self.push_button_to_main.setFont(QtGui.QFont("Segoe UI", 14))
+        self.push_button_to_main.setMinimumHeight(42)
         self.push_button_to_main.setText("На главную")
 
         self.hbox_layout_tools.addWidget(self.push_button_to_main)
@@ -95,34 +107,13 @@ class StackTableResults(QtWidgets.QWidget):
         self.set_style_sheet()
 
     def init_variables(self):
-        self.min_height = 42
-        self.min_height_label_header = 54
-        self.font_push_button_to_main = QtGui.QFont("Segoe UI", 14)
-        self.font_label_header = QtGui.QFont("Segoe UI", 17, weight = QtGui.QFont.Bold)
-        self.font_table_results = QtGui.QFont("Segoe UI", 12)
-
         pattern = re.compile(r"^\s*rgb\s*\(\s*|\s*,\s*|\s*\)\s*$")
 
-        self.background_item1_table = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["table_results"]["background_item1_table"])[1:-1]])
-        self.color_item1_table = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["table_results"]["color_item1_table"])[1:-1]])
+        self.background_even_item_table = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["frame_main"]["table_results"]["even_item"]["background"])[1:-1]])
+        self.color_even_item_table = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["frame_main"]["table_results"]["even_item"]["color"])[1:-1]])
 
-        self.background_item2_table = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["table_results"]["background_item2_table"])[1:-1]])
-        self.color_item2_table = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["table_results"]["color_item2_table"])[1:-1]])
-
-    def strfdelta(self, td: datetime.timedelta, fmt: str) -> str:
-        sec = abs(td).total_seconds()
-
-        days, rem = divmod(sec, 86400)
-        hours, rem = divmod(rem, 3600)
-        mins, sec = divmod(rem, 60)
-
-        t = DeltaTemplate(fmt)
-        return t.substitute(
-            D = "{:d}".format(int(days)),
-            H = "{:02d}".format(int(hours)),
-            M = "{:02d}".format(int(mins)),
-            S = "{:02d}".format(int(sec))
-        )
+        self.background_odd_item_table = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["frame_main"]["table_results"]["odd_item"]["background"])[1:-1]])
+        self.color_odd_item_table = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["frame_main"]["table_results"]["odd_item"]["color"])[1:-1]])
 
     def create_table_results(self):
         self.table_results.setHorizontalHeaderLabels([
@@ -131,8 +122,8 @@ class StackTableResults(QtWidgets.QWidget):
             "Имя",
             "Фамилия",
             "Класс",
-            "Курс",
-            "результат, %",
+            "Урок",
+            "Результат",
             "Верных",
             "Неверных",
             "Пропущенных"
@@ -150,70 +141,58 @@ class StackTableResults(QtWidgets.QWidget):
 
             for row in range(len(list_users)):
                 data = list_users[row]
-                # дата начала
-                table_item = QtWidgets.QTableWidgetItem(data[0])
-                self.table_results.setItem(row, 0, table_item)
+                list_table_items = []
+
+                # время начала
+                list_table_items.append(data[0])
 
                 # время прохождения
-                date_start = datetime.datetime.strptime(data[0], r"%d.%m.%Y %H:%M")
-                date_end = datetime.datetime.strptime(data[1], r"%d.%m.%Y %H:%M")
+                date_start = datetime.datetime.strptime(data[0], r"%Y.%m.%d %H:%M")
+                date_end = datetime.datetime.strptime(data[1], r"%Y.%m.%d %H:%M")
 
                 time_delta = date_end - date_start
-                time_duration = self.strfdelta(td = time_delta, fmt = r"%H:%M:%S")
+                time_duration = int(time_delta.total_seconds() // 60)
 
-                table_item = QtWidgets.QTableWidgetItem(time_duration)
-                self.table_results.setItem(row, 1, table_item)
+                list_table_items.append(f"{time_duration} минут")
 
                 # фамилия
-                table_item = QtWidgets.QTableWidgetItem(data[2])
-                self.table_results.setItem(row, 2, table_item)
+                list_table_items.append(data[2])
 
                 # имя
-                table_item = QtWidgets.QTableWidgetItem(data[3])
-                self.table_results.setItem(row, 3, table_item)
+                list_table_items.append(data[3])
 
                 # класс
-                table_item = QtWidgets.QTableWidgetItem(data[4])
-                self.table_results.setItem(row, 4, table_item)
+                list_table_items.append(data[4])
 
-                # курс
-                table_item = QtWidgets.QTableWidgetItem(data[5])
-                self.table_results.setItem(row, 5, table_item)
+                # урок
+                list_table_items.append(data[5])
 
-                # результат, %
-                table_item = QtWidgets.QTableWidgetItem(str(data[10]))
-                self.table_results.setItem(row, 6, table_item)
+                # результат
+                list_table_items.append(f"{data[10]} %")
 
                 # верных
-                table_item = QtWidgets.QTableWidgetItem(str(data[7]))
-                self.table_results.setItem(row, 7, table_item)
+                list_table_items.append(str(data[7]))
 
                 # неверных
-                table_item = QtWidgets.QTableWidgetItem(str(data[8]))
-                self.table_results.setItem(row, 8, table_item)
+                list_table_items.append(str(data[8]))
 
                 # пропущенных
-                table_item = QtWidgets.QTableWidgetItem(str(data[9]))
-                self.table_results.setItem(row, 9, table_item)
+                list_table_items.append(str(data[9]))
 
+                # чередование цветов строк
                 if row % 2 == 0:
-                    background = QtGui.QColor(222, 234, 246)
-                    color = QtGui.QColor(0, 0, 0)
+                    background = self.background_even_item_table
+                    color = self.color_even_item_table
                 else:
-                    background = QtGui.QColor(255, 255, 255)
-                    color = QtGui.QColor(0, 0, 0)
-
-                # установить цвет
-                if row % 2 == 0:
-                    background = self.background_item1_table
-                    color = self.color_item1_table
-                else:
-                    background = self.background_item2_table
-                    color = self.color_item2_table
+                    background = self.background_odd_item_table
+                    color = self.color_odd_item_table
 
                 for i in range(10):
-                    self.table_results.item(row, i).setBackground(background)
-                    self.table_results.item(row, i).setForeground(color)
+                    table_item = QtWidgets.QTableWidgetItem(list_table_items[i])
+                    self.table_results.setItem(row, i, table_item)
+
+                    table_item.setBackground(background)
+                    table_item.setForeground(color)
 
         self.table_results.resizeColumnsToContents()
 
@@ -221,25 +200,30 @@ class StackTableResults(QtWidgets.QWidget):
         # главная рамка
         self.frame_main.setStyleSheet("""
         #frame_main {
-            background-color: %(background_frame_main)s;
-        } """ % self.data_theme)
+            background: %(background)s;
+        } """ % self.data_theme["frame_main"])
+
+        # рамка заголовка
+        self.frame_header.setStyleSheet("""
+        #frame_header {
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            background: %(background)s;
+        } """ % self.data_theme["frame_main"]["frame_header"])
 
         # метка заголовка
         self.label_header.setStyleSheet("""
         #label_header {
-            border-bottom-left-radius: 40px;
-            border-bottom-right-radius: 40px;
-            background-color: %(background)s;
             color: %(color)s;
-        } """ % self.data_theme["label_header"])
+        } """ % self.data_theme["frame_main"]["frame_header"]["label_header"])
 
         # рамка панели инстументов
         self.frame_tools.setStyleSheet("""
         #frame_tools {
             border-top-left-radius: 40px;
             border-top-right-radius: 40px;
-            background-color: %(background)s;
-        } """ % self.data_theme["frame_tools"])
+            background: %(background)s;
+        } """ % self.data_theme["frame_main"]["frame_tools"])
 
         # кнопка на главную
         self.push_button_to_main.setStyleSheet("""
@@ -248,42 +232,43 @@ class StackTableResults(QtWidgets.QWidget):
             border-radius: 7px; 
             padding-left: 10px;
             padding-right: 10px;
-            background-color: %(background)s; 
+            background: %(background)s; 
             color: %(color)s;
-        } """ % self.data_theme["frame_tools"]["push_button_to_main"])
+        } """ % self.data_theme["frame_main"]["frame_tools"]["push_button_to_main"])
 
         # таблица результатов
         self.table_results.horizontalHeader().setStyleSheet("""
         ::section:horizontal {
-            background-color: %(background_header_table)s;
-            color: %(color_header_table)s;
+            background:  %(background)s;
+            color: %(color)s;
             border: none;
-        } """ % self.data_theme["table_results"])
+        } """ % self.data_theme["frame_main"]["table_results"]["header"])
 
         self.table_results.verticalHeader().setStyleSheet("""
         ::section:vertical {
-            background-color:  %(background_header_table)s;
-            color: %(color_header_table)s;
+            background:  %(background)s;
+            color: %(color)s;
             border: none;
-        } """ % self.data_theme["table_results"])
+        } """ % self.data_theme["frame_main"]["table_results"]["header"])
 
         self.table_results.setStyleSheet("""
         #table_results {
             background: %(background)s;
             gridline-color: %(color_border)s;
             border: none;
-        } """ % self.data_theme["table_results"])
-
-    # полоса прокрутки
+        } """ % self.data_theme["frame_main"]["table_results"])
+    
+        self.data_theme["frame_main"]["table_results"]["scrollbar"]["background_handle"] = self.data_theme["frame_main"]["table_results"]["scrollbar"]["handle"]["background"]
+        # полоса прокрутки
         self.setStyleSheet("""
         QScrollBar:vertical {
-            background-color: %(background)s;
+            background: %(background)s;
             width: 20px;
             margin: 0px 0px 0px 0px;
             border: none;
         }
         QScrollBar::handle:vertical {
-            background-color: %(background_handle)s;         
+            background: %(background_handle)s;         
             min-height: 20px;
             border-radius: 10px;
         }
@@ -311,13 +296,13 @@ class StackTableResults(QtWidgets.QWidget):
         }
         
         QScrollBar:horizontal {
-            background-color: %(background)s;
+            background: %(background)s;
             height: 20px;
             margin: 0px 0px 0px 0px;
             border: none;
         }
         QScrollBar::handle:horizontal {
-            background-color: %(background_handle)s;         
+            background: %(background_handle)s;         
             min-width: 20px;
             border-radius: 10px;
         }
@@ -343,4 +328,4 @@ class StackTableResults(QtWidgets.QWidget):
         QScrollBar::add-page:vertical, QScrollBar::sub-page:horizontal {
             background: none;
         }
-        """ % self.data_theme["table_results"]["scrollbar"])
+        """ % self.data_theme["frame_main"]["table_results"]["scrollbar"])
