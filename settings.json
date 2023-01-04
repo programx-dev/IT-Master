@@ -1,5 +1,5 @@
 {
-    "path_theme": ".\\resources\\themes\\blue_theme.json",
+    "path_theme": ".\\resources\\themes\\default.json",
     "path_images": ".\\resources\\images",
     "path_cources": ".\\cources",
     "path_database": ".\\resources\\table_tesult.db"
