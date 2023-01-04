@@ -233,6 +233,22 @@
       }
     }
   },
+  "dialog_table_results_empty": {
+    "frame_main": {
+      "background": "rgb(245, 245, 245)",
+      "color_border": "rgb(0, 0, 0)",
+      "label_header": {
+        "color": "rgb(0, 0, 0)"
+      },
+      "label_hint": {
+        "color": "rgb(0, 0, 0)"
+      },
+      "push_button_ok": {
+        "background": "rgb(3, 123, 251)",
+        "color": "rgb(255, 255, 255)"
+      }
+    }
+  },
   "dialog_info": {
     "frame_main": {
       "background": "rgb(245, 245, 245)",

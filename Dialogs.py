@@ -1,5 +1,135 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+class DialogTableResultsEmpty(QtWidgets.QDialog):
+    push_button_clicked_ok = QtCore.pyqtSignal()
+    def __init__(self, data_theme: dict, parent = None):
+        self.parent = parent
+
+        super().__init__(self.parent)
+
+        self.data_theme = data_theme
+        
+        self.setWindowTitle('Выход')
+        self.setModal(True)
+
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(
+            QtCore.Qt.Window |
+            QtCore.Qt.FramelessWindowHint
+        )
+
+        # главная сетка
+        self.grid_layout_main = QtWidgets.QGridLayout()
+        self.grid_layout_main.setSpacing(0)
+        self.grid_layout_main.setContentsMargins(0, 0, 0, 0)
+        self.grid_layout_main.setRowStretch(0, 0)
+        self.grid_layout_main.setRowStretch(1, 1)
+        self.grid_layout_main.setRowStretch(2, 0)
+        self.grid_layout_main.setColumnStretch(0, 0)
+        self.grid_layout_main.setColumnStretch(1, 1)
+        self.grid_layout_main.setColumnStretch(2, 0)
+
+        self.setLayout(self.grid_layout_main)
+
+        # главная рамка
+        self.frame_main = QtWidgets.QFrame()
+        self.frame_main.setObjectName("frame_main")
+        self.frame_main.setContentsMargins(30, 20, 30, 30)
+        self.frame_main.setFixedWidth(440)
+
+        self.grid_layout_main.addWidget(self.frame_main, 1, 1)
+
+        # внутренний макет
+        self.vbox_layout_internal = QtWidgets.QVBoxLayout()
+        self.vbox_layout_internal.setSpacing(0)
+        self.vbox_layout_internal.setContentsMargins(0, 0, 0, 0)
+
+        self.frame_main.setLayout(self.vbox_layout_internal)
+
+        # метка заголовка
+        self.label_header = QtWidgets.QLabel()
+        self.label_header.setFont(QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Bold))
+        self.label_header.setObjectName("label_header")
+        self.label_header.setText("Действие невозможно")
+        self.label_header.setWordWrap(True)
+        self.label_header.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.vbox_layout_internal.addWidget(self.label_header)
+        self.vbox_layout_internal.addSpacing(10)
+
+        # метка подсказки
+        self.label_hint = QtWidgets.QLabel()
+        self.label_hint.setFont(QtGui.QFont("Segoe UI", 12))
+        self.label_hint.setObjectName("label_hint")
+        self.label_hint.setText("В таблице результатов ещё нет записей")
+        self.label_hint.setWordWrap(True)
+        self.label_hint.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.vbox_layout_internal.addWidget(self.label_hint)
+        self.vbox_layout_internal.addSpacing(20)
+
+        # макет инстументов
+        self.hbox_layout_tools = QtWidgets.QHBoxLayout()
+        self.hbox_layout_tools.setSpacing(0)
+        self.hbox_layout_tools.setContentsMargins(0, 0, 0, 0)
+
+        self.vbox_layout_internal.addLayout(self.hbox_layout_tools)
+
+        self.hbox_layout_tools.addStretch(1)
+
+        # кнопка ок
+        self.push_button_ok = QtWidgets.QPushButton()
+        self.push_button_ok.setObjectName("push_button_ok")
+        self.push_button_ok.clicked.connect(self.clicked_push_button_ok)
+        self.push_button_ok.setFont(QtGui.QFont("Segoe UI", 12))
+        self.push_button_ok.setFixedSize(142, 42)
+        self.push_button_ok.setText("Ок")
+        self.push_button_ok.setFocusPolicy(QtCore.Qt.NoFocus)
+
+        self.hbox_layout_tools.addWidget(self.push_button_ok)
+
+        self.set_style_sheet()
+
+        self.show()
+  
+        self.move(QtCore.QPoint(self.parent.geometry().getCoords()[0], self.parent.geometry().getCoords()[1]) + self.parent.rect().center() - self.rect().center())
+
+    def clicked_push_button_ok(self):
+        self.close()
+        self.push_button_clicked_ok.emit()
+
+    def set_style_sheet(self):
+        # главная рамка
+        self.frame_main.setStyleSheet("""
+        #frame_main {
+            border-radius: 14px;
+            border: 1px solid;
+            border-color: %(color_border)s;
+            background: %(background)s;
+        } """ % self.data_theme["frame_main"])
+
+        # метка заголовка
+        self.label_header.setStyleSheet("""
+        #label_header {
+            color: %(color)s;
+        } """ % self.data_theme["frame_main"]["label_header"])
+
+        # метка подсказки
+        self.label_hint.setStyleSheet("""
+        #label_hint {
+            color: %(color)s;
+        } """ % self.data_theme["frame_main"]["label_hint"])
+
+        # кнопка ок
+        self.push_button_ok.setStyleSheet("""
+        #push_button_ok {
+            outline: 0;
+            border-radius: 7px;
+            border: none;
+            background: %(background)s; 
+            color: %(color)s;
+        } """ % self.data_theme["frame_main"]["push_button_ok"])
+
 class DialogExit(QtWidgets.QDialog):
     push_button_clicked_exit = QtCore.pyqtSignal()
     push_button_clicked_cancel = QtCore.pyqtSignal()
@@ -52,6 +182,7 @@ class DialogExit(QtWidgets.QDialog):
         self.label_header.setFont(QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Bold))
         self.label_header.setObjectName("label_header")
         self.label_header.setText("Выйти из теста?")
+        self.label_header.setWordWrap(True)
         self.label_header.setAlignment(QtCore.Qt.AlignCenter)
 
         self.vbox_layout_internal.addWidget(self.label_header)
@@ -62,17 +193,18 @@ class DialogExit(QtWidgets.QDialog):
         self.label_hint.setFont(QtGui.QFont("Segoe UI", 12))
         self.label_hint.setObjectName("label_hint")
         self.label_hint.setText("Результаты не сохранятся")
+        self.label_hint.setWordWrap(True)
         self.label_hint.setAlignment(QtCore.Qt.AlignCenter)
 
         self.vbox_layout_internal.addWidget(self.label_hint)
         self.vbox_layout_internal.addSpacing(20)
 
-        # макет кнопок
-        self.hbox_layout_push_buttons = QtWidgets.QHBoxLayout()
-        self.hbox_layout_push_buttons.setSpacing(0)
-        self.hbox_layout_push_buttons.setContentsMargins(0, 0, 0, 0)
+        # макет инстументов
+        self.hbox_layout_tools = QtWidgets.QHBoxLayout()
+        self.hbox_layout_tools.setSpacing(0)
+        self.hbox_layout_tools.setContentsMargins(0, 0, 0, 0)
 
-        self.vbox_layout_internal.addLayout(self.hbox_layout_push_buttons)
+        self.vbox_layout_internal.addLayout(self.hbox_layout_tools)
 
         # кнопка отменить
         self.push_button_cancel = QtWidgets.QPushButton()
@@ -83,8 +215,8 @@ class DialogExit(QtWidgets.QDialog):
         self.push_button_cancel.setText("Отмена")
         self.push_button_cancel.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        self.hbox_layout_push_buttons.addWidget(self.push_button_cancel)
-        self.hbox_layout_push_buttons.addSpacing(15)
+        self.hbox_layout_tools.addWidget(self.push_button_cancel)
+        self.hbox_layout_tools.addSpacing(15)
 
         # кнопка выход
         self.push_button_exit = QtWidgets.QPushButton()
@@ -95,7 +227,7 @@ class DialogExit(QtWidgets.QDialog):
         self.push_button_exit.setText("Выйти")
         self.push_button_exit.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        self.hbox_layout_push_buttons.addWidget(self.push_button_exit)
+        self.hbox_layout_tools.addWidget(self.push_button_exit)
 
         self.set_style_sheet()
 

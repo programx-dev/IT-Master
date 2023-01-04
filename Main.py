@@ -223,21 +223,32 @@ class Main(Window.Window):
         self.stacked_widget.setCurrentWidget(self.current_stack)
 
     def open_table_result(self, data: StackLogin.DataPassage):
-        self.data_loggin = DataLoggin(
-            name = data.name,
-            surname = data.surname,
-            class_name = data.class_name,
-            path_course = data.path_course
-        )
+        # проверить пустая ли таблица
+        with sqlite3.connect(self.path_database) as db:
+            cursor = db.cursor()
 
-        # удаление старого окна
-        self.stacked_widget.removeWidget(self.current_stack)
+            cursor.execute("""SELECT date_end FROM users""")
+            amount = len(cursor.fetchall())
 
-        # создание и упаковка окна с таблицей результатов
-        self.current_stack = StackTableResults.StackTableResults(path_database = self.path_database, func = self.to_main, data_theme = self.data_theme["stack_table_result"])
+        if amount != 0:
+            self.data_loggin = DataLoggin(
+                name = data.name,
+                surname = data.surname,
+                class_name = data.class_name,
+                path_course = data.path_course
+            )
 
-        self.stacked_widget.addWidget(self.current_stack)
-        self.stacked_widget.setCurrentWidget(self.current_stack)
+            # удаление старого окна
+            self.stacked_widget.removeWidget(self.current_stack)
+
+            # создание и упаковка окна с таблицей результатов
+            self.current_stack = StackTableResults.StackTableResults(path_database = self.path_database, func = self.to_main, data_theme = self.data_theme["stack_table_result"])
+
+            self.stacked_widget.addWidget(self.current_stack)
+            self.stacked_widget.setCurrentWidget(self.current_stack)
+
+        else:
+            self.open_dialog_table_results_empty()
 
     def start(self, data: StackLogin.DataPassage):
         self.data_loggin = DataLoggin(
@@ -302,6 +313,12 @@ class Main(Window.Window):
             parent = self
         )
 
+    def open_dialog_table_results_empty(self):
+        dialog = Dialogs.DialogTableResultsEmpty(
+            data_theme = self.data_theme["dialog_table_results_empty"], 
+            parent = self
+        )
+
     def exit_test(self):
         self.test_started = False
 
@@ -309,11 +326,7 @@ class Main(Window.Window):
 
     def close_window(self):
         if self.test_started:
-            dialog = Dialogs.DialogExit(
-                data_theme = self.data_theme["dialog_exit"],
-                parent = self
-            )
-
+            dialog = Dialogs.DialogExit(data_theme = self.data_theme["dialog_exit"], parent = self)
             dialog.push_button_clicked_exit.connect(self.exit_test)
         else:
             super().close_window()
