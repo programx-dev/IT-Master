@@ -237,95 +237,97 @@ class StackTableResults(QtWidgets.QWidget):
         } """ % self.data_theme["frame_main"]["frame_tools"]["push_button_to_main"])
 
         # таблица результатов
-        self.table_results.horizontalHeader().setStyleSheet("""
-        ::section:horizontal {
-            background:  %(background)s;
-            color: %(color)s;
-            border: none;
-        } """ % self.data_theme["frame_main"]["table_results"]["header"])
-
-        self.table_results.verticalHeader().setStyleSheet("""
-        ::section:vertical {
-            background:  %(background)s;
-            color: %(color)s;
-            border: none;
-        } """ % self.data_theme["frame_main"]["table_results"]["header"])
-
+        self.data_theme["frame_main"]["table_results"]["background_header"] = self.data_theme["frame_main"]["table_results"]["header"]["background"]
+        self.data_theme["frame_main"]["table_results"]["color_header"] = self.data_theme["frame_main"]["table_results"]["header"]["color"]
+        
         self.table_results.setStyleSheet("""
+        #table_results, QHeaderView::section {
+            background:  %(background)s;
+        }
+        #table_results, QHeaderView::section:horizontal {
+            background:  %(background_header)s;
+            color: %(color_header)s;
+            border: none;
+        }
+        #table_results, QHeaderView::section:vertical {
+            background:  %(background_header)s;
+            color: %(color_header)s;
+            border: none;
+        }
         #table_results {
             background: %(background)s;
             gridline-color: %(color_border)s;
             border: none;
         } """ % self.data_theme["frame_main"]["table_results"])
     
-        self.data_theme["frame_main"]["table_results"]["scrollbar"]["background_handle"] = self.data_theme["frame_main"]["table_results"]["scrollbar"]["handle"]["background"]
         # полоса прокрутки
+        self.data_theme["frame_main"]["table_results"]["scrollbar"]["background_handle"] = self.data_theme["frame_main"]["table_results"]["scrollbar"]["handle"]["background"]
         self.setStyleSheet("""
-        QScrollBar:vertical {
+        #table_results, QScrollBar:vertical {
             background: %(background)s;
             width: 20px;
             margin: 0px 0px 0px 0px;
             border: none;
         }
-        QScrollBar::handle:vertical {
+        #table_results, QScrollBar::handle:vertical {
             background: %(background_handle)s;         
             min-height: 20px;
             border-radius: 10px;
         }
-        QScrollBar::sub-line:vertical {
+        #table_results, QScrollBar::sub-line:vertical {
             border: none;
             background: none;
         }
-        QScrollBar::add-line:vertical {
+        #table_results, QScrollBar::add-line:vertical {
             border: none;
             background: none;
         }
-        QScrollBar::sub-line:vertical:hover,QScrollBar::sub-line:vertical:on {
+        #table_results, QScrollBar::sub-line:vertical:hover,QScrollBar::sub-line:vertical:on {
             border: none;
             background: none;
         }
-        QScrollBar::add-line:vertical:hover, QScrollBar::add-line:vertical:on {
+        #table_results, QScrollBar::add-line:vertical:hover, QScrollBar::add-line:vertical:on {
             border: none;
             background: none;
         }
-        QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+        #table_results, QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
             background: none;
         }
-        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+        #table_results, QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
             background: none;
         }
         
-        QScrollBar:horizontal {
+        #table_results, QScrollBar:horizontal {
             background: %(background)s;
             height: 20px;
             margin: 0px 0px 0px 0px;
             border: none;
         }
-        QScrollBar::handle:horizontal {
+        #table_results, QScrollBar::handle:horizontal {
             background: %(background_handle)s;         
             min-width: 20px;
             border-radius: 10px;
         }
-        QScrollBar::sub-line:horizontal {
+        #table_results, QScrollBar::sub-line:horizontal {
             border: none;
             background: none;
         }
-        QScrollBar::add-line:horizontal {
+        #table_results, QScrollBar::add-line:horizontal {
             border: none;
             background: none;
         }
-        QScrollBar::sub-line:horizontal:hover,QScrollBar::sub-line:horizontal:on {
+        #table_results, QScrollBar::sub-line:horizontal:hover,QScrollBar::sub-line:horizontal:on {
             border: none;
             background: none;
         }
-        QScrollBar::add-line:horizontal:hover, QScrollBar::add-line:horizontal:on {
+        #table_results, QScrollBar::add-line:horizontal:hover, QScrollBar::add-line:horizontal:on {
             border: none;
             background: none;
         }
-        QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
+        #table_results, QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
             background: none;
         }
-        QScrollBar::add-page:vertical, QScrollBar::sub-page:horizontal {
+        #table_results, QScrollBar::add-page:vertical, QScrollBar::sub-page:horizontal {
             background: none;
         }
         """ % self.data_theme["frame_main"]["table_results"]["scrollbar"])
