@@ -310,9 +310,9 @@ class StackLogin(QtWidgets.QWidget):
         
         # строка ввода фамилии
         temp_data_theme = {
-            "color_border_normal": self.data_theme["frame_main"]["frame_internal"]["line_edit_surname"]["normal"]["color_border"],
-            "background_normal": self.data_theme["frame_main"]["frame_internal"]["line_edit_surname"]["normal"]["background"], 
-            "color_normal": self.data_theme["frame_main"]["frame_internal"]["line_edit_surname"]["normal"]["color"], 
+            "color_border_not_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_surname"]["not_focus"]["color_border"],
+            "background_not_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_surname"]["not_focus"]["background"], 
+            "color_not_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_surname"]["not_focus"]["color"], 
             "color_border_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_surname"]["focus"]["color_border"],
             "background_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_surname"]["focus"]["background"], 
             "color_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_surname"]["focus"]["color"]
@@ -321,9 +321,9 @@ class StackLogin(QtWidgets.QWidget):
         self.line_edit_surname.setStyleSheet("""
         #line_edit_surname {
             border-radius: 7px; 
-            border: 2px solid %(color_border_normal)s; 
-            background: %(background_normal)s; 
-            color: %(color_normal)s;
+            border: 2px solid %(color_border_not_focus)s; 
+            background: %(background_not_focus)s; 
+            color: %(color_not_focus)s;
         } 
         #line_edit_surname:focus {
             border: 2px solid %(color_border_focus)s; 
@@ -333,9 +333,9 @@ class StackLogin(QtWidgets.QWidget):
 
         # строка ввода имени
         temp_data_theme = {
-            "color_border_normal": self.data_theme["frame_main"]["frame_internal"]["line_edit_name"]["normal"]["color_border"],
-            "background_normal": self.data_theme["frame_main"]["frame_internal"]["line_edit_name"]["normal"]["background"], 
-            "color_normal": self.data_theme["frame_main"]["frame_internal"]["line_edit_name"]["normal"]["color"], 
+            "color_border_not_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_name"]["not_focus"]["color_border"],
+            "background_not_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_name"]["not_focus"]["background"], 
+            "color_not_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_name"]["not_focus"]["color"], 
             "color_border_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_name"]["focus"]["color_border"],
             "background_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_name"]["focus"]["background"], 
             "color_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_name"]["focus"]["color"]
@@ -344,9 +344,9 @@ class StackLogin(QtWidgets.QWidget):
         self.line_edit_name.setStyleSheet("""
         #line_edit_name {
             border-radius: 7px; 
-            border: 2px solid %(color_border_normal)s; 
-            background: %(background_normal)s; 
-            color: %(color_normal)s;
+            border: 2px solid %(color_border_not_focus)s; 
+            background: %(background_not_focus)s; 
+            color: %(color_not_focus)s;
         } 
         #line_edit_name:focus {
             border: 2px solid %(color_border_focus)s; 
@@ -356,9 +356,9 @@ class StackLogin(QtWidgets.QWidget):
         
         # строка ввода класса
         temp_data_theme = {
-            "color_border_normal": self.data_theme["frame_main"]["frame_internal"]["line_edit_class"]["normal"]["color_border"],
-            "background_normal": self.data_theme["frame_main"]["frame_internal"]["line_edit_class"]["normal"]["background"], 
-            "color_normal": self.data_theme["frame_main"]["frame_internal"]["line_edit_class"]["normal"]["color"], 
+            "color_border_not_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_class"]["not_focus"]["color_border"],
+            "background_not_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_class"]["not_focus"]["background"], 
+            "color_not_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_class"]["not_focus"]["color"], 
             "color_border_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_class"]["focus"]["color_border"],
             "background_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_class"]["focus"]["background"], 
             "color_focus": self.data_theme["frame_main"]["frame_internal"]["line_edit_class"]["focus"]["color"]
@@ -367,9 +367,9 @@ class StackLogin(QtWidgets.QWidget):
         self.line_edit_class.setStyleSheet("""
         #line_edit_class {
             border-radius: 7px;
-            border: 2px solid %(color_border_normal)s; 
-            background: %(background_normal)s; 
-            color: %(color_normal)s;
+            border: 2px solid %(color_border_not_focus)s; 
+            background: %(background_not_focus)s; 
+            color: %(color_not_focus)s;
         } 
         #line_edit_class:focus {
             border: 2px solid %(color_border_focus)s; 

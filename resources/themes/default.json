@@ -9,7 +9,7 @@
           "color": "rgb(0, 0, 0)"
         },
         "line_edit_surname": {
-          "normal": {
+          "not_focus": {
             "color_border": "rgb(232, 232, 239)",
             "background": "rgb(244, 243, 248)",
             "color": "rgb(0, 0, 0)"
@@ -21,7 +21,7 @@
           }
         },
         "line_edit_name": {
-          "normal": {
+          "not_focus": {
             "color_border": "rgb(232, 232, 239)",
             "background": "rgb(244, 243, 248)",
             "color": "rgb(0, 0, 0)"
@@ -33,7 +33,7 @@
           }
         },
         "line_edit_class": {
-          "normal": {
+          "not_focus": {
             "color_border": "rgb(232, 232, 239)",
             "background": "rgb(244, 243, 248)",
             "color": "rgb(0, 0, 0)"
@@ -198,7 +198,7 @@
             "color": "rgb(0, 0, 0)"
           },
           "line_edit": {
-            "normal": {
+            "not_focus": {
               "color_border": "rgb(232, 232, 239)",
               "background": "rgb(244, 243, 248)",
               "color": "rgb(0, 0, 0)"

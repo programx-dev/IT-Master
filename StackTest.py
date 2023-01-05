@@ -291,27 +291,24 @@ class WidgetTest(QtWidgets.QWidget):
             if self.started:
                 self.line_edit_answer.insert(self.answer)
 
-            self.vbox_layout.addWidget(self.line_edit_answer)
-
-            temp_data_theme_not_focus = self.data_theme["line_edit"]["not_focus"]
-            temp_data_theme_focus = self.data_theme["line_edit"]["focus"]
+            self.vbox_layout_internal.addWidget(self.line_edit_answer)
 
             temp_data_theme = {
-            "color_border_normal": self.data_theme["frame_main"]["normal"]["color_border"],
-            "background_normal": self.data_theme["frame_main"]["normal"]["background"], 
-            "color_normal": self.data_theme["frame_main"]["normal"]["color"], 
-            "color_border_focus": self.data_theme["frame_main"]["focus"]["color_border"],
-            "background_focus": self.data_theme["frame_main"]["focus"]["background"], 
-            "color_focus": self.data_theme["frame_main"]["focus"]["color"]
+            "color_border_not_focus": self.data_theme["frame_main"]["line_edit"]["not_focus"]["color_border"],
+            "background_not_focus": self.data_theme["frame_main"]["line_edit"]["not_focus"]["background"], 
+            "color_not_focus": self.data_theme["frame_main"]["line_edit"]["not_focus"]["color"], 
+            "color_border_focus": self.data_theme["frame_main"]["line_edit"]["focus"]["color_border"],
+            "background_focus": self.data_theme["frame_main"]["line_edit"]["focus"]["background"], 
+            "color_focus": self.data_theme["frame_main"]["line_edit"]["focus"]["color"]
             }
 
             self.line_edit_answer.setStyleSheet("""
             #line_edit_answer {
                 border-radius: 7px; 
                 border: 2px solid; 
-                border-color: %(color_border_normal)s;
-                background: %(background_normal)s; 
-                color: %(color_normal)s;
+                border-color: %(color_border_not_focus)s;
+                background: %(background_not_focus)s; 
+                color: %(color_not_focus)s;
             } 
             #line_edit_answer:focus {
                 border-color: %(color_border_focus)s;
@@ -570,7 +567,7 @@ class StackTest(QtWidgets.QWidget):
                     settings = None
                     right_answer = right_answer[0]
 
-                    if (_setting := self.root.findall("exercise")[i].find("answers").find("settings") != None):
+                    if (_setting := self.root.findall("exercise")[i].find("answers").find("settings")) != None:
                         settings = _setting.attrib
                     
                     if settings and user_answer != None:
