@@ -1,4 +1,4 @@
-__version_app__ = "2.5"
+__version_app__ = "2.6"
 __name_app__ = "IT Master"
 
 from PyQt5 import QtCore, QtGui, QtWidgets
