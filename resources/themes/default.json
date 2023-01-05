@@ -322,7 +322,7 @@
       },
       "table_results": {
         "background": "rgb(255, 255, 255)",
-        "color_border": "rgb(100, 100, 100)",
+        "color_gridline": "rgb(100, 100, 100)",
         "header": {
           "background": "rgb(90, 153, 255)",
           "color": "rgb(255, 255, 255)"
@@ -334,6 +334,10 @@
         "odd_item": {
           "background": "rgb(255, 255, 255)",
           "color": "rgb(0, 0, 0)"
+        },
+        "selected_item": {
+          "background": "rgb(3, 123, 251)",
+          "color": "rgb(255, 255, 255)"
         },
         "scrollbar": {
           "background": "rgb(255, 255, 255)",

@@ -72,6 +72,8 @@ class StackTableResults(QtWidgets.QWidget):
         self.table_results.setFont(QtGui.QFont("Segoe UI", 12))
         self.table_results.horizontalHeader().setFont(QtGui.QFont("Segoe UI", 12))
         self.table_results.verticalHeader().setFont(QtGui.QFont("Segoe UI", 12))
+        self.table_results.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.table_results.verticalHeader().setVisible(False)
 
         self.vbox_layout_internal.addWidget(self.table_results)
 
@@ -206,7 +208,6 @@ class StackTableResults(QtWidgets.QWidget):
         # рамка заголовка
         self.frame_header.setStyleSheet("""
         #frame_header {
-            border-bottom-left-radius: 40px;
             border-bottom-right-radius: 40px;
             background: %(background)s;
         } """ % self.data_theme["frame_main"]["frame_header"])
@@ -236,98 +237,107 @@ class StackTableResults(QtWidgets.QWidget):
             color: %(color)s;
         } """ % self.data_theme["frame_main"]["frame_tools"]["push_button_to_main"])
 
-        # таблица результатов
-        self.data_theme["frame_main"]["table_results"]["background_header"] = self.data_theme["frame_main"]["table_results"]["header"]["background"]
-        self.data_theme["frame_main"]["table_results"]["color_header"] = self.data_theme["frame_main"]["table_results"]["header"]["color"]
-        
-        self.table_results.setStyleSheet("""
-        #table_results, QHeaderView::section {
+        # таблица результатов        
+        self.table_results.horizontalHeader().setStyleSheet("""
+        ::section:horizontal {
+            background: %(background)s;
+            color: %(color)s;
+            border: none;
+        } """ % self.data_theme["frame_main"]["table_results"]["header"])
+
+        self.table_results.verticalHeader().setStyleSheet("""
+        ::section:vertical {
             background:  %(background)s;
-        }
-        #table_results, QHeaderView::section:horizontal {
-            background:  %(background_header)s;
-            color: %(color_header)s;
+            color: %(color)s;
             border: none;
-        }
-        #table_results, QHeaderView::section:vertical {
-            background:  %(background_header)s;
-            color: %(color_header)s;
-            border: none;
-        }
+        } """ % self.data_theme["frame_main"]["table_results"]["header"])
+
+        self.data_theme["frame_main"]["table_results"]["background_selected"] = self.data_theme["frame_main"]["table_results"]["selected_item"]["background"]
+        self.data_theme["frame_main"]["table_results"]["color_selected"] = self.data_theme["frame_main"]["table_results"]["selected_item"]["color"]
+
+        self.table_results.setStyleSheet("""
+        QHeaderView {
+            background: %(background)s;
+        }      
         #table_results {
             background: %(background)s;
-            gridline-color: %(color_border)s;
+            gridline-color: %(color_gridline)s;
             border: none;
+        }
+        #table_results::item::selected {
+            background: %(background_selected)s;
+            color: %(color_selected)s;
         } """ % self.data_theme["frame_main"]["table_results"])
-    
+
         # полоса прокрутки
         self.data_theme["frame_main"]["table_results"]["scrollbar"]["background_handle"] = self.data_theme["frame_main"]["table_results"]["scrollbar"]["handle"]["background"]
+
         self.setStyleSheet("""
-        #table_results, QScrollBar:vertical {
+        QScrollBar:vertical {
             background: %(background)s;
             width: 20px;
             margin: 0px 0px 0px 0px;
             border: none;
         }
-        #table_results, QScrollBar::handle:vertical {
+        QScrollBar::handle:vertical {
             background: %(background_handle)s;         
             min-height: 20px;
             border-radius: 10px;
         }
-        #table_results, QScrollBar::sub-line:vertical {
+        QScrollBar::sub-line:vertical {
             border: none;
             background: none;
         }
-        #table_results, QScrollBar::add-line:vertical {
+        QScrollBar::add-line:vertical {
             border: none;
             background: none;
         }
-        #table_results, QScrollBar::sub-line:vertical:hover,QScrollBar::sub-line:vertical:on {
+        QScrollBar::sub-line:vertical:hover,QScrollBar::sub-line:vertical:on {
             border: none;
             background: none;
         }
-        #table_results, QScrollBar::add-line:vertical:hover, QScrollBar::add-line:vertical:on {
+        QScrollBar::add-line:vertical:hover, QScrollBar::add-line:vertical:on {
             border: none;
             background: none;
         }
-        #table_results, QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+        QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
             background: none;
         }
-        #table_results, QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
             background: none;
         }
         
-        #table_results, QScrollBar:horizontal {
+        QScrollBar:horizontal {
             background: %(background)s;
             height: 20px;
             margin: 0px 0px 0px 0px;
             border: none;
         }
-        #table_results, QScrollBar::handle:horizontal {
+        QScrollBar::handle:horizontal {
             background: %(background_handle)s;         
             min-width: 20px;
             border-radius: 10px;
         }
-        #table_results, QScrollBar::sub-line:horizontal {
+        QScrollBar::sub-line:horizontal {
             border: none;
             background: none;
         }
-        #table_results, QScrollBar::add-line:horizontal {
+        QScrollBar::add-line:horizontal {
             border: none;
             background: none;
         }
-        #table_results, QScrollBar::sub-line:horizontal:hover,QScrollBar::sub-line:horizontal:on {
+        QScrollBar::sub-line:horizontal:hover,QScrollBar::sub-line:horizontal:on {
             border: none;
             background: none;
         }
-        #table_results, QScrollBar::add-line:horizontal:hover, QScrollBar::add-line:horizontal:on {
+        QScrollBar::add-line:horizontal:hover, QScrollBar::add-line:horizontal:on {
             border: none;
             background: none;
         }
-        #table_results, QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
+        QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
             background: none;
         }
-        #table_results, QScrollBar::add-page:vertical, QScrollBar::sub-page:horizontal {
+        QScrollBar::add-page:vertical, QScrollBar::sub-page:horizontal {
             background: none;
         }
         """ % self.data_theme["frame_main"]["table_results"]["scrollbar"])
