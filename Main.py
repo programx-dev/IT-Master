@@ -1,4 +1,3 @@
-__version_app__ = "2.6"
 __name_app__ = "IT Master"
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -9,6 +8,7 @@ import StackResult
 import StackTableResults
 import Window
 import Dialogs
+import version
 import os
 import sys
 import json
@@ -306,7 +306,7 @@ class Main(Window.Window):
     def open_dialog_info(self):
         dialog = Dialogs.DialogInfo(
             data_theme = self.data_theme["dialog_info"],
-            version = f"Версия {__version_app__}",
+            version = f"Версия {version.__version__}",
             name = __name_app__,
             text_info = self.text_info,
             path_logo = self.path_image_logo,
