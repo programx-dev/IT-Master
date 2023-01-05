@@ -60,7 +60,7 @@ class Main(Window.Window):
 
         # создание страницы входа
         self.current_stack = StackLogin.StackLogin(
-            path_cources = self.path_cources, 
+            path_courses = self.path_courses, 
             path_images = self.path_images, 
             data_theme = self.data_theme["stack_login"], 
             func_start = self.start, 
@@ -99,7 +99,7 @@ class Main(Window.Window):
         with open(self.path_theme, "r", encoding = "utf-8") as file:
             self.data_theme = json.load(file)
 
-        self.path_cources = self.data["path_cources"]
+        self.path_courses = self.data["path_courses"]
         self.path_images = self.data["path_images"]
         self.path_database = self.data["path_database"]
         self.path_image_logo = os.path.join(self.path_images, r"logo.png")
@@ -290,7 +290,7 @@ class Main(Window.Window):
 
         # создание и упаковка окна входа
         self.current_stack = StackLogin.StackLogin(
-            path_cources = self.path_cources, 
+            path_courses = self.path_courses, 
             path_images = self.path_images, 
             data_theme = self.data_theme["stack_login"], 
             func_start = self.start, 

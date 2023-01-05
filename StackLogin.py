@@ -84,10 +84,10 @@ class PushButtonCourse(QtWidgets.QWidget):
         self.push_button_download.setIconSize(QtCore.QSize(42 - 14, 42 - 14))
 
 class StackLogin(QtWidgets.QWidget):
-    def __init__(self, path_cources: str, path_images: str, data_theme: dict, func_start: callable, func_table_results: callable, name: str = None, surname: str = None, class_name: str = None):
+    def __init__(self, path_courses: str, path_images: str, data_theme: dict, func_start: callable, func_table_results: callable, name: str = None, surname: str = None, class_name: str = None):
         super().__init__()
 
-        self.path_cources = path_cources
+        self.path_courses = path_courses
         self.path_images = path_images
         self.data_theme = data_theme
         self.func_start = func_start
@@ -266,7 +266,7 @@ class StackLogin(QtWidgets.QWidget):
 
     def choose_course(self):
         # диалог выбора файла с курсом
-        path_file_course = QtWidgets.QFileDialog.getOpenFileName(self, "Выбор курса", self.path_cources, "XML Файл (*.xml)")[0]
+        path_file_course = QtWidgets.QFileDialog.getOpenFileName(self, "Выбор курса", self.path_courses, "XML Файл (*.xml)")[0]
 
         if os.path.isfile(path_file_course):
             self.path_course = path_file_course
