@@ -333,6 +333,6 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
     window_main = Main()
-    window_main.show()
+    window_main.show_window()
 
     sys.exit(app.exec_())

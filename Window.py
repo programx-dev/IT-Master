@@ -124,7 +124,7 @@ class Window(QtWidgets.QMainWindow):
     def minimize_window(self):
         super().showMinimized()
 
-    def show(self):
+    def show_window(self):
         super().showMaximized()
 
     def set_icon(self, icon: QtGui.QPixmap):
