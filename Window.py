@@ -7,8 +7,8 @@ class Window(QtWidgets.QMainWindow):
     open_info = QtCore.pyqtSignal()
     def __init__(self, data_theme: dict):
         super().__init__()
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
 
         self.__data_theme = data_theme
 
