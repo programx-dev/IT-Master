@@ -28,7 +28,7 @@ class Window(QtWidgets.QMainWindow):
         # рамка заголовка
         self.frame_title = QtWidgets.QFrame()
         self.frame_title.setObjectName("frame_title")
-        self.frame_title.setFixedHeight(40)
+        self.frame_title.setFixedHeight(36)
 
         self.vbox_layout_internal.addWidget(self.frame_title)
 
@@ -43,7 +43,7 @@ class Window(QtWidgets.QMainWindow):
         self.label_icon = QtWidgets.QLabel()
         self.label_icon.setObjectName("label_icon")
         self.label_icon.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_icon.setFixedSize(32, 32)
+        self.label_icon.setFixedSize(24, 24)
 
         self.hbox_layout_title.addWidget(self.label_icon)
         self.hbox_layout_title.addSpacing(5)
@@ -52,7 +52,7 @@ class Window(QtWidgets.QMainWindow):
         self.label_title = QtWidgets.QLabel()
         self.label_title.setObjectName("label_title")
         self.label_title.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        self.label_title.setFont(QtGui.QFont("Trebuchet MS", 10, weight = QtGui.QFont.Bold))
+        self.label_title.setFont(QtGui.QFont("Segoe UI", 10))
 
         self.hbox_layout_title.addWidget(self.label_title)
         self.hbox_layout_title.addStretch(1)
@@ -61,9 +61,9 @@ class Window(QtWidgets.QMainWindow):
         self.push_button_info = QtWidgets.QPushButton()
         self.push_button_info.setObjectName("push_button_info")
         self.push_button_info.clicked.connect(self.clicked_push_button_info)
-        self.push_button_info.setFont(QtGui.QFont("Webdings", 9))
-        self.push_button_info.setText("s")
-        self.push_button_info.setFixedSize(56, 40)
+        self.push_button_info.setFont(QtGui.QFont("Segoe MDL2 Assets", 10))
+        self.push_button_info.setText("?")
+        self.push_button_info.setFixedSize(58, 36)
         self.push_button_info.setFocusPolicy(QtCore.Qt.NoFocus)
 
         self.hbox_layout_title.addWidget(self.push_button_info)
@@ -72,9 +72,9 @@ class Window(QtWidgets.QMainWindow):
         self.push_button_minimize = QtWidgets.QPushButton()
         self.push_button_minimize.setObjectName("push_button_minimize")
         self.push_button_minimize.clicked.connect(self.clicked_push_button_minimize)
-        self.push_button_minimize.setFont(QtGui.QFont("Webdings", 9))
-        self.push_button_minimize.setText("0")
-        self.push_button_minimize.setFixedSize(56, 40)
+        self.push_button_minimize.setFont(QtGui.QFont("Segoe MDL2 Assets", 10))
+        self.push_button_minimize.setText("—")
+        self.push_button_minimize.setFixedSize(58, 36)
         self.push_button_minimize.setFocusPolicy(QtCore.Qt.NoFocus)
 
         self.hbox_layout_title.addWidget(self.push_button_minimize)
@@ -83,9 +83,9 @@ class Window(QtWidgets.QMainWindow):
         self.push_button_close = QtWidgets.QPushButton()
         self.push_button_close.setObjectName("push_button_close")
         self.push_button_close.clicked.connect(self.clicked_push_button_exit)
-        self.push_button_close.setFont(QtGui.QFont("Webdings", 9))
-        self.push_button_close.setText("r")
-        self.push_button_close.setFixedSize(56, 40)
+        self.push_button_close.setFont(QtGui.QFont("Segoe MDL2 Assets", 10))
+        self.push_button_close.setText("✕")
+        self.push_button_close.setFixedSize(58, 36)
         self.push_button_close.setFocusPolicy(QtCore.Qt.NoFocus)
 
         self.hbox_layout_title.addWidget(self.push_button_close)
@@ -128,7 +128,7 @@ class Window(QtWidgets.QMainWindow):
         super().showMaximized()
 
     def set_icon(self, icon: QtGui.QPixmap):
-        icon = icon.scaled(30, 30, transformMode = QtCore.Qt.SmoothTransformation)
+        icon = icon.scaled(24, 24, transformMode = QtCore.Qt.SmoothTransformation)
         self.label_icon.setPixmap(icon)
 
     def set_title(self, title: str):
