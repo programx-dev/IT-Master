@@ -1,5 +1,3 @@
-__name_app__ = "IT Master"
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 import StackLogin
 import StackLesson
@@ -50,10 +48,10 @@ class Main(Window.Window):
 
         super().__init__(data_theme = self.data_theme["titlebar"])
 
-        self.setWindowTitle(__name_app__)
+        self.setWindowTitle("IT Master")
         self.setWindowIcon(QtGui.QIcon(self.path_image_logo))
 
-        self.set_title(__name_app__)
+        self.set_title("IT Master")
         self.set_icon(QtGui.QPixmap(self.path_image_logo))
 
         self.open_info.connect(self.open_dialog_info)
@@ -81,7 +79,7 @@ class Main(Window.Window):
         self.stacked_widget.setCurrentWidget(self.current_stack)
 
     def init_variables(self):
-        self.text_info = f"""{__name_app__} - это школьный предметный тренажёр по информатике, позволяющий изучить материал урока и закрепить полученные знания, выполнив тест\n
+        self.text_info = """IT Master - это школьный предметный тренажёр по информатике, позволяющий изучить материал урока и закрепить полученные знания, выполнив тест\n
 Ведущий разрабочик - Смирнов Н. А., 9 класс, ГБОУ школа №1370\n
 Приложение написано на языке программирования Python"""
 
@@ -307,7 +305,7 @@ class Main(Window.Window):
         dialog = Dialogs.DialogInfo(
             data_theme = self.data_theme["dialog_info"],
             version = f"Версия {version.__version__}",
-            name = __name_app__,
+            name = "IT Master",
             text_info = self.text_info,
             path_logo = self.path_image_logo,
             parent = self
