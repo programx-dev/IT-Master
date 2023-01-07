@@ -58,7 +58,7 @@ class StackTableResults(QtWidgets.QWidget):
         self.label_header = QtWidgets.QLabel()
         self.label_header.setFont(QtGui.QFont("Segoe UI", 17, weight = QtGui.QFont.Bold))
         self.label_header.setObjectName("label_header")
-        self.label_header.setText("Теоретическая часть")
+        self.label_header.setText("Таблица результатов")
         self.label_header.setAlignment(QtCore.Qt.AlignCenter)
 
         self.hbox_layout_header.addWidget(self.label_header)
