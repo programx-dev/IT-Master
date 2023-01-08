@@ -6,6 +6,7 @@ class DialogTableResultsEmpty(QtWidgets.QDialog):
         self.parent = parent
 
         super().__init__(self.parent)
+        self.setContentsMargins(7, 7, 7, 7)
 
         self.data_theme = data_theme
         
@@ -103,8 +104,7 @@ class DialogTableResultsEmpty(QtWidgets.QDialog):
         self.frame_main.setStyleSheet("""
         #frame_main {
             border-radius: 14px;
-            border: 1px solid;
-            border-color: %(color_border)s;
+            border: none;
             background: %(background)s;
         } """ % self.data_theme["frame_main"])
 
@@ -130,6 +130,13 @@ class DialogTableResultsEmpty(QtWidgets.QDialog):
             color: %(color)s;
         } """ % self.data_theme["frame_main"]["push_button_ok"])
 
+        # тень
+        self.frame_main.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.frame_main.shadow.setBlurRadius(17)
+        self.frame_main.shadow.setOffset(0, 0)
+        self.frame_main.shadow.setColor(QtGui.QColor(0, 0, 0, 100))
+        self.frame_main.setGraphicsEffect(self.frame_main.shadow)
+
 class DialogExit(QtWidgets.QDialog):
     push_button_clicked_exit = QtCore.pyqtSignal()
     push_button_clicked_cancel = QtCore.pyqtSignal()
@@ -137,6 +144,7 @@ class DialogExit(QtWidgets.QDialog):
         self.parent = parent
 
         super().__init__(self.parent)
+        self.setContentsMargins(7, 7, 7, 7)
 
         self.data_theme = data_theme
         
@@ -248,8 +256,7 @@ class DialogExit(QtWidgets.QDialog):
         self.frame_main.setStyleSheet("""
         #frame_main {
             border-radius: 14px;
-            border: 1px solid;
-            border-color: %(color_border)s;
+            border: none;
             background: %(background)s;
         } """ % self.data_theme["frame_main"])
 
@@ -285,12 +292,20 @@ class DialogExit(QtWidgets.QDialog):
             color: %(color)s;
         } """ % self.data_theme["frame_main"]["push_button_exit"])
 
+        # тень
+        self.frame_main.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.frame_main.shadow.setBlurRadius(17)
+        self.frame_main.shadow.setOffset(0, 0)
+        self.frame_main.shadow.setColor(QtGui.QColor(0, 0, 0, 100))
+        self.frame_main.setGraphicsEffect(self.frame_main.shadow)
+
 class DialogInfo(QtWidgets.QDialog):
     push_button_clicked_ok = QtCore.pyqtSignal()
     def __init__(self, data_theme: dict, version: str, name: str, text_info: str, path_logo: str, parent = None):
         self.parent = parent
 
         super().__init__(self.parent)
+        self.setContentsMargins(7, 7, 7, 7)
 
         self.data_theme = data_theme
         self.path_logo = path_logo
@@ -429,8 +444,7 @@ class DialogInfo(QtWidgets.QDialog):
         self.frame_main.setStyleSheet("""
         #frame_main {
             border-radius: 14px;
-            border: 1px solid;
-            border-color: %(color_border)s;
+            border: none;
             background: %(background)s;
         } """ % self.data_theme["frame_main"])
 
@@ -461,3 +475,10 @@ class DialogInfo(QtWidgets.QDialog):
             background: %(background)s; 
             color: %(color)s;
         } """ % self.data_theme["frame_main"]["push_button_ok"])
+
+        # тень
+        self.frame_main.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.frame_main.shadow.setBlurRadius(17)
+        self.frame_main.shadow.setOffset(0, 0)
+        self.frame_main.shadow.setColor(QtGui.QColor(0, 0, 0, 100))
+        self.frame_main.setGraphicsEffect(self.frame_main.shadow)

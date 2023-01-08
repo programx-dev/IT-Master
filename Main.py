@@ -324,7 +324,7 @@ class Main(Window.Window):
 
     def close_window(self):
         if self.test_started:
-            dialog = Dialogs.DialogExit(data_theme = self.data_theme["dialog_exit"], parent = self)
+            dialog = Dialogs.DialogExit(data_theme = self.data_theme["dialog_exit_test"], parent = self)
             dialog.push_button_clicked_exit.connect(self.exit_test)
         else:
             super().close_window()

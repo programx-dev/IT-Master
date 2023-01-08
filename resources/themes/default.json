@@ -213,10 +213,9 @@
       }
     }
   },
-  "dialog_exit": {
+  "dialog_exit_test": {
     "frame_main": {
       "background": "rgb(245, 245, 245)",
-      "color_border": "rgb(0, 0, 0)",
       "label_header": {
         "color": "rgb(0, 0, 0)"
       },
@@ -224,7 +223,7 @@
         "color": "rgb(0, 0, 0)"
       },
       "push_button_cancel": {
-        "background": "rgb(230, 230, 230)",
+        "background": "rgb(220, 220, 220)",
         "color": "rgb(0, 0, 0)"
       },
       "push_button_exit": {
@@ -236,7 +235,6 @@
   "dialog_table_results_empty": {
     "frame_main": {
       "background": "rgb(245, 245, 245)",
-      "color_border": "rgb(0, 0, 0)",
       "label_header": {
         "color": "rgb(0, 0, 0)"
       },
@@ -252,7 +250,6 @@
   "dialog_info": {
     "frame_main": {
       "background": "rgb(245, 245, 245)",
-      "color_border": "rgb(0, 0, 0)",
       "label_header": {
         "color": "rgb(0, 0, 0)"
       },
