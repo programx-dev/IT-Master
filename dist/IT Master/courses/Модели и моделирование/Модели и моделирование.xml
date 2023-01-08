@@ -16,6 +16,20 @@
 	</exercise>
 
 	<exercise>
+		<title>Модель - это...</title>
+		<questions>
+			<type>radio_button</type>
+			<question>копия реально существующего объекта</question>
+			<question>приближенная копия объекта</question>
+			<question>заменитель предмета, объекта или явления</question>
+			<question>точная копия чего бы то ни былоо</question>
+		</questions>
+		<answers>
+			<answer>заменитель предмета, объекта или явления</answer>
+		</answers>
+	</exercise>
+
+	<exercise>
 		<title>Замена реального объекта его формальным описанием – это:</title>
 		<questions>
 			<type>radio_button</type>
@@ -97,44 +111,32 @@
 	</exercise>
 
 	<exercise>
-		<title>Строка таблицы, содержащая информацию об одном конкретном объекте, – это</title>
+		<title>К вербальным моделям относится...</title>
 		<questions>
-			<type>radio_button</type>
-			<question>ключ</question>
-			<question>отчет</question>
-			<question>запись</question>
-			<question>поле</question>
+			<type>checkbox</type>
+			<question>пересказ сюжета книги</question>
+			<question>обдумывание решения задачи</question>
+			<question>схема технического устройства</question>
+			<question>расписание проведения консультаций к экзаменам</question>
 		</questions>
 		<answers>
-			<answer>запись</answer>
+			<answer>пересказ сюжета книги</answer>
+			<answer>обдумывание решения задачи</answer>
 		</answers>
 	</exercise>
 
 	<exercise>
-		<title>Столбец таблицы, содержащий определенную характеристику объекта – это:</title>
+		<title>К образным моделям относится...</title>
 		<questions>
-			<type>radio_button</type>
-			<question>поле</question>
-			<question>запись</question>
-			<question>ключ</question>
-			<question>отчет</question>
+			<type>checkbox</type>
+			<question>рисунок на доске</question>
+			<question>журнал успеваемости класса</question>
+			<question>макет здания</question>
+			<question>изображение радуги на асфальте</question>
 		</questions>
 		<answers>
-			<answer>поле</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Графической моделью иерархической системы является:</title>
-		<questions>
-			<type>radio_button</type>
-			<question>цепь</question>
-			<question>сеть</question>
-			<question>дерево</question>
-			<question>генеалогическое дерево</question>
-		</questions>
-		<answers>
-			<answer>дерево</answer>
+			<answer>рисунок на доске</answer>
+			<answer>изображение радуги на асфальте</answer>
 		</answers>
 	</exercise>
 </main>
