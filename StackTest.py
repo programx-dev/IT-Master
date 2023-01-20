@@ -4,6 +4,7 @@ import datetime
 import xml.etree.ElementTree as ET
 import re
 from dataclasses import dataclass
+import Dialogs
 
 @dataclass
 class DataPassage:
@@ -13,6 +14,7 @@ class DataPassage:
     points_right: int
     points_wrong: int
     points_skip: int
+    dict_result: dict
 
 class PushButtonNavigation(QtWidgets.QPushButton):
     push_button_current = None
@@ -123,93 +125,307 @@ class BarNavigation(QtWidgets.QWidget):
     def init_variables(self):
         self.list_answered = {i: [None, False] for i in range(self.len_course)}
 
-class RadiobuttonAnswers(QtWidgets.QRadioButton):
+class RadiobuttonAnswers(QtWidgets.QWidget):
+    radio_button_checked = QtCore.pyqtSignal()
     def __init__(self, text: str, path_images: str, data_theme: dict):
-        self.text = text
+        self.__text = text
         self.data_theme = data_theme
         self.path_images = path_images
 
         self.init_variables()
 
         super().__init__()
-        self.setObjectName("radio_button")
-        self.setText(self.text)
-        self.setFont(QtGui.QFont("Segoe UI", 14))
+
+        # главный макет
+        self.hbox_layout_main = QtWidgets.QHBoxLayout()
+        self.hbox_layout_main.setSpacing(0)
+        self.hbox_layout_main.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(self.hbox_layout_main)
+
+        # кнопка с флажком
+        self.push_button_flag = QtWidgets.QPushButton()
+        self.push_button_flag.setObjectName("push_button_flag")
+        self.push_button_flag.clicked.connect(self.radio_button_clicked)
+        self.push_button_flag.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+        self.push_button_flag.setMinimumHeight(25)
+
+        self.hbox_layout_main.addWidget(self.push_button_flag)
+        self.hbox_layout_main.addSpacing(5)
+
+        # кнопка с текстом
+        self.push_button_text = QtWidgets.QPushButton ()
+        self.push_button_text.setObjectName("push_button_text")
+        self.push_button_text.clicked.connect(self.radio_button_clicked)
+        self.push_button_text.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+
+        self.hbox_layout_main.addWidget(self.push_button_text)
+
+        # макет внутки кнопки
+        self.push_button_text.layout_label_text = QtWidgets.QHBoxLayout()
+        self.push_button_text.layout_label_text.setSpacing(0)
+        self.push_button_text.layout_label_text.setContentsMargins(0, 0, 0, 0)
+
+        self.push_button_text.setLayout(self.push_button_text.layout_label_text)
+
+        # метка внутри кнопки
+        self.label_text = QtWidgets.QLabel()
+        self.label_text.setObjectName("label_text")
+        self.label_text.setText(self.__text)
+        self.label_text.setWordWrap(True)
+        self.label_text.setAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignLeft)
+        self.label_text.setFont(QtGui.QFont("Segoe UI", 14))
+        self.label_text.setMinimumHeight(25)
+
+        self.push_button_text.layout().addWidget(self.label_text)
 
         self.set_style_sheet()
+
+        self.set_checked(checked = False)
+
+    def text(self) -> str:
+        return self.__text
+
+    def is_checked(self) -> bool:
+        return self.__checked
 
     def init_variables(self):
         self.path_img_checked = os.path.join(self.path_images, "radio_button_checked.png").replace("\\", "/")
         self.path_img_unchecked = os.path.join(self.path_images, "radio_button_unchecked.png").replace("\\", "/")
 
-    def set_style_sheet(self):
-        self.data_theme["path_img_checked"] = self.path_img_checked
-        self.data_theme["path_img_unchecked"] = self.path_img_unchecked
+        self.image_flag_checked = QtGui.QIcon(self.path_img_checked)
+        self.image_flag_unchecked = QtGui.QIcon(self.path_img_unchecked)
 
-        self.setStyleSheet("""
-        #radio_button {
+    def radio_button_clicked(self):
+        if self.__checked == False:
+            self.set_checked(checked = True)
+
+    def set_checked(self, checked: bool):
+        if checked == True:
+            self.__checked = True
+
+            self.push_button_flag.setIcon(self.image_flag_checked)
+            self.push_button_flag.setIconSize(QtCore.QSize(22, 22))
+
+            self.radio_button_checked.emit()
+
+        elif checked == False:
+            self.__checked = False
+
+            self.push_button_flag.setIcon(self.image_flag_unchecked)
+            self.push_button_flag.setIconSize(QtCore.QSize(22, 22))
+
+    def set_style_sheet(self):
+        # кнопка с флажком
+        self.push_button_flag.setStyleSheet("""
+        #push_button_flag {
             outline: 0;
+            border: none;
             background: %(background)s;
-        }
-        #radio_button::title {
-            color: %(color)s;
-        }
-        #radio_button::indicator {
-            width: 22;
-            height: 22;
-        }
-        #radio_button::indicator:checked {
-            border-image: url("%(path_img_checked)s");
-        }
-        #radio_button::indicator:unchecked {
-            border-image: url("%(path_img_unchecked)s");
         } """ % self.data_theme)
 
-class CheckboxAnswers(QtWidgets.QCheckBox):
+        # кнопка с текстом
+        self.push_button_text.setStyleSheet("""
+        #push_button_text {
+            text-align: left;
+            outline: 0;
+            border: none;
+            background: %(background)s;
+        } """ % self.data_theme)
+
+        # метка внутри кнопки
+        self.label_text.setStyleSheet("""
+        #label_text {
+            background: %(background)s;
+            color: %(color)s;
+        } """ % self.data_theme)
+
+class GroupRadiobuttons(QtCore.QObject):
+    radio_button_checked = QtCore.pyqtSignal(RadiobuttonAnswers)
+    def __init__(self):
+        super().__init__()
+
+        self.__list_radio_buttons = []
+        self.__checked_radio_button = None
+
+    def change_radio_button(self, radio_button: RadiobuttonAnswers):
+        if self.__checked_radio_button != radio_button:
+            if self.__checked_radio_button !=  None:
+                self.__checked_radio_button.set_checked(checked = False)
+            self.__checked_radio_button = radio_button
+
+            self.radio_button_checked.emit(self.__checked_radio_button)
+
+    def add_radio_button(self, radio_button: RadiobuttonAnswers):
+        radio_button.radio_button_checked.connect(lambda: self.change_radio_button(radio_button))
+        self.__list_radio_buttons.append(radio_button)
+
+class CheckboxAnswers(QtWidgets.QWidget):
+    checkbox_checked = QtCore.pyqtSignal()
     def __init__(self, text: str, path_images: str, data_theme: dict):
-        self.text = text
+        self.__text = text
         self.data_theme = data_theme
         self.path_images = path_images
+        self.__checked = False
 
         self.init_variables()
 
-        super().__init__(self.text)
-        self.setObjectName("checkbox")
-        self.setFont(QtGui.QFont("Segoe UI", 14))
+        super().__init__()
+
+        # главный макет
+        self.hbox_layout_main = QtWidgets.QHBoxLayout()
+        self.hbox_layout_main.setSpacing(0)
+        self.hbox_layout_main.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(self.hbox_layout_main)
+
+        # кнопка с флажком
+        self.push_button_flag = QtWidgets.QPushButton()
+        self.push_button_flag.setObjectName("push_button_flag")
+        self.push_button_flag.clicked.connect(self.checkbox_clicked)
+        self.push_button_flag.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+        self.push_button_flag.setMinimumHeight(25)
+
+        self.hbox_layout_main.addWidget(self.push_button_flag)
+        self.hbox_layout_main.addSpacing(5)
+
+        # кнопка с текстом
+        self.push_button_text = QtWidgets.QPushButton()
+        self.push_button_text.setObjectName("push_button_text")
+        self.push_button_text.clicked.connect(self.checkbox_clicked)
+        self.push_button_text.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+
+        self.hbox_layout_main.addWidget(self.push_button_text)
+
+        # макет внутки кнопки
+        self.push_button_text.layout_label_text = QtWidgets.QHBoxLayout()
+        self.push_button_text.layout_label_text.setSpacing(0)
+        self.push_button_text.layout_label_text.setContentsMargins(0, 0, 0, 0)
+
+        self.push_button_text.setLayout(self.push_button_text.layout_label_text)
+
+        # метка внутри кнопки
+        self.label_text = QtWidgets.QLabel()
+        self.label_text.setObjectName("label_text")
+        self.label_text.setText(self.__text)
+        self.label_text.setWordWrap(True)
+        self.label_text.setAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignLeft)
+        self.label_text.setFont(QtGui.QFont("Segoe UI", 14))
+        self.label_text.setMinimumHeight(25)
+
+        self.push_button_text.layout().addWidget(self.label_text)
+
+        self.set_style_sheet()
+
+        self.set_checked(checked = False)
+
+    def is_checked(self) -> bool:
+        return self.__checked
+
+    def text(self) -> str:
+        return self.__text
+
+    def init_variables(self):
+        self.path_img_checked = os.path.join(self.path_images, "checkbox_checked.png").replace("\\", "/")
+        self.path_img_unchecked = os.path.join(self.path_images, "checkbox_unchecked.png").replace("\\", "/")
+
+        self.image_flag_checked = QtGui.QIcon(self.path_img_checked)
+        self.image_flag_unchecked = QtGui.QIcon(self.path_img_unchecked)
+
+    def checkbox_clicked(self):
+        if self.__checked == True:
+            self.set_checked(checked = False)
+        else:
+            self.set_checked(checked = True)
+
+        self.checkbox_checked.emit()
+
+    def set_checked(self, checked: bool):
+        if checked == True:
+            self.__checked = True
+
+            self.push_button_flag.setIcon(self.image_flag_checked)
+            self.push_button_flag.setIconSize(QtCore.QSize(22, 22))
+
+        elif checked == False:
+            self.__checked = False
+
+            self.push_button_flag.setIcon(self.image_flag_unchecked)
+            self.push_button_flag.setIconSize(QtCore.QSize(22, 22))
+
+    def set_style_sheet(self):
+        # кнопка с флажком
+        self.push_button_flag.setStyleSheet("""
+        #push_button_flag {
+            outline: 0;
+            border: none;
+            background: %(background)s;
+        } """ % self.data_theme)
+
+        # кнопка с текстом
+        self.push_button_text.setStyleSheet("""
+        #push_button_text {
+            text-align: left;
+            outline: 0;
+            border: none;
+            background: %(background)s;
+        } """ % self.data_theme)
+
+        # метка внутри кнопки
+        self.label_text.setStyleSheet("""
+        #label_text {
+            background: %(background)s;
+            color: %(color)s;
+        } """ % self.data_theme)
+
+class PushButtonImage(QtWidgets.QPushButton):
+    push_button_clicked = QtCore.pyqtSignal()
+    def __init__(self, path_image: str,  data_theme: dict):
+        super().__init__()
+
+        self.path_image = path_image
+        self.data_theme = data_theme
+
+        self.init_variables()
+
+        self.setObjectName("push_button_image")
+        self.setFixedSize(300, 200)
+        self.clicked.connect(self.push_button_press)
+
+        self.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
         self.set_style_sheet()
 
     def init_variables(self):
-        self.path_img_checked = os.path.join(self.path_images, "checkbox_checked.png").replace('\\', '/')
-        self.path_img_unchecked = os.path.join(self.path_images, "checkbox_unchecked.png").replace('\\', '/')
+        self.pixmap = QtGui.QPixmap(self.path_image)
+
+        zoom = max(300 / self.pixmap.width(), 200 / self.pixmap.height())
+        self.pixmap = self.pixmap.scaled(round(self.pixmap.width() * zoom), round(self.pixmap.height() * zoom), transformMode = QtCore.Qt.SmoothTransformation)
+        
+        delta_x = (self.pixmap.width() - 300) // 2
+        delta_y = (self.pixmap.height() - 200) // 2
+        self.pixmap = self.pixmap.copy(delta_x + 10, delta_y + 10, 300 - 10, 200 - 10)
+        self.image = QtGui.QIcon(self.pixmap)
+
+    def push_button_press(self):
+        self.push_button_clicked.emit()
 
     def set_style_sheet(self):
-        self.data_theme["path_img_checked"] = self.path_img_checked
-        self.data_theme["path_img_unchecked"] = self.path_img_unchecked
-
         self.setStyleSheet("""
-        #checkbox {
+        #push_button_image {
             outline: 0;
-            background: %(background)s;
-        }
-        #checkbox::title {
-            color: %(color)s;
-        }
-        #checkbox::indicator {
-            width: 22;
-            height: 22;
-        }
-        #checkbox::indicator:checked {
-            border-image: url("%(path_img_checked)s");
-        }
-        #checkbox::indicator:unchecked {
-            border-image: url("%(path_img_unchecked)s");
+            border-radius: 7px; 
+            background: %(background)s; 
         } """ % self.data_theme)
+        
+        self.setIcon(self.image)
+        self.setIconSize(QtCore.QSize(300, 200))
 
 class WidgetTest(QtWidgets.QWidget):
-    def __init__(self, question: str, path_images: str, started: bool, answer, data_theme: dict, number: int, len_course: int, func_changed: callable):
+    def __init__(self, path_course: str, icon_dialogs: QtGui.QPixmap, question: str, path_images: str, started: bool, answer, data_theme: dict, number: int, len_course: int, func_changed: callable, parent = None):
         super().__init__()
 
+        self.path_course = path_course
         self.started = started
         self.answer = answer
         self.question = question
@@ -218,9 +434,11 @@ class WidgetTest(QtWidgets.QWidget):
         self.number = number
         self.len_course = len_course
         self.func_changed = func_changed
+        self.parent = parent
+        self.icon_dialogs = icon_dialogs
 
         # главный макет
-        self.grid_layout_main = QtWidgets.QGridLayout(self)
+        self.grid_layout_main = QtWidgets.QGridLayout()
         self.grid_layout_main.setSpacing(0)
         self.grid_layout_main.setContentsMargins(0, 0, 0, 0)
         self.grid_layout_main.setColumnStretch(0, 0)
@@ -229,6 +447,8 @@ class WidgetTest(QtWidgets.QWidget):
         self.grid_layout_main.setRowStretch(0, 0)
         self.grid_layout_main.setRowStretch(1, 1)
         self.grid_layout_main.setRowStretch(2, 0)
+
+        self.setLayout(self.grid_layout_main)
 
         # главная рамка
         self.frame_main = QtWidgets.QFrame()
@@ -267,6 +487,16 @@ class WidgetTest(QtWidgets.QWidget):
 
         self.vbox_layout_internal.addWidget(self.label_type_question)
         self.vbox_layout_internal.addSpacing(5)
+
+        # добавление кнопки с изображением
+        if (path_image := self.question.find("questions").find("image")) != None:
+            self.path_image = os.path.join(os.path.split(self.path_course)[0], path_image.text).replace("\\", "/")
+
+            self.push_button_image = PushButtonImage(path_image = self.path_image, data_theme = self.data_theme["frame_main"]["push_button_image"])
+            self.push_button_image.push_button_clicked.connect(self.show_image)
+
+            self.vbox_layout_internal.addWidget(self.push_button_image)
+            self.vbox_layout_internal.addSpacing(5)
 
         # создание виджетов ответов
         if self.question.find("questions").find("type").text == "radio_button":
@@ -320,16 +550,27 @@ class WidgetTest(QtWidgets.QWidget):
         
         self.set_style_sheet()
 
-    def radio_button_clicked(self, radio_button):
-        self.answer = radio_button.text
+    def show_image(self):
+        self.dialog_image = Dialogs.DialogImage(
+            parent = self.parent, 
+            path_image = self.path_image,
+            data_theme = self.data_theme["frame_main"]["dialog_image"]
+        )
+        self.dialog_image.set_icon(icon = self.icon_dialogs)
+        self.dialog_image.set_title(title = "Изображение")
+
+        self.dialog_image.load_lesson()
+
+    def radio_button_clicked(self, radio_button: RadiobuttonAnswers):
+        self.answer = radio_button.text()
 
         self.func_changed(self.number)
 
     def ceckbox_clicked(self):
-        if not self.sender().isChecked() and self.sender().text in self.answer:
-            self.answer.remove(self.sender().text)
+        if not self.sender().is_checked() and self.sender().text() in self.answer:
+            self.answer.remove(self.sender().text())
         else:
-            self.answer.append(self.sender().text)
+            self.answer.append(self.sender().text())
 
         self.func_changed(self.number)
 
@@ -347,7 +588,7 @@ class WidgetTest(QtWidgets.QWidget):
         self.vbox_layout_internal.addLayout(self.vbox_layout_radio_buttons)
 
         # группа радио кнопок
-        self.group_radio_buttons = QtWidgets.QButtonGroup()
+        self.group_radio_buttons = GroupRadiobuttons()
 
         # создание и упаковка радиокнопок
         for element in list_radio_buttons:
@@ -357,14 +598,14 @@ class WidgetTest(QtWidgets.QWidget):
                 data_theme = self.data_theme["frame_main"]["radio_button"]
             )
 
-            if self.started and element.text == self.answer:
-                radio_button.setChecked(True)
+            self.group_radio_buttons.add_radio_button(radio_button)
 
-            self.group_radio_buttons.addButton(radio_button)
+            if self.started and element.text == self.answer:
+                radio_button.set_checked(checked = True)
 
             self.vbox_layout_radio_buttons.addWidget(radio_button)
 
-        self.group_radio_buttons.buttonClicked.connect(self.radio_button_clicked)
+        self.group_radio_buttons.radio_button_checked.connect(self.radio_button_clicked)
     
     def create_checkboxes(self, list_checkboxes: list):
         # макет переключателей
@@ -383,11 +624,11 @@ class WidgetTest(QtWidgets.QWidget):
             )
 
             if self.started and element.text in self.answer:
-                checkbox.setChecked(True)
+                checkbox.set_checked(checked = True)
 
             self.vbox_layout_checkboxes.addWidget(checkbox)
             
-            checkbox.stateChanged.connect(self.ceckbox_clicked)
+            checkbox.checkbox_checked.connect(self.ceckbox_clicked)
 
     def set_style_sheet(self):
         # главная рамка
@@ -415,13 +656,15 @@ class WidgetTest(QtWidgets.QWidget):
         }""" % self.data_theme["frame_main"]["label_type_question"])
 
 class StackTest(QtWidgets.QWidget):
-    def __init__(self, data_theme: dict, path_images: str, path_course: str, func: callable):
+    def __init__(self, data_theme: dict, icon_dialogs: QtGui.QPixmap, path_images: str, path_course: str, func: callable, parent = None):
         super().__init__()
 
         self.data_theme = data_theme
         self.path_images = path_images
         self.path_course = path_course
         self.func = func
+        self.parent = parent
+        self.icon_dialogs = icon_dialogs
 
         self.init_variables()
 
@@ -539,6 +782,8 @@ class StackTest(QtWidgets.QWidget):
         points_wrong = 0
         points_skip = 0
 
+        dict_result = {}
+
         for i in range(self.len_course):
             user_answer = self.dict_answers[i]
             right_answer = list(i.text for i in self.root.findall("exercise")[i].find("answers").findall("answer"))
@@ -549,8 +794,10 @@ class StackTest(QtWidgets.QWidget):
                 if type == "radio_button":
                     if user_answer == right_answer[0]:
                         points_right += 1
+                        dict_result[i] = "right"
                     else:
                         points_wrong += 1
+                        dict_result[i] = "wrong"
 
                 # если переключатель
                 elif type == "checkbox":
@@ -559,8 +806,10 @@ class StackTest(QtWidgets.QWidget):
 
                     if user_answer == right_answer:
                         points_right += 1
+                        dict_result[i] = "right"
                     else:
                         points_wrong += 1
+                        dict_result[i] = "wrong"
 
                 # если ввод ответа
                 elif type == "input":
@@ -596,11 +845,14 @@ class StackTest(QtWidgets.QWidget):
 
                     if right_answer == user_answer:
                         points_right += 1
+                        dict_result[i] = "right"
                     else:
                         points_wrong += 1
+                        dict_result[i] = "wrong"
 
             else:
                 points_skip += 1
+                dict_result[i] = "skip"
 
         data_passage = DataPassage(
             date_start = self.time_start,
@@ -608,7 +860,8 @@ class StackTest(QtWidgets.QWidget):
             points_max = self.len_course,
             points_right = points_right,
             points_wrong = points_wrong,
-            points_skip = points_skip
+            points_skip = points_skip,
+            dict_result = dict_result
         )
 
         self.func(data_passage)
@@ -625,6 +878,9 @@ class StackTest(QtWidgets.QWidget):
 
         # создание и упаковка новой страницы
         self.current_stack = WidgetTest(
+            icon_dialogs = self.icon_dialogs,
+            parent = self.parent,
+            path_course = self.path_course,
             question = current_question,
             path_images = self.path_images, 
             started = self.dict_started[number],

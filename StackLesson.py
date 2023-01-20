@@ -1,6 +1,4 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import xml.etree.ElementTree as ET
-import os
 import re
 
 class LessonGraphicsView(QtWidgets.QGraphicsView):

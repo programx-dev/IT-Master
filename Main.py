@@ -21,6 +21,7 @@ class DataResult:
     points_right: int
     points_wrong: int
     points_skip: int
+    dict_result: dict
 
 @dataclass
 class DataSave:
@@ -46,7 +47,7 @@ class Main(Window.Window):
     def __init__(self):
         self.init_variables()
 
-        super().__init__(data_theme = self.data_theme["titlebar"])
+        super().__init__(data_theme = self.data_theme["window"])
 
         self.setWindowTitle("IT Master")
         self.setWindowIcon(QtGui.QIcon(self.path_image_logo))
@@ -58,6 +59,7 @@ class Main(Window.Window):
 
         # создание страницы входа
         self.current_stack = StackLogin.StackLogin(
+            path_theme = self.path_theme,
             path_courses = self.path_courses, 
             path_images = self.path_images, 
             data_theme = self.data_theme["stack_login"], 
@@ -194,7 +196,8 @@ class Main(Window.Window):
             points_max = data.points_max,
             points_right = data.points_right,
             points_wrong = data.points_wrong,
-            points_skip = data.points_skip
+            points_skip = data.points_skip,
+            dict_result = data.dict_result
         )
 
         self.create_record(data_save)
@@ -203,7 +206,7 @@ class Main(Window.Window):
         self.stacked_widget.removeWidget(self.current_stack)
 
         # создание и упаковка окна результата выполнения
-        self.current_stack = StackResult.StackResult(data = data_result, data_theme = self.data_theme["stack_result"], func = self.to_main)
+        self.current_stack = StackResult.StackResult(data_result = data_result, data_theme = self.data_theme["stack_result"], func = self.to_main)
 
         self.stacked_widget.addWidget(self.current_stack)
         self.stacked_widget.setCurrentWidget(self.current_stack)
@@ -215,7 +218,13 @@ class Main(Window.Window):
         self.stacked_widget.removeWidget(self.current_stack)
 
         # создание и упаковка окна с тестом
-        self.current_stack = StackTest.StackTest(func = self.finish_test, path_images = self.path_images, data_theme = self.data_theme["stack_test"], path_course = self.data_loggin.path_course)
+        self.current_stack = StackTest.StackTest(
+            icon_dialogs = QtGui.QPixmap(self.path_image_logo),
+            parent = self, func = self.finish_test, 
+            path_images = self.path_images, 
+            data_theme = self.data_theme["stack_test"], 
+            path_course = self.data_loggin.path_course
+        )
 
         self.stacked_widget.addWidget(self.current_stack)
         self.stacked_widget.setCurrentWidget(self.current_stack)
@@ -288,6 +297,7 @@ class Main(Window.Window):
 
         # создание и упаковка окна входа
         self.current_stack = StackLogin.StackLogin(
+            path_theme = self.path_theme,
             path_courses = self.path_courses, 
             path_images = self.path_images, 
             data_theme = self.data_theme["stack_login"], 

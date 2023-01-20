@@ -48,11 +48,76 @@ class LabelLegend(QtWidgets.QWidget):
             color: %(color)s;
         } """ % self.data_theme)
 
-class StackResult(QtWidgets.QWidget):
-    def __init__(self, data, data_theme: dict, func: callable):
+class BarNavigation(QtWidgets.QWidget):
+    def __init__(self, dict_result: dict , data_theme: dict):
         super().__init__()
 
-        self.data = data
+        self.dict_result = dict_result
+        self.data_theme = data_theme
+
+        # главный макет
+        self.hbox_layout_main = QtWidgets.QHBoxLayout()
+        self.hbox_layout_main.setSpacing(0)
+        self.hbox_layout_main.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(self.hbox_layout_main)
+
+        # панель инструментов и навигации
+        self.frame_tools = QtWidgets.QFrame()
+        self.frame_tools.setObjectName("frame_tools")
+
+        self.hbox_layout_main.addWidget(self.frame_tools)
+
+        # макет панели инстументов
+        self.hbox_layout_tools = QtWidgets.QHBoxLayout()
+        self.hbox_layout_tools.setSpacing(10)
+        self.hbox_layout_tools.setContentsMargins(20, 10, 20, 10)
+
+        self.frame_tools.setLayout(self.hbox_layout_tools)
+
+        self.hbox_layout_tools.addStretch(1)
+
+        for i in range(max(self.dict_result.keys()) + 1):
+            label_number = QtWidgets.QLabel()
+            label_number.setObjectName("label_number")
+            label_number.setText(f"{i + 1}")
+            label_number.setAlignment(QtCore.Qt.AlignCenter)
+            label_number.setFont(QtGui.QFont("Segoe UI", 12))
+            label_number.setFixedSize(50, 50)
+
+            self.hbox_layout_tools.addWidget(label_number)
+
+            if self.dict_result[i] == "right":
+                temp_data_theme = self.data_theme["label_number_right"]
+            elif self.dict_result[i] == "wrong":
+                temp_data_theme = self.data_theme["label_number_wrong"]
+            elif self.dict_result[i] == "skip":
+                temp_data_theme = self.data_theme["label_number_skip"]
+
+            label_number.setStyleSheet("""
+            #label_number {
+                border-radius: 25px;
+                background: %(background)s;
+                color: %(color)s;
+            } """ % temp_data_theme)
+
+        self.hbox_layout_tools.addStretch(1)
+
+        self.set_style_sheet()
+
+    def set_style_sheet(self):
+        # панель инструментов и навигации
+        self.frame_tools.setStyleSheet("""
+        #frame_tools {
+            border-radius: 20px;
+            background: %(background)s;
+        } """ % self.data_theme)
+
+class StackResult(QtWidgets.QWidget):
+    def __init__(self, data_result, data_theme: dict, func: callable):
+        super().__init__()
+
+        self.data_result = data_result
         self.data_theme = data_theme
         self.func = func
 
@@ -100,9 +165,9 @@ class StackResult(QtWidgets.QWidget):
         self.series = QPieSeries()
         self.series.setHoleSize(0.4)
 
-        self.slice_right = self.series.append("Правильные", round(self.data.points_right / self.data.points_max * 100))
-        self.slice_wrong = self.series.append("Неправильные", round(self.data.points_wrong / self.data.points_max * 100))
-        self.slice_skip = self.series.append("Пропущенные", round(self.data.points_skip / self.data.points_max * 100))
+        self.slice_right = self.series.append("Правильные", round(self.data_result.points_right / self.data_result.points_max * 100))
+        self.slice_wrong = self.series.append("Неправильные", round(self.data_result.points_wrong / self.data_result.points_max * 100))
+        self.slice_skip = self.series.append("Пропущенные", round(self.data_result.points_skip / self.data_result.points_max * 100))
 
         self.chart = QChart()
         self.chart.legend().hide()
@@ -135,7 +200,7 @@ class StackResult(QtWidgets.QWidget):
         # метка количества баллов
         self.label_result = QtWidgets.QLabel()
         self.label_result.setObjectName("label_result")
-        self.label_result.setText(f"{round(self.data.points_right / self.data.points_max * 100)} / 100")
+        self.label_result.setText(f"{round(self.data_result.points_right / self.data_result.points_max * 100)} / 100")
         self.label_result.setFont(QtGui.QFont("Segoe UI", 20))
         self.label_result.setAlignment(QtCore.Qt.AlignCenter)
 
@@ -154,7 +219,7 @@ class StackResult(QtWidgets.QWidget):
 
         # метка легенды правильно
         self.label_legent_right = LabelLegend(
-            text = f"Правильные: {self.data.points_right} ({round(self.data.points_right / self.data.points_max * 100)}%)",
+            text = f"Правильные: {self.data_result.points_right} ({round(self.data_result.points_right / self.data_result.points_max * 100)}%)",
             data_theme = self.data_theme["frame_main"]["frame_legend"]["label_legend_right"]
         )
 
@@ -163,7 +228,7 @@ class StackResult(QtWidgets.QWidget):
 
         # метка легенды неправильно
         self.label_legent_right = LabelLegend(
-            text = f"Неправильные: {self.data.points_wrong} ({round(self.data.points_wrong / self.data.points_max * 100)}%)",
+            text = f"Неправильные: {self.data_result.points_wrong} ({round(self.data_result.points_wrong / self.data_result.points_max * 100)}%)",
             data_theme = self.data_theme["frame_main"]["frame_legend"]["label_legend_wrong"]
         )
 
@@ -172,11 +237,26 @@ class StackResult(QtWidgets.QWidget):
 
         # метка легенды пропущенно
         self.label_legent_right = LabelLegend(
-            text = f"Пропущенные: {self.data.points_skip} ({round(self.data.points_skip / self.data.points_max * 100)}%)",
+            text = f"Пропущенные: {self.data_result.points_skip} ({round(self.data_result.points_skip / self.data_result.points_max * 100)}%)",
             data_theme = self.data_theme["frame_main"]["frame_legend"]["label_legend_skip"]
         )
 
         self.vbox_layout_legend.addWidget(self.label_legent_right)
+
+        # макет панель навигации
+        self.hbox_layout_bar_navigation = QtWidgets.QHBoxLayout()
+        self.hbox_layout_bar_navigation.setSpacing(0)
+        self.hbox_layout_bar_navigation.setContentsMargins(20, 20, 20, 20)
+
+        self.vbox_layout_internal.addLayout(self.hbox_layout_bar_navigation)
+
+        # панель навигации
+        self.bar_navigation = BarNavigation(
+            dict_result = self.data_result.dict_result,
+            data_theme = self.data_theme["frame_main"]["bar_navigation"] 
+        )
+
+        self.hbox_layout_bar_navigation.addWidget(self.bar_navigation)
 
         # панель инструментов
         self.frame_tools = QtWidgets.QFrame()
@@ -244,10 +324,15 @@ class StackResult(QtWidgets.QWidget):
         self.frame_legend.setStyleSheet("""
         #frame_legend {
             border-radius: 14px;
-            border: 3px solid;
-            border-color: %(color_border)s;
             background: %(background)s;
         } """ % self.data_theme["frame_main"]["frame_legend"])
+
+        # тень рамки легенды
+        self.frame_legend.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.frame_legend.shadow.setBlurRadius(17)
+        self.frame_legend.shadow.setOffset(0, 0)
+        self.frame_legend.shadow.setColor(QtGui.QColor(0, 0, 0, 100))
+        self.frame_legend.setGraphicsEffect(self.frame_legend.shadow)
 
         # панель инструментов
         self.frame_tools.setStyleSheet("""

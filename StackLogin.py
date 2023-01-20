@@ -84,7 +84,7 @@ class PushButtonCourse(QtWidgets.QWidget):
         self.push_button_download.setIconSize(QtCore.QSize(42 - 14, 42 - 14))
 
 class StackLogin(QtWidgets.QWidget):
-    def __init__(self, path_courses: str, path_images: str, data_theme: dict, func_start: callable, func_table_results: callable, name: str = None, surname: str = None, class_name: str = None):
+    def __init__(self, path_theme: str, path_courses: str, path_images: str, data_theme: dict, func_start: callable, func_table_results: callable, name: str = None, surname: str = None, class_name: str = None):
         super().__init__()
 
         self.path_courses = path_courses
@@ -92,6 +92,7 @@ class StackLogin(QtWidgets.QWidget):
         self.data_theme = data_theme
         self.func_start = func_start
         self.func_table_results = func_table_results
+        self.path_theme = path_theme
 
         self.name = name
         self.surname = surname
@@ -288,10 +289,15 @@ class StackLogin(QtWidgets.QWidget):
             self.push_button_enter.setEnabled(False)
 
     def set_style_sheet(self):
+        self.data_theme["frame_main"]["path_background_image"] = os.path.join(os.path.split(self.path_theme)[0], self.data_theme["frame_main"]["background_image"]).replace("\\", "/")
+
         # главная рамка
         self.frame_main.setStyleSheet("""
         #frame_main {
             background: %(background)s;
+            border-image: url(%(path_background_image)s);
+            background-repeat: no-repeat; 
+            background-position: center;
         } """ % self.data_theme["frame_main"])
 
         # внутренняя рамка формы
