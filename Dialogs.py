@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 import re
 
 class ImageGraphicsView(QtWidgets.QGraphicsView):
@@ -11,20 +11,20 @@ class ImageGraphicsView(QtWidgets.QGraphicsView):
         self.init_variables()
 
         self.image = QtWidgets.QGraphicsPixmapItem()
-        self.image.setTransformationMode(QtCore.Qt.SmoothTransformation) 
+        self.image.setTransformationMode(QtCore.Qt.TransformationMode.SmoothTransformation) 
 
         self.graphics_scene = QtWidgets.QGraphicsScene()
         self.graphics_scene.addItem(self.image)
 
         self.setScene(self.graphics_scene)
 
-        self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.HighQualityAntialiasing)
+        self.setDragMode(QtWidgets.QGraphicsView.DragMode.ScrollHandDrag)
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
+        self.setRenderHints(QtGui.QPainter.RenderHint.Antialiasing)
 
         self.set_style_sheet()
 
@@ -93,8 +93,8 @@ class DialogImage(QtWidgets.QDialog):
         self.setWindowTitle('Изображение')
         self.setModal(True)
 
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
 
         # главная сетка
         self.grid_layout_main = QtWidgets.QGridLayout()
@@ -140,7 +140,7 @@ class DialogImage(QtWidgets.QDialog):
         # метка иконки
         self.label_icon = QtWidgets.QLabel()
         self.label_icon.setObjectName("label_icon")
-        self.label_icon.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_icon.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label_icon.setFixedSize(25, 25)
 
         self.hbox_layout_title.addWidget(self.label_icon)
@@ -149,8 +149,8 @@ class DialogImage(QtWidgets.QDialog):
         # метка титла
         self.label_title = QtWidgets.QLabel()
         self.label_title.setObjectName("label_title")
-        self.label_title.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        self.label_title.setFont(QtGui.QFont("Trebuchet MS", 10, weight = QtGui.QFont.Bold))
+        self.label_title.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.label_title.setFont(QtGui.QFont("Trebuchet MS", 10, weight = QtGui.QFont.Weight.Bold))
 
         self.hbox_layout_title.addWidget(self.label_title)
         self.hbox_layout_title.addStretch(1)
@@ -162,7 +162,7 @@ class DialogImage(QtWidgets.QDialog):
         self.push_button_close.setFont(QtGui.QFont("Webdings", 9))
         self.push_button_close.setText("r")
         self.push_button_close.setFixedSize(58, 36)
-        self.push_button_close.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_close.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.hbox_layout_title.addWidget(self.push_button_close)
 
@@ -209,7 +209,7 @@ class DialogImage(QtWidgets.QDialog):
         self.close()
 
     def set_icon(self, icon: QtGui.QPixmap):
-        icon = icon.scaled(25, 25, transformMode = QtCore.Qt.SmoothTransformation)
+        icon = icon.scaled(25, 25, transformMode = QtCore.Qt.TransformationMode.SmoothTransformation)
         self.label_icon.setPixmap(icon)
 
     def set_title(self, title: str):
@@ -285,10 +285,10 @@ class DialogTableResultsEmpty(QtWidgets.QDialog):
         self.setWindowTitle('Выход')
         self.setModal(True)
 
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setWindowFlags(
             QtCore.Qt.Window |
-            QtCore.Qt.FramelessWindowHint
+            QtCore.Qt.WindowType.FramelessWindowHint
         )
 
         # главная сетка
@@ -321,11 +321,11 @@ class DialogTableResultsEmpty(QtWidgets.QDialog):
 
         # метка заголовка
         self.label_header = QtWidgets.QLabel()
-        self.label_header.setFont(QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Bold))
+        self.label_header.setFont(QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Weight.Bold))
         self.label_header.setObjectName("label_header")
         self.label_header.setText("Действие невозможно")
         self.label_header.setWordWrap(True)
-        self.label_header.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.vbox_layout_internal.addWidget(self.label_header)
         self.vbox_layout_internal.addSpacing(10)
@@ -336,7 +336,7 @@ class DialogTableResultsEmpty(QtWidgets.QDialog):
         self.label_hint.setObjectName("label_hint")
         self.label_hint.setText("В таблице результатов ещё нет записей")
         self.label_hint.setWordWrap(True)
-        self.label_hint.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_hint.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.vbox_layout_internal.addWidget(self.label_hint)
         self.vbox_layout_internal.addSpacing(20)
@@ -357,7 +357,7 @@ class DialogTableResultsEmpty(QtWidgets.QDialog):
         self.push_button_ok.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_ok.setFixedSize(142, 42)
         self.push_button_ok.setText("Ок")
-        self.push_button_ok.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_ok.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.hbox_layout_tools.addWidget(self.push_button_ok)
 
@@ -423,8 +423,8 @@ class DialogExit(QtWidgets.QDialog):
         self.setWindowTitle('Выход')
         self.setModal(True)
 
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
 
         # главная сетка
         self.grid_layout_main = QtWidgets.QGridLayout()
@@ -456,11 +456,11 @@ class DialogExit(QtWidgets.QDialog):
 
         # метка заголовка
         self.label_header = QtWidgets.QLabel()
-        self.label_header.setFont(QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Bold))
+        self.label_header.setFont(QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Weight.Bold))
         self.label_header.setObjectName("label_header")
         self.label_header.setText("Выйти из теста?")
         self.label_header.setWordWrap(True)
-        self.label_header.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.vbox_layout_internal.addWidget(self.label_header)
         self.vbox_layout_internal.addSpacing(10)
@@ -471,7 +471,7 @@ class DialogExit(QtWidgets.QDialog):
         self.label_hint.setObjectName("label_hint")
         self.label_hint.setText("Результаты не сохранятся")
         self.label_hint.setWordWrap(True)
-        self.label_hint.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_hint.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.vbox_layout_internal.addWidget(self.label_hint)
         self.vbox_layout_internal.addSpacing(20)
@@ -490,7 +490,7 @@ class DialogExit(QtWidgets.QDialog):
         self.push_button_cancel.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_cancel.setFixedHeight(42)
         self.push_button_cancel.setText("Отмена")
-        self.push_button_cancel.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_cancel.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.hbox_layout_tools.addWidget(self.push_button_cancel)
         self.hbox_layout_tools.addSpacing(15)
@@ -502,7 +502,7 @@ class DialogExit(QtWidgets.QDialog):
         self.push_button_exit.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_exit.setFixedHeight(42)
         self.push_button_exit.setText("Выйти")
-        self.push_button_exit.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_exit.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.hbox_layout_tools.addWidget(self.push_button_exit)
 
@@ -585,8 +585,8 @@ class DialogInfo(QtWidgets.QDialog):
         self.setWindowTitle('О программе')
         self.setModal(True)
 
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
 
         # главная сетка
         self.grid_layout_main = QtWidgets.QGridLayout()
@@ -626,12 +626,12 @@ class DialogInfo(QtWidgets.QDialog):
 
         # логотип
         self.logo = QtGui.QPixmap(self.path_logo)
-        self.logo = self.logo.scaled(110, 110, transformMode = QtCore.Qt.SmoothTransformation)
+        self.logo = self.logo.scaled(110, 110, transformMode = QtCore.Qt.TransformationMode.SmoothTransformation)
 
         # метка с логотипом
         self.label_logo = QtWidgets.QLabel()
         self.label_logo.setObjectName("label_logo")
-        self.label_logo.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_logo.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label_logo.setPixmap(self.logo)
         self.label_logo.setFixedSize(self.logo.width(), self.logo.height())
 
@@ -641,16 +641,16 @@ class DialogInfo(QtWidgets.QDialog):
         self.vbox_layout_text_header = QtWidgets.QVBoxLayout()
         self.vbox_layout_text_header.setSpacing(0)
         self.vbox_layout_text_header.setContentsMargins(0, 0, 0, 0)
-        self.vbox_layout_text_header.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        self.vbox_layout_text_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
         self.hbox_layout_header.addLayout(self.vbox_layout_text_header)
 
         # метка заголовка
         self.label_header = QtWidgets.QLabel()
-        self.label_header.setFont(QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Bold))
+        self.label_header.setFont(QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Weight.Bold))
         self.label_header.setObjectName("label_header")
         self.label_header.setText(self.name)
-        self.label_header.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        self.label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
         self.vbox_layout_text_header.addWidget(self.label_header)
         self.vbox_layout_text_header.addSpacing(10)
@@ -660,7 +660,7 @@ class DialogInfo(QtWidgets.QDialog):
         self.label_version.setFont(QtGui.QFont("Segoe UI", 11))
         self.label_version.setObjectName("label_version")
         self.label_version.setText(self.version)
-        self.label_version.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        self.label_version.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
         self.vbox_layout_text_header.addWidget(self.label_version)
 
@@ -670,7 +670,7 @@ class DialogInfo(QtWidgets.QDialog):
         self.label_text_info.setObjectName("label_text_info")
         self.label_text_info.setWordWrap(True)
         self.label_text_info.setText(self.text_info)
-        self.label_text_info.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        self.label_text_info.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
         self.vbox_layout_internal.addWidget(self.label_text_info)
         self.vbox_layout_internal.addSpacing(20)
@@ -691,7 +691,7 @@ class DialogInfo(QtWidgets.QDialog):
         self.push_button_ok.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_ok.setFixedSize(142, 42)
         self.push_button_ok.setText("Ок")
-        self.push_button_ok.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_ok.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.hbox_layout_tools.addWidget(self.push_button_ok)
 

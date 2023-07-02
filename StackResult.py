@@ -1,5 +1,5 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtChart import QChart, QChartView, QPieSeries
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCharts import QChart, QChartView, QPieSeries
 import re
 
 class LabelLegend(QtWidgets.QWidget):
@@ -81,7 +81,7 @@ class BarNavigation(QtWidgets.QWidget):
             label_number = QtWidgets.QLabel()
             label_number.setObjectName("label_number")
             label_number.setText(f"{i + 1}")
-            label_number.setAlignment(QtCore.Qt.AlignCenter)
+            label_number.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             label_number.setFont(QtGui.QFont("Segoe UI", 12))
             label_number.setFixedSize(50, 50)
 
@@ -202,7 +202,7 @@ class StackResult(QtWidgets.QWidget):
         self.label_result.setObjectName("label_result")
         self.label_result.setText(f"{round(self.data_result.points_right / self.data_result.points_max * 100)} / 100")
         self.label_result.setFont(QtGui.QFont("Segoe UI", 20))
-        self.label_result.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_result.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.vbox_layout_legend.addWidget(self.label_result)
         self.vbox_layout_legend.addSpacing(10)
@@ -212,7 +212,7 @@ class StackResult(QtWidgets.QWidget):
         self.label_header.setObjectName("label_header")
         self.label_header.setText(f"Результат теста в баллах")
         self.label_header.setFont(QtGui.QFont("Segoe UI", 16))
-        self.label_header.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.vbox_layout_legend.addWidget(self.label_header)
         self.vbox_layout_legend.addSpacing(10)

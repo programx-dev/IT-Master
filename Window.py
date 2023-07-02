@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 import sys
 
 class Window(QtWidgets.QMainWindow):
@@ -7,8 +7,8 @@ class Window(QtWidgets.QMainWindow):
     open_info = QtCore.pyqtSignal()
     def __init__(self, data_theme: dict):
         super().__init__()
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.__data_theme = data_theme
 
@@ -42,7 +42,7 @@ class Window(QtWidgets.QMainWindow):
         # метка иконки
         self.label_icon = QtWidgets.QLabel()
         self.label_icon.setObjectName("label_icon")
-        self.label_icon.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_icon.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label_icon.setFixedSize(25, 25)
 
         self.hbox_layout_title.addWidget(self.label_icon)
@@ -51,8 +51,8 @@ class Window(QtWidgets.QMainWindow):
         # метка титла
         self.label_title = QtWidgets.QLabel()
         self.label_title.setObjectName("label_title")
-        self.label_title.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        self.label_title.setFont(QtGui.QFont("Trebuchet MS", 10, weight = QtGui.QFont.Bold))
+        self.label_title.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.label_title.setFont(QtGui.QFont("Trebuchet MS", 10, weight = QtGui.QFont.Weight.Bold))
 
         self.hbox_layout_title.addWidget(self.label_title)
         self.hbox_layout_title.addStretch(1)
@@ -64,7 +64,7 @@ class Window(QtWidgets.QMainWindow):
         self.push_button_info.setFont(QtGui.QFont("Webdings", 9))
         self.push_button_info.setText("s")
         self.push_button_info.setFixedSize(58, 36)
-        self.push_button_info.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_info.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.hbox_layout_title.addWidget(self.push_button_info)
 
@@ -75,7 +75,7 @@ class Window(QtWidgets.QMainWindow):
         self.push_button_minimize.setFont(QtGui.QFont("Webdings", 9))
         self.push_button_minimize.setText("0")
         self.push_button_minimize.setFixedSize(58, 36)
-        self.push_button_minimize.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_minimize.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.hbox_layout_title.addWidget(self.push_button_minimize)
 
@@ -86,7 +86,7 @@ class Window(QtWidgets.QMainWindow):
         self.push_button_close.setFont(QtGui.QFont("Webdings", 9))
         self.push_button_close.setText("r")
         self.push_button_close.setFixedSize(58, 36)
-        self.push_button_close.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_close.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.hbox_layout_title.addWidget(self.push_button_close)
 
@@ -128,7 +128,7 @@ class Window(QtWidgets.QMainWindow):
         super().showMaximized()
 
     def set_icon(self, icon: QtGui.QPixmap):
-        icon = icon.scaled(25, 25, transformMode = QtCore.Qt.SmoothTransformation)
+        icon = icon.scaled(25, 25, transformMode = QtCore.Qt.TransformationMode.SmoothTransformation)
         self.label_icon.setPixmap(icon)
 
     def set_title(self, title: str):

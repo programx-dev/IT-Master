@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 import os
 from dataclasses import dataclass
 
@@ -26,14 +26,14 @@ class PushButtonCourse(QtWidgets.QWidget):
 
         self.setLayout(self.hbox_layout_main)
 
-        # кнопка с название курса
+        # кнопка с название курсаNoFocusw
         self.push_button_title = QtWidgets.QPushButton()
         self.push_button_title.setObjectName("push_button_title")
         self.push_button_title.clicked.connect(self.press_choose_course)
         self.push_button_title.setText("Выбрать урок")
         self.push_button_title.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_title.setFixedHeight(42)
-        self.push_button_title.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_title.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.hbox_layout_main.addWidget(self.push_button_title)
 
@@ -43,7 +43,7 @@ class PushButtonCourse(QtWidgets.QWidget):
         self.push_button_download.clicked.connect(self.press_choose_course)
         self.push_button_download.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_download.setFixedSize(42, 42)
-        self.push_button_download.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_download.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.hbox_layout_main.addWidget(self.push_button_download)
 
@@ -155,10 +155,10 @@ class StackLogin(QtWidgets.QWidget):
 
         # метка заголовка
         self.label_header = QtWidgets.QLabel()
-        self.label_header.setFont(QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Bold))
+        self.label_header.setFont(QtGui.QFont("Segoe UI", 20, weight = QtGui.QFont.Weight.Bold))
         self.label_header.setObjectName("label_header")
         self.label_header.setText("Вход")
-        self.label_header.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.vbox_layout_data.addWidget(self.label_header)
         self.vbox_layout_data.addSpacing(10)
@@ -217,7 +217,7 @@ class StackLogin(QtWidgets.QWidget):
         self.push_button_enter.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_enter.setText("Войти")
         self.push_button_enter.setFixedHeight(42)
-        self.push_button_enter.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_enter.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.vbox_layout_data.addWidget(self.push_button_enter)
 
@@ -230,7 +230,7 @@ class StackLogin(QtWidgets.QWidget):
         self.push_button_table_results.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_table_results.setText("Таблица результатов")
         self.push_button_table_results.setFixedHeight(42)
-        self.push_button_table_results.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_table_results.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.vbox_layout_internal.addWidget(self.push_button_table_results)
 

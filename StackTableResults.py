@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 import sqlite3
 import datetime 
 import re
@@ -56,10 +56,10 @@ class StackTableResults(QtWidgets.QWidget):
 
         # метка заголовка
         self.label_header = QtWidgets.QLabel()
-        self.label_header.setFont(QtGui.QFont("Segoe UI", 17, weight = QtGui.QFont.Bold))
+        self.label_header.setFont(QtGui.QFont("Segoe UI", 17, weight = QtGui.QFont.Weight.Bold))
         self.label_header.setObjectName("label_header")
         self.label_header.setText("Таблица результатов")
-        self.label_header.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.hbox_layout_header.addWidget(self.label_header)
         self.hbox_layout_header.addStretch(1)
@@ -68,11 +68,11 @@ class StackTableResults(QtWidgets.QWidget):
         self.table_results = QtWidgets.QTableWidget()
         self.table_results.setObjectName("table_results")
         self.table_results.setColumnCount(10)
-        self.table_results.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.table_results.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table_results.setFont(QtGui.QFont("Segoe UI", 12))
         self.table_results.horizontalHeader().setFont(QtGui.QFont("Segoe UI", 12))
         self.table_results.verticalHeader().setFont(QtGui.QFont("Segoe UI", 12))
-        self.table_results.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.table_results.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.table_results.verticalHeader().setVisible(False)
 
         self.vbox_layout_internal.addWidget(self.table_results)

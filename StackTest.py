@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 import os
 import datetime
 import xml.etree.ElementTree as ET
@@ -147,7 +147,7 @@ class RadiobuttonAnswers(QtWidgets.QWidget):
         self.push_button_flag = QtWidgets.QPushButton()
         self.push_button_flag.setObjectName("push_button_flag")
         self.push_button_flag.clicked.connect(self.radio_button_clicked)
-        self.push_button_flag.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+        self.push_button_flag.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Expanding)
         self.push_button_flag.setMinimumHeight(25)
 
         self.hbox_layout_main.addWidget(self.push_button_flag)
@@ -157,7 +157,7 @@ class RadiobuttonAnswers(QtWidgets.QWidget):
         self.push_button_text = QtWidgets.QPushButton ()
         self.push_button_text.setObjectName("push_button_text")
         self.push_button_text.clicked.connect(self.radio_button_clicked)
-        self.push_button_text.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        self.push_button_text.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Preferred)
 
         self.hbox_layout_main.addWidget(self.push_button_text)
 
@@ -173,7 +173,7 @@ class RadiobuttonAnswers(QtWidgets.QWidget):
         self.label_text.setObjectName("label_text")
         self.label_text.setText(self.__text)
         self.label_text.setWordWrap(True)
-        self.label_text.setAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignLeft)
+        self.label_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignVCenter | QtCore.Qt.AlignmentFlag.AlignLeft)
         self.label_text.setFont(QtGui.QFont("Segoe UI", 14))
         self.label_text.setMinimumHeight(25)
 
@@ -283,7 +283,7 @@ class CheckboxAnswers(QtWidgets.QWidget):
         self.push_button_flag = QtWidgets.QPushButton()
         self.push_button_flag.setObjectName("push_button_flag")
         self.push_button_flag.clicked.connect(self.checkbox_clicked)
-        self.push_button_flag.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+        self.push_button_flag.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Expanding)
         self.push_button_flag.setMinimumHeight(25)
 
         self.hbox_layout_main.addWidget(self.push_button_flag)
@@ -293,7 +293,7 @@ class CheckboxAnswers(QtWidgets.QWidget):
         self.push_button_text = QtWidgets.QPushButton()
         self.push_button_text.setObjectName("push_button_text")
         self.push_button_text.clicked.connect(self.checkbox_clicked)
-        self.push_button_text.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        self.push_button_text.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Preferred)
 
         self.hbox_layout_main.addWidget(self.push_button_text)
 
@@ -309,7 +309,7 @@ class CheckboxAnswers(QtWidgets.QWidget):
         self.label_text.setObjectName("label_text")
         self.label_text.setText(self.__text)
         self.label_text.setWordWrap(True)
-        self.label_text.setAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignLeft)
+        self.label_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignVCenter | QtCore.Qt.AlignmentFlag.AlignLeft)
         self.label_text.setFont(QtGui.QFont("Segoe UI", 14))
         self.label_text.setMinimumHeight(25)
 
@@ -392,7 +392,7 @@ class PushButtonImage(QtWidgets.QPushButton):
         self.setFixedSize(300, 200)
         self.clicked.connect(self.push_button_press)
 
-        self.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
 
         self.set_style_sheet()
 
@@ -400,7 +400,7 @@ class PushButtonImage(QtWidgets.QPushButton):
         self.pixmap = QtGui.QPixmap(self.path_image)
 
         zoom = max(300 / self.pixmap.width(), 200 / self.pixmap.height())
-        self.pixmap = self.pixmap.scaled(round(self.pixmap.width() * zoom), round(self.pixmap.height() * zoom), transformMode = QtCore.Qt.SmoothTransformation)
+        self.pixmap = self.pixmap.scaled(round(self.pixmap.width() * zoom), round(self.pixmap.height() * zoom), transformMode = QtCore.Qt.TransformationMode.SmoothTransformation)
         
         delta_x = (self.pixmap.width() - 300) // 2
         delta_y = (self.pixmap.height() - 200) // 2

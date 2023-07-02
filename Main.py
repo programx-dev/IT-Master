@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 import StackLogin
 import StackLesson
 import StackTest
@@ -345,4 +345,4 @@ if __name__ == "__main__":
     window_main = Main()
     window_main.show_window()
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

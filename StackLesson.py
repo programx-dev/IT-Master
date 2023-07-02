@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 import re
 
 class LessonGraphicsView(QtWidgets.QGraphicsView):
@@ -11,20 +11,20 @@ class LessonGraphicsView(QtWidgets.QGraphicsView):
         self.init_variables()
 
         self.image = QtWidgets.QGraphicsPixmapItem()
-        self.image.setTransformationMode(QtCore.Qt.SmoothTransformation) 
+        self.image.setTransformationMode(QtCore.Qt.TransformationMode.SmoothTransformation) 
 
         self.graphics_scene = QtWidgets.QGraphicsScene()
         self.graphics_scene.addItem(self.image)
 
         self.setScene(self.graphics_scene)
 
-        self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.HighQualityAntialiasing)
+        self.setDragMode(QtWidgets.QGraphicsView.DragMode.ScrollHandDrag)
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
+        self.setRenderHints(QtGui.QPainter.RenderHint.Antialiasing)
 
         self.set_style_sheet()
 
@@ -60,7 +60,7 @@ class LessonGraphicsView(QtWidgets.QGraphicsView):
         self.fit_in_view()
 
     def wheelEvent(self, event):
-        if event.modifiers() & QtCore.Qt.ControlModifier:
+        if event.modifiers() & QtCore.Qt.KeyboardModifier.ControlModifier:
             current_zoom = self.zoom
             if event.angleDelta().y() > 0 and self.zoom < self.max_zoom:
                 factor = 1.25
@@ -171,10 +171,10 @@ class StackLesson(QtWidgets.QWidget):
 
         # метка заголовка
         self.label_header = QtWidgets.QLabel()
-        self.label_header.setFont(QtGui.QFont("Segoe UI", 17, weight = QtGui.QFont.Bold))
+        self.label_header.setFont(QtGui.QFont("Segoe UI", 17, weight = QtGui.QFont.Weight.Bold))
         self.label_header.setObjectName("label_header")
         self.label_header.setText("Теоретическая часть")
-        self.label_header.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+        self.label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
         self.hbox_layout_header.addWidget(self.label_header)
         self.hbox_layout_header.addStretch(1)
@@ -206,7 +206,7 @@ class StackLesson(QtWidgets.QWidget):
         self.push_button_start.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_start.setFixedHeight(42)
         self.push_button_start.setText("Начать тест")
-        self.push_button_start.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.push_button_start.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.hbox_layout_tools.addWidget(self.push_button_start)
         self.hbox_layout_tools.addStretch(1)
