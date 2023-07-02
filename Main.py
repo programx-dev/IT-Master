@@ -340,6 +340,13 @@ class Main(Window.Window):
             super().close_window()
 
 if __name__ == "__main__":
+    # https://doc.qt.io/qt-5/highdpi.html
+    # os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+    if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
+        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+    if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
+        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+
     app = QtWidgets.QApplication(sys.argv)
 
     window_main = Main()
