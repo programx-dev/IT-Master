@@ -63,26 +63,12 @@
     }
   },
   "window": {
-    "frame_title": {
-      "background":"rgb(90, 153, 255)",
+    "frame_header": {
+      "background": "rgb(90, 153, 255)",
       "label_title": {
         "color": " rgb(255, 255, 255)"
       },
-      "push_button_info": {
-        "normal": {
-          "background": "rgb(90, 153, 255)",
-          "color": "rgb(255, 255, 255)"
-        },
-        "hover": {
-          "background": "rgb(64, 127, 228)",
-          "color": "rgb(255, 255, 255)"
-        },
-        "press": {
-          "background": "rgb(39, 102, 204)",
-          "color": "rgb(255, 255, 255)"
-        }
-      },
-      "push_button_minimize": {
+      "push_button": {
         "normal": {
           "background": "rgb(90, 153, 255)",
           "color": "rgb(255, 255, 255)"
@@ -107,6 +93,19 @@
         },
         "press": {
           "background": "rgb(241, 112, 122)",
+          "color": "rgb(255, 255, 255)"
+        }
+      }
+    },
+    "frame_tool_bar": {
+      "background": "rgb(89, 152, 254)",
+      "tool_button": {
+        "selected": {
+          "background": "rgb(66, 138, 255)",
+          "color": "rgb(255, 255, 255)"
+        },
+        "not_selected": {
+          "background": "rgb(89, 152, 254)",
           "color": "rgb(255, 255, 255)"
         }
       }

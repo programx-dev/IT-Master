@@ -11,6 +11,7 @@ class DataPassage:
 
 class PushButtonCourse(QtWidgets.QWidget):
     push_button_clicked_choose_course = QtCore.pyqtSignal()
+    
     def __init__(self, path_images: str, data_theme: dict):
         super().__init__()
 
