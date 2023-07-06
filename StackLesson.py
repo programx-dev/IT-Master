@@ -250,7 +250,7 @@ class StackLesson(QtWidgets.QWidget):
         #push_button_start {
             outline: 0;
             border-radius: 7px; 
-            padding-left: 10px;
+            padding-left: 10px;  
             padding-right: 10px;
             background-color: %(background)s; 
             color: %(color)s;

@@ -178,7 +178,7 @@ class ToolButtonToolbar(QtWidgets.QToolButton):
         self.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
 
         self.setText(self.__text)
-        self.setFont(QtGui.QFont("Calibri", 12))
+        self.setFont(QtGui.QFont("Segoe UI", 10))
 
         self.set_style_sheet()
 

@@ -1,5 +1,5 @@
 {
-  "stack_login": {
+  "stack_home_page": {
     "frame_main": {
       "background": "rgb(90, 153, 255)",
       "background_image": "background.png",
@@ -9,56 +9,25 @@
           "background": "rgb(255, 255, 255)",
           "color": "rgb(0, 0, 0)"
         },
-        "line_edit_surname": {
-          "not_focus": {
-            "color_border": "rgb(232, 232, 239)",
-            "background": "rgb(244, 243, 248)",
-            "color": "rgb(0, 0, 0)"
-          },
-          "focus": {
-            "color_border": "rgb(182, 217, 253)",
-            "background": "rgb(255, 255, 255)",
-            "color": "rgb(0, 0, 0)"
+        "list_view": {
+          "background": "#FFFFFF",
+          "color": "#000000",
+          "scrollbar": {
+            "background": "#F2F2F2",
+            "handle": {
+              "background": "#888888"
+            }
           }
         },
-        "line_edit_name": {
-          "not_focus": {
-            "color_border": "rgb(232, 232, 239)",
-            "background": "rgb(244, 243, 248)",
-            "color": "rgb(0, 0, 0)"
-          },
-          "focus": {
-            "color_border": "rgb(182, 217, 253)",
-            "background": "rgb(255, 255, 255)",
-            "color": "rgb(0, 0, 0)"
-          }
+        "push_button_select_explorer": {
+          "color": "#000000"
         },
-        "line_edit_class": {
-          "not_focus": {
-            "color_border": "rgb(232, 232, 239)",
-            "background": "rgb(244, 243, 248)",
-            "color": "rgb(0, 0, 0)"
-          },
-          "focus": {
-            "color_border": "rgb(182, 217, 253)",
-            "background": "rgb(255, 255, 255)",
-            "color": "rgb(0, 0, 0)"
-          }
-        },
-        "push_button_cource": {
-          "background": "rgb(244, 243, 248)",
-          "color": "rgb(0, 0, 0)"
-        },
-        "push_button_enter": {
+        "push_button_start_test": {
           "background": "rgb(3, 123, 251)",
           "background_disabled": "rgb(149, 200, 255)",
           "background_pressed": "rgb(0, 74, 173)",
           "color": "rgb(255, 255, 255)"
         }
-      },
-      "push_button_table_results": {
-        "background": "rgb(232, 232, 239)",
-        "color": "rgb(0, 0, 0)"
       }
     }
   },

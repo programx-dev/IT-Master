@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import StackLogin
+import StackHomePage
 import StackLesson
 import StackTest
 import StackResult
@@ -103,17 +103,25 @@ class Main(Window.Window):
         self.set_icon(QtGui.QPixmap(self.__path_image_logo))
 
         # создание страницы входа
-        self.__current_stack = StackLogin.StackLogin(
-            path_theme = self.__path_theme,
+        # self.__current_stack = StackHomePage.StackLogin(
+        #     path_theme = self.__path_theme,
+        #     path_courses = self.__path_courses, 
+        #     path_images = self.__path_images, 
+        #     data_theme = self.__data_theme["stack_login"], 
+        #     func_start = self.__start, 
+        #     func_table_results = self.__open_table_result, 
+        #     surname = self.__data_loggin.surname, 
+        #     name = self.__data_loggin.name,
+        #     class_name = self.__data_loggin.class_name
+        # )
+
+        self.__current_stack = StackHomePage.StackHomePage(
             path_courses = self.__path_courses, 
             path_images = self.__path_images, 
-            data_theme = self.__data_theme["stack_login"], 
-            func_start = self.__start, 
-            func_table_results = self.__open_table_result, 
-            surname = self.__data_loggin.surname, 
-            name = self.__data_loggin.name,
-            class_name = self.__data_loggin.class_name
+            path_theme = self.__path_theme,
+            data_theme = self.__data_theme["stack_home_page"], 
         )
+        self.__current_stack.push_button_clicked_start_test.connect(self.__start)
 
         # виджет стеков для страниц
         self.__stacked_widget = QtWidgets.QStackedWidget()
@@ -231,7 +239,7 @@ class Main(Window.Window):
         self.__stacked_widget.addWidget(self.__current_stack)
         self.__stacked_widget.setCurrentWidget(self.__current_stack)
 
-    def __open_table_result(self, data: StackLogin.DataPassage):
+    def __open_table_result(self, data: StackHomePage.DataHomePage):
         # проверить пустая ли таблица
         with sqlite3.connect(self.__path_database) as db:
             cursor = db.cursor()
@@ -263,11 +271,12 @@ class Main(Window.Window):
         else:
             self.__open_dialog_table_results_empty()
 
-    def __start(self, data: StackLogin.DataPassage):
+    def __start(self, data: StackHomePage.DataHomePage):
+        print("KABAN", data, "KABAN")
         self.__data_loggin = DataLoggin(
-            name = data.name,
-            surname = data.surname,
-            class_name = data.class_name,
+            name = None,
+            surname = None,
+            class_name = None,
             path_course = data.path_course
         )
 
@@ -306,7 +315,7 @@ class Main(Window.Window):
         self.__stacked_widget.removeWidget(self.__current_stack)
 
         # создание и упаковка окна входа
-        self.__current_stack = StackLogin.StackLogin(
+        self.__current_stack = StackHomePage.StackLogin(
             path_theme = self.__path_theme,
             path_courses = self.__path_courses, 
             path_images = self.__path_images, 
