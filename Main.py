@@ -52,7 +52,7 @@ class Main(Window.Window):
         self.__test_started = False
         self.__current_stack = None
 
-        # получение настроек
+        # получение настроек из файла
         with open(self.__path_settings, "r", encoding = "utf-8") as file:
             self.__data = json.load(file)
 
@@ -134,7 +134,7 @@ class Main(Window.Window):
         self.__stacked_widget.setCurrentWidget(self.__current_stack)
 
     def __delete_old_record(self):
-        # оставить в БД <= 100 записей
+        # оставить в БД до 100 записей
         with sqlite3.connect(self.__path_database) as db:
             cursor = db.cursor()
 
@@ -212,7 +212,7 @@ class Main(Window.Window):
         self.__current_stack = StackResult.StackResult(
             data_result = data_result, 
             data_theme = self.__data_theme["stack_result"], 
-            func = self.__to_main
+            func = self.__open_home_page
         )
 
         self.__stacked_widget.addWidget(self.__current_stack)
