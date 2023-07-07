@@ -6,12 +6,20 @@
       "frame_internal": {
         "background": "rgb(255, 255, 255)",
         "label_header": {
-          "background": "rgb(255, 255, 255)",
           "color": "rgb(0, 0, 0)"
         },
         "list_view": {
-          "background": "#FFFFFF",
           "color": "#000000",
+          "item": {
+            "selected": {
+              "background": "#CCE8FF",
+              "color": "#000000"
+            },
+            "hover": {
+              "background": "#E5F3FF",
+              "color": "#000000"
+            }
+          },
           "scrollbar": {
             "background": "#F2F2F2",
             "handle": {
@@ -19,14 +27,20 @@
             }
           }
         },
-        "push_button_select_explorer": {
+        "push_button_select_in_explorer": {
           "color": "#000000"
         },
         "push_button_start_test": {
           "background": "rgb(3, 123, 251)",
-          "background_disabled": "rgb(149, 200, 255)",
-          "background_pressed": "rgb(0, 74, 173)",
-          "color": "rgb(255, 255, 255)"
+          "color": "rgb(255, 255, 255)",
+          "disabled": {
+            "background": "rgb(149, 200, 255)",
+            "color":" rgb(255, 255, 255)"
+          },
+          "pressed": {
+            "background": "rgb(0, 74, 173)",
+            "color":" rgb(255, 255, 255)"
+          }
         }
       }
     }

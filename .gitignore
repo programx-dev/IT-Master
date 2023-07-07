@@ -5,3 +5,5 @@ IT Master Installer/
 Main.spec
 resources/table_tesult.db
 run.bat
+
+deleted_code.py

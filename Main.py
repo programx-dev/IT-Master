@@ -48,10 +48,9 @@ class Main(Window.Window):
         self.__text_info = """IT Master - это школьный предметный тренажёр по информатике, позволяющий изучить материал урока и закрепить полученные знания, выполнив тест\n
 Ведущий разрабочик - Смирнов Н. А., 9 класс, ГБОУ школа №1370\n
 Приложение написано на языке программирования Python"""
-
         self.__path_settings = r"settings.json"
-
         self.__test_started = False
+        self.__current_stack = None
 
         # получение настроек
         with open(self.__path_settings, "r", encoding = "utf-8") as file:
@@ -102,19 +101,27 @@ class Main(Window.Window):
         self.set_title("IT Master")
         self.set_icon(QtGui.QPixmap(self.__path_image_logo))
 
-        # создание страницы входа
-        # self.__current_stack = StackHomePage.StackLogin(
-        #     path_theme = self.__path_theme,
-        #     path_courses = self.__path_courses, 
-        #     path_images = self.__path_images, 
-        #     data_theme = self.__data_theme["stack_login"], 
-        #     func_start = self.__start, 
-        #     func_table_results = self.__open_table_result, 
-        #     surname = self.__data_loggin.surname, 
-        #     name = self.__data_loggin.name,
-        #     class_name = self.__data_loggin.class_name
-        # )
+        # виджет стеков для страниц
+        self.__stacked_widget = QtWidgets.QStackedWidget()
+        self.__stacked_widget.setObjectName("stacked_widget")
 
+        self.add_widget(self.__stacked_widget)
+
+        # присоединение слотов к сигналам
+        self.toolbar.tool_button_home_page_cliced.connect(self.__open_home_page)
+
+        # выбрать кнопку Домашняя страница
+        self.toolbar.tool_button_home_page.press_tool_button()
+
+    def __open_home_page(self):
+        if type(self.__current_stack) == StackHomePage.StackHomePage:
+            return
+           
+        # удаление старого окна
+        if self.__current_stack!= None:
+            self.__stacked_widget.removeWidget(self.__current_stack)
+
+        # создание и упаковка окна входа
         self.__current_stack = StackHomePage.StackHomePage(
             path_courses = self.__path_courses, 
             path_images = self.__path_images, 
@@ -123,16 +130,6 @@ class Main(Window.Window):
         )
         self.__current_stack.push_button_clicked_start_test.connect(self.__start)
 
-        # виджет стеков для страниц
-        self.__stacked_widget = QtWidgets.QStackedWidget()
-        self.__stacked_widget.setObjectName("stacked_widget")
-
-        self.add_widget(self.__stacked_widget)
-
-        # выбрать кнопку Домашняя страница
-        self.toolbar.tool_button_home_page.press_tool_button()
-
-        # добавление страницы входа в виджет стеков
         self.__stacked_widget.addWidget(self.__current_stack)
         self.__stacked_widget.setCurrentWidget(self.__current_stack)
 
@@ -272,7 +269,6 @@ class Main(Window.Window):
             self.__open_dialog_table_results_empty()
 
     def __start(self, data: StackHomePage.DataHomePage):
-        print("KABAN", data, "KABAN")
         self.__data_loggin = DataLoggin(
             name = None,
             surname = None,

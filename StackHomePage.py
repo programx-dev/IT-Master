@@ -10,85 +10,11 @@ class DataHomePage:
 
 @dataclass
 class DataCourse:
-    text: str
-    path: str
-
-class PushButtonCourse(QtWidgets.QWidget):
-    push_button_clicked_choose_course = QtCore.pyqtSignal()
-    
-    def __init__(self, path_images: str, data_theme: dict):
-        super().__init__()
-
-        self.path_images = path_images
-        self.data_theme = data_theme
-
-        self.init_variables()
-
-        # главный макет
-        self.hbox_layout_main = QtWidgets.QHBoxLayout(self)
-        self.hbox_layout_main.setSpacing(0)
-        self.hbox_layout_main.setContentsMargins(0, 0, 0, 0)
-
-        self.setLayout(self.hbox_layout_main)
-
-        # кнопка с название курсаNoFocusw
-        self.push_button_title = QtWidgets.QPushButton()
-        self.push_button_title.setObjectName("push_button_title")
-        self.push_button_title.clicked.connect(self.press_choose_course)
-        self.push_button_title.setText("Выбрать урок")
-        self.push_button_title.setFont(QtGui.QFont("Segoe UI", 12))
-        self.push_button_title.setFixedHeight(42)
-        self.push_button_title.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-
-        self.hbox_layout_main.addWidget(self.push_button_title)
-
-        # кнопка со значком выбора курса
-        self.push_button_download = QtWidgets.QPushButton()
-        self.push_button_download.setObjectName("push_button_download")
-        self.push_button_download.clicked.connect(self.press_choose_course)
-        self.push_button_download.setFont(QtGui.QFont("Segoe UI", 12))
-        self.push_button_download.setFixedSize(42, 42)
-        self.push_button_download.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-
-        self.hbox_layout_main.addWidget(self.push_button_download)
-
-        self.set_style_sheet()
-
-    def change_title(self, text: str):
-        self.push_button_title.setText(text)
-
-    def press_choose_course(self):
-        self.push_button_clicked_choose_course.emit()
-
-    def init_variables(self):
-        self.img_download = QtGui.QIcon(os.path.join(self.path_images, "download.png"))
-
-    def set_style_sheet(self):
-        # кнопка с название курса
-        self.push_button_title.setStyleSheet("""
-        #push_button_title { 
-            outline: 0;
-            border-top-left-radius: 7px; 
-            border-bottom-left-radius: 7px;
-            padding-left: 42px;
-            background: %(background)s;
-            color: %(color)s;
-        } """ % self.data_theme)
-
-        # кнопка со значком выбора курса
-        self.push_button_download.setStyleSheet("""
-        #push_button_download {
-            outline: 0;
-            border-top-right-radius: 7px; 
-            border-bottom-right-radius: 7px; 
-            background: %(background)s; 
-            color: %(color)s;
-        } """ % self.data_theme)
-        
-        self.push_button_download.setIcon(self.img_download)
-        self.push_button_download.setIconSize(QtCore.QSize(42 - 14, 42 - 14))
+    name: str
+    path_course: str
 
 class StackHomePage(QtWidgets.QWidget):
+    """Домашняя страница"""
     push_button_clicked_start_test = QtCore.pyqtSignal(DataHomePage)
 
     def __init__(self, path_courses: str, path_images: str, path_theme: str, data_theme: dict):
@@ -101,7 +27,7 @@ class StackHomePage(QtWidgets.QWidget):
 
         self.__path_selected_course = None
 
-        # главвный макет
+        # главный макет
         self.__hbox_layout_main = QtWidgets.QHBoxLayout()
         self.__hbox_layout_main.setSpacing(0)
         self.__hbox_layout_main.setContentsMargins(0, 0, 0, 0)
@@ -137,12 +63,13 @@ class StackHomePage(QtWidgets.QWidget):
         # макет внутри внутренней рамки
         self.__vbox_layout_internal = QtWidgets.QVBoxLayout()
         self.__vbox_layout_internal.setSpacing(0)
-        self.__vbox_layout_internal.setContentsMargins(20, 20, 20, 20)
+        self.__vbox_layout_internal.setContentsMargins(20, 10, 20, 20)
 
         self.__frame_internal.setLayout(self.__vbox_layout_internal)
 
         # метка заголовка
         self.__label_header = QtWidgets.QLabel()
+        self.__label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.__label_header.setFont(QtGui.QFont("Segoe UI", 14))
         self.__label_header.setObjectName("label_header")
         self.__label_header.setText("Каталог уроков")
@@ -162,40 +89,41 @@ class StackHomePage(QtWidgets.QWidget):
         self.__list_view_model = QtGui.QStandardItemModel()
         self.__list_view.setModel(self.__list_view_model) 
 
-        for i, data_course in enumerate(self.__get_courses(self.__path_courses)):
-            item = QtGui.QStandardItem(data_course.text)
-            item.path = data_course.path
+        for data_course in self.__get_courses(self.__path_courses):
+            item = QtGui.QStandardItem(data_course.name)
+            item._path = data_course.path_course
             self.__list_view_model.appendRow(item)
 
-            item.setData(QtGui.QIcon(os.path.join(self.__path_images, "folder.png")), QtCore.Qt.ItemDataRole.DecorationRole)
+            item.setData(QtGui.QIcon(os.path.join(self.__path_images, r"folder.png")), QtCore.Qt.ItemDataRole.DecorationRole)
         
         self.__list_view.selectionModel().currentChanged.connect(self.__list_view_row_changed)
+        self.__list_view.pressed.connect(lambda _: self.__push_button_select_in_explorer.setText("Выбрать в проводнике"))
 
         self.__vbox_layout_internal.addWidget(self.__list_view)
         self.__vbox_layout_internal.addSpacing(10)
 
         # кнопка Выбрать в проводнике
-        self.__push_button_select_explorer = QtWidgets.QPushButton()
-        self.__push_button_select_explorer.setObjectName("push_button_select_explorer")
-        self.__push_button_select_explorer.clicked.connect(self.__choose_course)
-        self.__push_button_select_explorer.setFont(QtGui.QFont("Segoe UI", 14))
-        self.__push_button_select_explorer.setIcon(QtGui.QIcon(os.path.join(self.__path_images, "select_in_explorer.png")))
-        self.__push_button_select_explorer.setIconSize(QtCore.QSize(20, 20))
-        self.__push_button_select_explorer.setText("Выбрать в проводнике")
-        self.__push_button_select_explorer.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.__push_button_select_in_explorer = QtWidgets.QPushButton()
+        self.__push_button_select_in_explorer.setObjectName("push_button_select_in_explorer")
+        self.__push_button_select_in_explorer.clicked.connect(self.__select_course_in_explorer)
+        self.__push_button_select_in_explorer.setFont(QtGui.QFont("Segoe UI", 14))
+        self.__push_button_select_in_explorer.setIcon(QtGui.QIcon(os.path.join(self.__path_images, r"select_in_explorer.png")))
+        self.__push_button_select_in_explorer.setIconSize(QtCore.QSize(20, 20))
+        self.__push_button_select_in_explorer.setText("Выбрать в проводнике")
+        self.__push_button_select_in_explorer.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
 
-        self.__vbox_layout_internal.addWidget(self.__push_button_select_explorer)
+        self.__vbox_layout_internal.addWidget(self.__push_button_select_in_explorer)
         self.__vbox_layout_internal.addSpacing(10)
 
         # кнопка Выбрать урок
         self.__push_button_start_test = QtWidgets.QPushButton()
-        self.__push_button_start_test.setObjectName("push_button_enter")
+        self.__push_button_start_test.setObjectName("push_button_start_test")
         self.__push_button_start_test.setEnabled(False)
         self.__push_button_start_test.clicked.connect(self.__start_test)
         self.__push_button_start_test.setFont(QtGui.QFont("Segoe UI", 14))
         self.__push_button_start_test.setText("Выбрать урок")
         self.__push_button_start_test.setFixedHeight(42)
-        self.__push_button_start_test.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.__push_button_start_test.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
 
         self.__vbox_layout_internal.addWidget(self.__push_button_start_test)
 
@@ -203,9 +131,10 @@ class StackHomePage(QtWidgets.QWidget):
 
     def __list_view_row_changed(self, current: QtCore.QModelIndex, previous: QtCore.QModelIndex):
         if current.isValid():
-            self.__path_selected_course = self.__list_view_model.item(current.row()).path
+            self.__path_selected_course = self.__list_view_model.item(current.row())._path
 
             self.__push_button_start_test.setEnabled(True)
+            self.__push_button_select_in_explorer.setText("Выбрать в проводнике")
 
     def __get_courses(self, path_courses: str) -> list[DataCourse]:
         files = [f for x in os.walk(path_courses) for f in glob(os.path.join(x[0], '*.xml'))]
@@ -215,52 +144,50 @@ class StackHomePage(QtWidgets.QWidget):
             tree = ET.parse(f)
             root = tree.getroot()
 
-            if root.find("type") != None and root.find("type").text == "IT Master course":
-                text = root.find("name").text
-                list_data_courses.append(DataCourse(text = text, path = f))
+            if (type := root.find("type")) != None and type.text == "IT Master course":
+                name = root.find("name").text
+                list_data_courses.append(DataCourse(name = name, path_course = f))
 
         return list_data_courses
 
     def __start_test(self):
-        data_passage = DataHomePage(
-            path_course = self.__path_selected_course
-        )
+        data_passage = DataHomePage(path_course = self.__path_selected_course)
 
         self.push_button_clicked_start_test.emit(data_passage)
 
-    def __choose_course(self):
-        # диалог выбора файла с курсом
+    def __select_course_in_explorer(self):
         path_file_course = QtWidgets.QFileDialog.getOpenFileName(self, "Выбор курса", self.__path_courses, "XML Файл (*.xml)")[0]
 
         if os.path.isfile(path_file_course):
-            self.__path_selected_course = path_file_course
-
-            self.__push_button_start_test.setEnabled(True)
+            self.__path_selected_course = path_file_course 
             
             name_course = os.path.splitext(os.path.basename(self.__path_selected_course))[0]
             formated_name_course = QtGui.QFontMetrics.elidedText(
-                QtGui.QFontMetrics(self.__push_button_select_explorer.font()),
+                QtGui.QFontMetrics(self.__push_button_select_in_explorer.font()),
                 name_course, 
                 QtCore.Qt.TextElideMode.ElideRight, 
-                (self.__push_button_select_explorer.width() - (self.__push_button_select_explorer.iconSize().width()\
-                    + (x := self.__push_button_select_explorer.contentsMargins()).left() + x.right())
+                (self.__push_button_select_in_explorer.width() - (self.__push_button_select_in_explorer.iconSize().width()\
+                    + (x := self.__push_button_select_in_explorer.contentsMargins()).left() + x.right())
                 )
             )
             # + QtGui.QFontMetrics.boundingRect(self.__push_button_select_explorer.fontMetrics(), "—").width())
 
-            self.__push_button_select_explorer.setText(formated_name_course)
+            self.__push_button_start_test.setEnabled(True)
+            self.__list_view.clearSelection()
+            self.__push_button_select_in_explorer.setText(formated_name_course)
 
     def set_style_sheet(self):
-        self.__data_theme["frame_main"]["path_background_image"] = os.path.join(os.path.split(self.__path_theme)[0], self.__data_theme["frame_main"]["background_image"]).replace("\\", "/")
-
         # главная рамка
+        temp_data_theme = self.__data_theme["frame_main"]
+        temp_data_theme["path_background_image"] = os.path.join(os.path.split(self.__path_theme)[0], temp_data_theme["background_image"]).replace("\\", "/")
+
         self.__frame_main.setStyleSheet("""
         #frame_main {
             background: %(background)s;
             border-image: url(%(path_background_image)s);
             background-repeat: no-repeat; 
             background-position: center;
-        } """ % self.__data_theme["frame_main"])
+        } """ % temp_data_theme)
 
         # внутренняя рамка формы
         self.__frame_internal.setStyleSheet("""
@@ -271,8 +198,8 @@ class StackHomePage(QtWidgets.QWidget):
 
         # метка заголовка
         self.__label_header.setStyleSheet("""
-        #label_header {
-            background: %(background)s; 
+        #label_header { 
+            background: none; 
             color: %(color)s
         } """ % self.__data_theme["frame_main"]["frame_internal"]["label_header"])
 
@@ -280,21 +207,39 @@ class StackHomePage(QtWidgets.QWidget):
         temp_data_theme = self.__data_theme["frame_main"]["frame_internal"]["list_view"]
         temp_data_theme["scrollbar_background"] = temp_data_theme["scrollbar"]["background"]
         temp_data_theme["scrollbar_background_handle"] = temp_data_theme["scrollbar"]["handle"]["background"]
+        temp_data_theme["item_selected_background"] = temp_data_theme["item"]["selected"]["background"]
+        temp_data_theme["item_selected_color"] = temp_data_theme["item"]["selected"]["color"]
+        temp_data_theme["item_hover_background"] = temp_data_theme["item"]["hover"]["background"]
+        temp_data_theme["item_hover_color"] = temp_data_theme["item"]["hover"]["color"]
         
         self.__list_view.setStyleSheet("""
         #list_view {
+            outline: 0;
             border: 0px;
-            background: %(background)s; 
+            background: transparent;
             color: %(color)s;
         }
-        
+        #list_view::item {
+            margin: 0px 14px 0px 0px;
+        }  
+        #list_view::item:selected {
+            border-radius: 6px;
+            background: %(item_selected_background)s;
+            color: %(item_selected_color)s;
+        }  
+        #list_view::item:hover:!selected {
+            border-radius: 6px;
+            background: %(item_hover_background)s;
+            color: %(item_hover_color)s;
+        }                        
+       
         QScrollBar:vertical {              
-            border: none;
+            border: transparent;
             background: %(scrollbar_background)s;
             width: 14px;
             border-radius: 6px;
             padding: 4px;
-            margin: 14px 0px 14px 0px;
+            margin: 0px 0px 0px 0px;
         }
         QScrollBar::handle:vertical {
             background: %(scrollbar_background_handle)s;
@@ -302,20 +247,20 @@ class StackHomePage(QtWidgets.QWidget):
             min-height: 30px;
         }
         QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-            background: none;
+            background: transparent;
             height: 0px;
         }
         QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-            background: none;
+            background: transparent;
         } 
 
         QScrollBar:horizontal {              
-            border: none;
+            border: transparent;
             background: %(scrollbar_background)s;
             height: 14px;
             border-radius: 6px;
             padding: 4px;
-            margin: 0px 14px 0px 14px;
+            margin: 0px 0px 0px 0px;
         }
         QScrollBar::handle:horizontal {
             background: %(scrollbar_background_handle)s;
@@ -323,36 +268,42 @@ class StackHomePage(QtWidgets.QWidget):
             min-width: 30px;
         }
         QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
-            background: none;
+            background: transparent;
             width: 0px;
         }
         QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
-            background: none;
+            background: transparent;
         } """ % temp_data_theme)
         
         # кнопка Выбрать в проводнике
-        self.__push_button_select_explorer.setStyleSheet("""
-        #push_button_select_explorer {
-            outline: 0;
+        self.__push_button_select_in_explorer.setStyleSheet("""
+        #push_button_select_in_explorer {
+            outline: 0;                                         
             text-align: left;
             border-radius: 7px; 
             background: transparent; 
             color: %(color)s;
-        } """ % self.__data_theme["frame_main"]["frame_internal"]["push_button_select_explorer"])
+        } """ % self.__data_theme["frame_main"]["frame_internal"]["push_button_select_in_explorer"])
 
         # кнопка входа
+        temp_data_theme = self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]
+        temp_data_theme["background_pressed"] = temp_data_theme["pressed"]["background"]
+        temp_data_theme["color_pressed"] = temp_data_theme["pressed"]["color"]
+        temp_data_theme["background_disabled"] = temp_data_theme["disabled"]["background"]
+        temp_data_theme["color_disabled"] = temp_data_theme["disabled"]["color"]
+
         self.__push_button_start_test.setStyleSheet("""
-        #push_button_enter {
+        #push_button_start_test {
             outline: 0;
             border-radius: 7px; 
             background: %(background)s; 
             color: %(color)s;
         } 
-        #push_button_enter::pressed {
-            background: %(background_pressed)s; 
+        #push_button_start_test::pressed {
+            background: %(color_pressed)s; 
             color: %(color)s;
         }
-        #push_button_enter::disabled {
+        #push_button_start_test::disabled {
             background: %(background_disabled)s;
-            color: %(color)s;
-        } """ % self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"])
+            color: %(color_disabled)s;
+        } """ % temp_data_theme)
