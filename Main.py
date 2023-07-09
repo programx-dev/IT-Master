@@ -1,7 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import StackHomePage
 import StackLesson
-import StackTest
+import StackTesting
 import StackResult
 import StackTableResults
 import Window
@@ -178,7 +178,7 @@ class Main(Window.Window):
 
         self.__delete_old_record()
 
-    def __finish_test(self, data: StackTest.DataPassage):
+    def __finish_test(self, data: StackTesting.DataPassage):
         self.__test_started = False
 
         # получение данных о прохождении
@@ -225,7 +225,7 @@ class Main(Window.Window):
         self.__stacked_widget.removeWidget(self.__current_stack)
 
         # создание и упаковка окна с тестом
-        self.__current_stack = StackTest.StackTest(
+        self.__current_stack = StackTesting.StackTest(
             icon_dialogs = QtGui.QPixmap(self.__path_image_logo),
             parent = self, func = self.__finish_test, 
             path_images = self.__path_images, 
