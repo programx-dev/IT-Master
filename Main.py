@@ -181,6 +181,8 @@ class Main(Window.Window):
     def __finish_test(self, data: StackTesting.DataPassage):
         self.__test_started = False
 
+        list_status = [i.status for i in data.list_data_result]
+
         # получение данных о прохождении
         data_save = DataSave(
             name = self.__data_loggin.name,
@@ -189,18 +191,18 @@ class Main(Window.Window):
             course = os.path.splitext(os.path.basename(self.__data_loggin.path_course))[0],
             date_start = data.date_start,
             date_end = data.date_end,
-            points_max = data.points_max,
-            points_right = data.points_right,
-            points_wrong = data.points_wrong,
-            points_skip = data.points_skip
+            points_max = len(list_status),
+            points_right = list_status.count(StackTesting.AnswerStatus.right),
+            points_wrong = list_status.count(StackTesting.AnswerStatus.wrong),
+            points_skip = list_status.count(StackTesting.AnswerStatus.skip)
         )
 
         data_result = DataResult(
-            points_max = data.points_max,
-            points_right = data.points_right,
-            points_wrong = data.points_wrong,
-            points_skip = data.points_skip,
-            dict_result = data.dict_result
+            points_max = data_save.points_max,
+            points_right = data_save.points_right,
+            points_wrong = data_save.points_wrong,
+            points_skip = data_save.points_skip,
+            dict_result = data.list_data_result
         )
 
         self.__create_record(data_save)
@@ -225,13 +227,13 @@ class Main(Window.Window):
         self.__stacked_widget.removeWidget(self.__current_stack)
 
         # создание и упаковка окна с тестом
-        self.__current_stack = StackTesting.StackTest(
-            icon_dialogs = QtGui.QPixmap(self.__path_image_logo),
-            parent = self, func = self.__finish_test, 
+        self.__current_stack = StackTesting.StackTesting(
+            path_course = self.__data_loggin.path_course,
             path_images = self.__path_images, 
-            data_theme = self.__data_theme["stack_test"], 
-            path_course = self.__data_loggin.path_course
+            icon_dialogs = QtGui.QPixmap(self.__path_image_logo),
+            data_theme = self.__data_theme["stack_test"] 
         )
+        self.__current_stack.push_button_finish_cliced.connect(self.__finish_test)
 
         self.__stacked_widget.addWidget(self.__current_stack)
         self.__stacked_widget.setCurrentWidget(self.__current_stack)
@@ -269,21 +271,26 @@ class Main(Window.Window):
             self.__open_dialog_table_results_empty()
 
     def __start(self, data: StackHomePage.DataHomePage):
+        # ?
         self.__data_loggin = DataLoggin(
             name = None,
             surname = None,
             class_name = None,
             path_course = data.path_course
         )
+        # ?
 
-        # определение есть ли урок
-        tree = ET.parse(self.__data_loggin.path_course)
-        root = tree.getroot()
+        self.__start_test()
 
-        if root.find("lesson") != None:
-            self.__open_lesson()
-        else:
-            self.__start_test()
+
+        # # определение есть ли урок
+        # tree = ET.parse(self.__data_loggin.path_course)
+        # root = tree.getroot()
+
+        # if root.find("lesson") != None:
+        #     self.__open_lesson()
+        # else:
+        #     self.__start_test()
 
     def __open_lesson(self):
         # удаление старого окна
@@ -364,6 +371,7 @@ if __name__ == "__main__":
     #     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     # if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
     #     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+    os.environ["QT_QUICK_BACKEND"] = "software"
 
     app = QtWidgets.QApplication(sys.argv)
 
