@@ -35,11 +35,11 @@
           "color": "rgb(255, 255, 255)",
           "disabled": {
             "background": "rgb(149, 200, 255)",
-            "color":" rgb(255, 255, 255)"
+            "color": "rgb(255, 255, 255)"
           },
           "pressed": {
             "background": "rgb(0, 74, 173)",
-            "color":" rgb(255, 255, 255)"
+            "color": "rgb(255, 255, 255)"
           }
         }
       }

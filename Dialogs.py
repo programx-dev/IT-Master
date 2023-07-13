@@ -1,6 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import re
 
+__parent__: "Main.Main" = None
+
 class ImageGraphicsView(QtWidgets.QGraphicsView):
     def __init__(self, path_image: str, data_theme: dict):
         super().__init__()
@@ -82,12 +84,12 @@ class ImageGraphicsView(QtWidgets.QGraphicsView):
 
 class DialogImage(QtWidgets.QDialog):
     window_close = QtCore.pyqtSignal()
-    def __init__(self, path_image: str, data_theme: dict, parent = None):
-        self.parent = parent
+    def __init__(self, path_image: str, data_theme: dict):
+        self.__parent = __parent__
         self.data_theme = data_theme
         self.path_image = path_image
 
-        super().__init__(self.parent)
+        super().__init__(self.__parent)
         self.setContentsMargins(7, 7, 7, 7)
         
         self.setWindowTitle('Изображение')
@@ -197,7 +199,7 @@ class DialogImage(QtWidgets.QDialog):
 
         self.show()
   
-        self.move(QtCore.QPoint(self.parent.geometry().getCoords()[0], self.parent.geometry().getCoords()[1]) + self.parent.rect().center() - self.rect().center())
+        self.move(QtCore.QPoint(self.__parent.geometry().getCoords()[0], self.__parent.geometry().getCoords()[1]) + self.__parent.rect().center() - self.rect().center())
 
     def load_lesson(self):
         self.image_viewer.set_image()

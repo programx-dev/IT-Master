@@ -52,6 +52,8 @@ class Main(Window.Window):
         self.__test_started = False
         self.__current_stack = None
 
+
+
         # получение настроек из файла
         with open(self.__path_settings, "r", encoding = "utf-8") as file:
             self.__data = json.load(file)
@@ -94,6 +96,8 @@ class Main(Window.Window):
             ) """)
 
         super().__init__(self.__path_images, data_theme = self.__data_theme["window"])
+
+        Dialogs.__parent__ = self
 
         self.setWindowTitle("IT Master")
         self.setWindowIcon(QtGui.QIcon(self.__path_image_logo))

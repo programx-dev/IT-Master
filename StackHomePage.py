@@ -300,8 +300,8 @@ class StackHomePage(QtWidgets.QWidget):
             color: %(color)s;
         } 
         #push_button_start_test::pressed {
-            background: %(color_pressed)s; 
-            color: %(color)s;
+            background: %(background_pressed)s; 
+            color: %(color_pressed)s;
         }
         #push_button_start_test::disabled {
             background: %(background_disabled)s;
