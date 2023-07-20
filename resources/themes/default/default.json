@@ -81,47 +81,35 @@
       }
     },
     "frame_tool_bar": {
-      "background": "rgb(89, 152, 254)",
-      "tool_button": {
-        "selected": {
-          "background": "rgb(66, 138, 255)",
-          "color": "rgb(255, 255, 255)"
-        },
-        "not_selected": {
-          "background": "rgb(89, 152, 254)",
-          "color": "rgb(255, 255, 255)"
+      "on_stack_home_page": {
+        "background": "rgb(89, 152, 254)",
+        "tool_button": {
+          "selected": {
+            "background": "rgb(66, 138, 255)",
+            "color": "rgb(255, 255, 255)"
+          },
+          "not_selected": {
+            "background": "rgb(89, 152, 254)",
+            "color": "rgb(255, 255, 255)"
+          }
+        }
+      },
+      "on_stack_test": {
+        "background": "rgb(89, 152, 254)",
+        "tool_button": {
+          "selected": {
+            "background": "rgb(66, 138, 255)",
+            "color": "rgb(255, 255, 255)"
+          },
+          "not_selected": {
+            "background": "#FFFFFF",
+            "color": "#000000"
+          }
         }
       }
     },
     "frame_widgets": {
       "background":"rgb(140, 140, 140)"
-    }
-  },
-  "stack_lesson": {
-    "frame_main": {
-      "background": "rgb(140, 140, 140)",
-      "frame_header": {
-        "background": "rgb(90, 153, 255)",
-        "label_header": {
-          "color": "rgb(255, 255, 255)"
-        }
-      },
-      "frame_tools": {
-        "background": "rgb(90, 153, 255)",
-        "push_button_start": {
-          "background": "rgb(3, 123, 251)",
-          "color": "rgb(255, 255, 255)"
-        }
-      },
-      "lesson_graphics_view": {
-        "background": "rgb(140, 140, 140)",
-        "scrollbar": {
-          "background": "rgb(140, 140, 140)",
-          "handle": {
-            "background": "rgb(3, 123, 255)"
-          }
-        }
-      }
     }
   },
   "stack_test": {
@@ -157,6 +145,18 @@
               "color": "rgb(255, 255, 255)",
               "color_border": "rgb(255, 255, 255)"
             }
+          }
+        },
+        "push_button_lesson": {
+          "not_current": {
+            "background": "rgb(112, 157, 255)",
+            "color": "rgb(255, 255, 255)",
+            "color_border": "transparent"
+          },
+          "current": {
+            "background": "rgb(112, 157, 255)",
+            "color": "rgb(255, 255, 255)",
+            "color_border": "rgb(255, 255, 255)"
           }
         }
       },

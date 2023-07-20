@@ -305,7 +305,7 @@ class Window(BaseMainWindow):
         self.__data_theme = data_theme
 
         # панель инструментов
-        self.toolbar = ToolBar(self.__path_images, self.__data_theme["frame_tool_bar"])
+        self.toolbar = ToolBar(self.__path_images, self.__data_theme["frame_tool_bar"]["on_stack_home_page"])
         self.add_widget(self.toolbar)
 
         self.set_style_sheet()
