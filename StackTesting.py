@@ -310,11 +310,9 @@ class CheckboxAnswer(QtWidgets.QWidget):
         self.__push_button_flag.setObjectName("push_button_flag")
         self.__push_button_flag.clicked.connect(self.__checkbox_clicked)
         self.__push_button_flag.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Preferred)
-        self.__push_button_flag.setFixedHeight(25)
         self.__push_button_flag.setIconSize(QtCore.QSize(22, 22))
 
         self.__hbox_layout_main.addWidget(self.__push_button_flag)
-        self.__hbox_layout_main.addSpacing(5)
 
         # кликабельная метка c текстом
         self.__label_text = LabelClickable()
@@ -323,7 +321,6 @@ class CheckboxAnswer(QtWidgets.QWidget):
         self.__label_text.setWordWrap(True)
         self.__label_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignVCenter | QtCore.Qt.AlignmentFlag.AlignLeft)
         self.__label_text.setFont(QtGui.QFont("Segoe UI", 14))
-        self.__label_text.setFixedHeight(25)
         self.__label_text.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Preferred)
         self.__label_text.clicked.connect(self.__checkbox_clicked)
         # self.__label_text.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
@@ -346,6 +343,28 @@ class CheckboxAnswer(QtWidgets.QWidget):
         else:
             self.set_checked(checked = True)
 
+    def enterEvent(self, event: QtGui.QEnterEvent):
+        self.__push_button_flag.setProperty("hover", True)
+        self.__push_button_flag.style().unpolish(self.__push_button_flag)
+        self.__push_button_flag.style().polish(self.__push_button_flag)
+
+        self.__label_text.setProperty("hover", True)
+        self.__label_text.style().unpolish(self.__label_text)
+        self.__label_text.style().polish(self.__label_text)
+
+        return super().enterEvent(event)
+
+    def leaveEvent(self, event: QtGui.QEnterEvent):
+        self.__push_button_flag.setProperty("hover", False)
+        self.__push_button_flag.style().unpolish(self.__push_button_flag)
+        self.__push_button_flag.style().polish(self.__push_button_flag)
+
+        self.__label_text.setProperty("hover", False)
+        self.__label_text.style().unpolish(self.__label_text)
+        self.__label_text.style().polish(self.__label_text)
+
+        return super().leaveEvent(event)
+
     def set_checked(self, checked: bool):
         if checked == True:
             self.__checked = True
@@ -363,6 +382,7 @@ class CheckboxAnswer(QtWidgets.QWidget):
         # кнопка с флажком
         self.__push_button_flag.setStyleSheet(f"""
         #push_button_flag {{
+            padding-left: 2px;
             border-top-left-radius: 6px;
             border-bottom-left-radius: 6px;
             outline: 0;
@@ -484,6 +504,7 @@ class RadiobuttonAnswer(QtWidgets.QWidget):
         # кнопка с флажком
         self.__push_button_flag.setStyleSheet(f"""
         #push_button_flag {{
+            padding-left: 2px;
             border-top-left-radius: 6px;
             border-bottom-left-radius: 6px;
             outline: 0;
@@ -608,10 +629,10 @@ class PushButtonImage(QtWidgets.QPushButton):
         self.push_button_image_clicked.emit()
 
     def enterEvent(self, event):
-        self.__push_buttton_save_image.setVisible(True)
+        self.__push_buttton_save_image.show()
 
     def leaveEvent(self, event):
-        self.__push_buttton_save_image.setVisible(False)
+        self.__push_buttton_save_image.hide()
 
     def __save_image_as(self):
         directory_desktop = os.path.abspath(os.path.normpath(os.path.join(os.environ["HOMEPATH"], "Desktop")))

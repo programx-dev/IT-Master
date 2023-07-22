@@ -94,6 +94,7 @@ class Main(Window.Window):
             ) """)
 
         super().__init__(self.__path_images, data_theme = self.__data_theme["window"])
+        self.toolbar.tool_button_test.hide()
 
         Dialogs.__parent__ = self
         StackTesting.__parent__ = self
@@ -224,6 +225,10 @@ class Main(Window.Window):
         self.__stacked_widget.setCurrentWidget(self.__current_stack)
 
     def __start_test(self):
+        self.toolbar.update_style_sheet(Window.PropertyPages.test_page)
+        self.toolbar.tool_button_test.press_tool_button()
+        self.toolbar.tool_button_test.show()
+
         self.__test_started = True
 
         # удаление старого окна
@@ -379,6 +384,6 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
     window_main = Main()
-    window_main.show_window()
+    window_main.show_maximized()
 
     sys.exit(app.exec())

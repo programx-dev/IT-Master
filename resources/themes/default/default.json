@@ -81,7 +81,7 @@
       }
     },
     "frame_tool_bar": {
-      "on_stack_home_page": {
+      "home_page": {
         "background": "rgb(89, 152, 254)",
         "tool_button": {
           "selected": {
@@ -94,12 +94,12 @@
           }
         }
       },
-      "on_stack_test": {
-        "background": "rgb(89, 152, 254)",
+      "test_page": {
+        "background": "#FFFFFF",
         "tool_button": {
           "selected": {
-            "background": "rgb(66, 138, 255)",
-            "color": "rgb(255, 255, 255)"
+            "background": "#DCDCDC",
+            "color": "#000000"
           },
           "not_selected": {
             "background": "#FFFFFF",

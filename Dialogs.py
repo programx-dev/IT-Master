@@ -1,89 +1,10 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import re
 
-__parent__: "Main.Main" = None
-
-class ImageGraphicsView(QtWidgets.QGraphicsView):
-    def __init__(self, path_image: str, data_theme: dict):
-        super().__init__()
-
-        self.data_theme = data_theme
-        self.path_image = path_image
-
-        self.init_variables()
-
-        self.image = QtWidgets.QGraphicsPixmapItem()
-        self.image.setTransformationMode(QtCore.Qt.TransformationMode.SmoothTransformation) 
-
-        self.graphics_scene = QtWidgets.QGraphicsScene()
-        self.graphics_scene.addItem(self.image)
-
-        self.setScene(self.graphics_scene)
-
-        self.setDragMode(QtWidgets.QGraphicsView.DragMode.ScrollHandDrag)
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
-        self.setRenderHints(QtGui.QPainter.RenderHint.Antialiasing)
-
-        self.set_style_sheet()
-
-    def init_variables(self):
-        self.min_zoom = None
-        self.max_zoom = None
-        self.zoom = None
-
-        pattern = re.compile(r"^\s*rgb\s*\(\s*|\s*,\s*|\s*\)\s*$")
-
-        self.background = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["background"])[1:-1]])
-
-    def fit_in_view(self):
-        rect = QtCore.QRectF(self.image.pixmap().rect())
-
-        self.setSceneRect(rect)
-
-        unity = self.transform().mapRect(QtCore.QRectF(0, 0, 1, 1))
-        self.scale(1 / unity.width(), 1 / unity.height())
-        view_rect = self.viewport().rect()
-        scene_rect = self.transform().mapRect(rect)
-
-        self.min_zoom = min(view_rect.width() / scene_rect.width(), view_rect.height() / scene_rect.height())
-        self.max_zoom = max(view_rect.width() / scene_rect.width(), view_rect.height() / scene_rect.height())
-
-        self.zoom = self.min_zoom
-
-        self.scale(self.zoom, self.zoom)
-
-    def set_image(self):
-        self.image.setPixmap(QtGui.QPixmap(self.path_image))
-
-        self.fit_in_view()
-
-    def wheelEvent(self, event):
-        current_zoom = self.zoom
-        if event.angleDelta().y() > 0 and self.zoom < self.max_zoom:
-            factor = 1.25
-            self.zoom *= factor
-            if self.zoom > self.max_zoom:
-                self.zoom = self.max_zoom
-                factor = self.zoom / current_zoom
-            self.scale(factor, factor)
-        elif  event.angleDelta().y() < 0 and self.zoom > self.min_zoom:
-            factor = 0.8
-            self.zoom *= factor
-            if self.zoom < self.min_zoom:
-                self.zoom = self.min_zoom
-                factor = self.zoom / current_zoom
-            self.scale(factor, factor)
-
-    def set_style_sheet(self):
-        # фоновый цвет холста
-        self.setBackgroundBrush(self.background)
+__parent__ = None
 
 class DialogImage(QtWidgets.QDialog):
-    window_close = QtCore.pyqtSignal()
+    dialog_close = QtCore.pyqtSignal()
     def __init__(self, path_image: str, data_theme: dict):
         self.__parent = __parent__
         self.data_theme = data_theme
