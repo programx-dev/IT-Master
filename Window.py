@@ -2,6 +2,12 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 import sys
 import os
 import enum
+from ctypes.wintypes import LPRECT, MSG
+# import win32con
+# import win32gui
+# from src import win32utils
+# from src.c import LPNCCALCSIZE_PARAMS
+# from ctypes import cast
 
 @enum.unique
 class PropertyPages(enum.Enum):
@@ -16,6 +22,7 @@ class TitileBarWindow(QtWidgets.QWidget):
     window_show_normal = QtCore.pyqtSignal()
 
     mouse_double_click = QtCore.pyqtSignal()
+    mouse_press = QtCore.pyqtSignal()
     mouse_move = QtCore.pyqtSignal(QtCore.QPoint)
 
     def __init__(self, data_theme):
@@ -77,7 +84,7 @@ class TitileBarWindow(QtWidgets.QWidget):
         self.__label_title = QtWidgets.QLabel()
         self.__label_title.setObjectName("label_title")
         self.__label_title.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
-        self.__label_title.setFont(QtGui.QFont("Trebuchet MS", 10, weight = QtGui.QFont.Weight.Bold))
+        self.__label_title.setFont(QtGui.QFont("Segoe UI", 12))
 
         self.__hbox_layout_title.addWidget(self.__label_title)
 
@@ -107,7 +114,7 @@ class TitileBarWindow(QtWidgets.QWidget):
 
         # кнопка максимизировать / нормализировать
         self.__push_button_maximize = QtWidgets.QPushButton()
-        self.__push_button_maximize.setObjectName("push_button_minimize")
+        self.__push_button_maximize.setObjectName("push_button_maximize")
         self.__push_button_maximize.clicked.connect(self.__press_push_button_maximize)
         self.__push_button_maximize.setFont(QtGui.QFont("Webdings", 9))
         self.__push_button_maximize.setText("1")
@@ -126,6 +133,8 @@ class TitileBarWindow(QtWidgets.QWidget):
         self.__push_button_close.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         self.__hbox_header_buttons.addWidget(self.__push_button_close)
+
+        self.set_style_sheet()
 
     def __press_push_button_minimize(self):
         self.window_show_minimized.emit()
@@ -148,13 +157,13 @@ class TitileBarWindow(QtWidgets.QWidget):
     def set_title(self, title: str):
         self.__title = title
         self.__label_title.setText(self.__title)
-        self.updateTitle()
+        self.update_title()
 
     def update_title(self, title: str = None):
         if title is None:
             title = self.__title
 
-        width = self.__title.width() - self.__hbox_layout_title.getContentsMargins()[0]
+        width = self.__label_title.width() - self.__hbox_layout_title.getContentsMargins()[0]
 
         self.__label_title.setText(self.fontMetrics().elidedText(title, QtCore.Qt.TextElideMode.ElideRight, width))
 
@@ -172,25 +181,108 @@ class TitileBarWindow(QtWidgets.QWidget):
 
     def window_state_changed(self, state: QtCore.Qt.WindowState):
         self.__window_state = state
-        self.__push_button_maximize.setText("1" if self.__window_state == QtCore.Qt.WindowState.WindowMaximized else "2")
+        self.__push_button_maximize.setText("2" if self.__window_state == QtCore.Qt.WindowState.WindowMaximized else "1")
 
     def get_mouse_pos(self) -> QtCore.QPoint | None:
         return self.__mouse_pos
 
     def mouseDoubleClickEvent(self, event):
-        self.mouse_double_click.emit()
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            self.mouse_double_click.emit()
 
     def mousePressEvent(self, event: QtGui.QMouseEvent):
         if event.button() == QtCore.Qt.MouseButton.LeftButton:
             self.__mouse_pos = event.scenePosition().toPoint()
+            self.mouse_press.emit()
 
     def mouseReleaseEvent(self, event):
         self.__mouse_pos = None
 
     def mouseMoveEvent(self, event):
         if event.buttons() == QtCore.Qt.MouseButton.LeftButton and self.__mouse_pos:
-            pos = event.scenePosition().toPoint() - self.__mouse_pos
+            pos = event.globalPosition().toPoint() - self.__mouse_pos
             self.mouse_move.emit(pos)
+
+    def set_style_sheet(self):
+        # рамка заголовка
+        self.__frame_header.setStyleSheet("""
+        #frame_header {
+            background: %(background)s;
+        } """ % self.__data_theme)
+
+        # метка титла
+        self.__label_title.setStyleSheet("""
+        #label_title {
+            color: %(color)s;
+        } """ % self.__data_theme["label_title"])
+
+        # кнопка свернуть
+        temp_data_theme = {
+            "background_normal": self.__data_theme["push_button"]["normal"]["background"],
+            "color_normal": self.__data_theme["push_button"]["normal"]["color"], 
+            "background_hover": self.__data_theme["push_button"]["hover"]["background"], 
+            "color_hover": self.__data_theme["push_button"]["hover"]["color"],
+            "background_press": self.__data_theme["push_button"]["press"]["background"], 
+            "color_press": self.__data_theme["push_button"]["press"]["color"]
+        }
+
+        self.__push_button_minimize.setStyleSheet("""
+        #push_button_minimize {
+            outline: 0;
+            border: none;
+            background: %(background_normal)s; 
+            color: %(color_normal)s;
+        }
+        #push_button_minimize::hover {
+            background: %(background_hover)s; 
+            color: %(color_hover)s;
+        }
+        #push_button_minimize::pressed {
+            background: %(background_press)s; 
+            color: %(color_press)s; 
+        } """ % temp_data_theme)
+
+        self.__push_button_maximize.setStyleSheet("""
+        #push_button_maximize {
+            outline: 0;
+            border: none;
+            background: %(background_normal)s; 
+            color: %(color_normal)s;
+        }
+        #push_button_maximize::hover {
+            background: %(background_hover)s; 
+            color: %(color_hover)s;
+        }
+        #push_button_maximize::pressed {
+            background: %(background_press)s; 
+            color: %(color_press)s; 
+        } """ % temp_data_theme)
+
+        # кнопка закрыть программу
+        temp_data_theme = {
+            "background_normal": self.__data_theme["push_button_close"]["normal"]["background"],
+            "color_normal": self.__data_theme["push_button_close"]["normal"]["color"], 
+            "background_hover": self.__data_theme["push_button_close"]["hover"]["background"], 
+            "color_hover": self.__data_theme["push_button_close"]["hover"]["color"],
+            "background_press": self.__data_theme["push_button_close"]["press"]["background"], 
+            "color_press": self.__data_theme["push_button_close"]["press"]["color"]
+        }
+
+        self.__push_button_close.setStyleSheet("""
+        #push_button_close {
+            outline: 0;
+            border: none;
+            background: %(background_normal)s; 
+            color: %(color_normal)s;
+        }
+        #push_button_close::hover {
+            background: %(background_hover)s; 
+            color: %(color_hover)s;
+        }
+        #push_button_close::pressed {
+            background: %(background_press)s; 
+            color: %(color_press)s; 
+        } """ % temp_data_theme)
 
 class ToolButtonToolbar(QtWidgets.QToolButton):
     """Кнопка панели инструментов"""
@@ -447,101 +539,157 @@ class Window(QtWidgets.QMainWindow):
 
         # присоединения слотов к сигналам
         self.__title_bar_window.window_close.connect(self.close_window)
-        self.window_show_minimized.connect(self.show_minimized)
-        self.window_show_maximized.connect(self.show_maximized)
-        self.window_show_normal.connect(self.show_normal)
+        self.__title_bar_window.window_show_maximized.connect(self.show_maximized)
+        self.__title_bar_window.window_show_minimized.connect(self.show_minimized)
+        self.__title_bar_window.window_show_normal.connect(self.show_normal)
+
+        self.__title_bar_window.mouse_double_click.connect(self.__mouse_double_click)
+        # self.__title_bar_window.mouse_move.connect(self.__mouse_move)
+        self.__title_bar_window.mouse_press.connect(self.__start_system_move)
 
         self.set_style_sheet()
 
-    def show_window(self):
+    def show_maximized(self):
         super().showMaximized()
+
+    def show_minimized(self):
+        super().showMinimized()
+
+    def show_normal(self):
+        super().showNormal()
+
+    def changeEvent(self, event):
+        if isinstance(event, QtGui.QWindowStateChangeEvent):
+            self.__title_bar_window.window_state_changed(self.windowState())
+
+    def resizeEvent(self, event):
+        self.__title_bar_window.update_title()
 
     def close_window(self):
         sys.exit()
 
-    def minimize_window(self):
-        super().showMinimized()
+    def __mouse_double_click(self):
+        if not self.__is_maxizeable() or not self.__is_resizable():
+            return
+        if super().isMaximized():
+            super().showNormal()
+        else:
+            super().showMaximized()
+   
+    def __mouse_move(self, pos: QtCore.QPoint):
+        if not super().isMaximized():
+            super().move(pos)
+
+    def __start_system_move(self):
+        super().windowHandle().startSystemMove()
+   
+    def __is_maxizeable(self) -> bool:
+        return super().windowFlags() & QtCore.Qt.WindowType.WindowMaximizeButtonHint
+
+    def __is_minimizeable(self) -> bool:
+        return super().windowFlags() & QtCore.Qt.WindowType.WindowMaximizeButtonHint
+
+    def __is_resizable(self) -> bool:
+        return super().windowFlags() & QtCore.Qt.WindowType.WindowMaximizeButtonHint
+
+    def set_icon(self, icon: QtGui.QPixmap):
+        self.__title_bar_window.set_icon(icon = icon)
+
+    def set_title(self, title: str):
+        self.__title_bar_window.set_title(title = title)
+
+    # def nativeEvent(self, e, message):
+    #     msg = MSG.from_address(message.__int__())
+    #     # check if it is message from Windows OS
+    #     if msg.hWnd:
+    #         # update cursor shape to resize/resize feature
+    #         # get WM_NCHITTEST message
+    #         # more info - https://learn.microsoft.com/ko-kr/windows/win32/inputdev/wm-nchittest
+    #         if msg.message == win32con.WM_NCHITTEST:
+    #             if self._resizable:
+    #                 pos = QtGui.QCursor.pos()
+    #                 x = pos.x() - self.x()
+    #                 y = pos.y() - self.y()
+
+    #                 w, h = self.width(), self.height()
+
+    #                 left = x < 5
+    #                 top = y < 5
+    #                 right = x > w - 5
+    #                 bottom = y > h - 5
+
+    #                 # to support snap layouts
+    #                 # more info - https://learn.microsoft.com/en-us/windows/apps/desktop/modernize/apply-snap-layout-menu
+    #                 # if win32gui.PtInRect((10, 10, 100, 100), (x, y)):
+    #                 #     return True, win32con.HTMAXBUTTON
+
+    #                 if top and left:
+    #                     return True, win32con.HTTOPLEFT
+    #                 elif top and right:
+    #                     return True, win32con.HTTOPRIGHT
+    #                 elif bottom and left:
+    #                     return True, win32con.HTBOTTOMLEFT
+    #                 elif bottom and right:
+    #                     return True, win32con.HTBOTTOMRIGHT
+    #                 elif left:
+    #                     return True, win32con.HTLEFT
+    #                 elif top:
+    #                     return True, win32con.HTTOP
+    #                 elif right:
+    #                     return True, win32con.HTRIGHT
+    #                 elif bottom:
+    #                     return True, win32con.HTBOTTOM
+
+    #         # maximize/minimize/full screen feature
+    #         # get WM_NCCALCSIZE message
+    #         # more info - https://learn.microsoft.com/ko-kr/windows/win32/winmsg/wm-nccalcsize
+    #         elif msg.message == win32con.WM_NCCALCSIZE:
+    #             if msg.wParam:
+    #                 rect = cast(msg.lParam, LPNCCALCSIZE_PARAMS).contents.rgrc[0]
+    #             else:
+    #                 rect = cast(msg.lParam, LPRECT).contents
+
+    #             max_f = win32utils.isMaximized(msg.hWnd)
+    #             full_f = win32utils.isFullScreen(msg.hWnd)
+
+    #             # adjust the size of window
+    #             if max_f and not full_f:
+    #                 thickness = win32utils.getResizeBorderThickness(msg.hWnd)
+    #                 rect.top += thickness
+    #                 rect.left += thickness
+    #                 rect.right -= thickness
+    #                 rect.bottom -= thickness
+
+    #             # for auto-hide taskbar
+    #             if (max_f or full_f) and win32utils.Taskbar.isAutoHide():
+    #                 position = win32utils.Taskbar.getPosition(msg.hWnd)
+    #                 if position == win32utils.Taskbar.LEFT:
+    #                     rect.top += win32utils.Taskbar.AUTO_HIDE_THICKNESS
+    #                 elif position == win32utils.Taskbar.BOTTOM:
+    #                     rect.bottom -= win32utils.Taskbar.AUTO_HIDE_THICKNESS
+    #                 elif position == win32utils.Taskbar.LEFT:
+    #                     rect.left += win32utils.Taskbar.AUTO_HIDE_THICKNESS
+    #                 elif position == win32utils.Taskbar.RIGHT:
+    #                     rect.right -= win32utils.Taskbar.AUTO_HIDE_THICKNESS
+
+    #             result = 0 if not msg.wParam else win32con.WVR_REDRAW
+    #             return True, result
+    #         elif msg.message == win32con.WM_SETTINGCHANGE:
+    #             if self.__detect_theme_flag:
+    #                 self.__setCurrentWindowsTheme()
+    #         # TODO temporary measurement
+    #         # this is just a inevitable workaround
+    #         elif msg.message == win32con.WM_STYLECHANGING:
+    #             self._resizable = not self.isFullScreen()
+    #             self._pressToMove = not self.isFullScreen()
+    #     return super().nativeEvent(e, message)
 
     def add_widget(self, widget: QtWidgets.QWidget):
         self.__hbox_layout_widgets.addWidget(widget)
 
-    def is_maxizeable(self) -> bool:
-        return self.__window_state & QtCore.Qt.WindowType.WindowMaximizeButtonHint
-
-    def is_minimizeable(self) -> bool:
-        return self.__window_state & QtCore.Qt.WindowType.WindowMaximizeButtonHint
-
-    def is_resizable(self) -> bool:
-        return self.__window_state & QtCore.Qt.WindowType.WindowMaximizeButtonHint
-
-
     def set_style_sheet(self):
-        # рамка заголовка
-        self._frame_header.setStyleSheet("""
-        #frame_header {
-            background: %(background)s;
-        } """ % self.__data_theme["frame_header"])
-
-        # метка титла
-        self._label_title.setStyleSheet("""
-        #label_title {
-            color: %(color)s;
-        } """ % self.__data_theme["frame_header"]["label_title"])
-
-        # кнопка свернуть
-        temp_data_theme = {
-            "background_normal": self.__data_theme["frame_header"]["push_button"]["normal"]["background"],
-            "color_normal": self.__data_theme["frame_header"]["push_button"]["normal"]["color"], 
-            "background_hover": self.__data_theme["frame_header"]["push_button"]["hover"]["background"], 
-            "color_hover": self.__data_theme["frame_header"]["push_button"]["hover"]["color"],
-            "background_press": self.__data_theme["frame_header"]["push_button"]["press"]["background"], 
-            "color_press": self.__data_theme["frame_header"]["push_button"]["press"]["color"]
-        }
-
-        self._push_button_minimize.setStyleSheet("""
-        #push_button_minimize {
-            outline: 0;
-            border: none;
-            background: %(background_normal)s; 
-            color: %(color_normal)s;
-        }
-        #push_button_minimize::hover {
-            background: %(background_hover)s; 
-            color: %(color_hover)s;
-        }
-        #push_button_minimize::pressed {
-            background: %(background_press)s; 
-            color: %(color_press)s; 
-        } """ % temp_data_theme)
-
-        # кнопка закрыть программу
-        temp_data_theme = {
-            "background_normal": self.__data_theme["frame_header"]["push_button_close"]["normal"]["background"],
-            "color_normal": self.__data_theme["frame_header"]["push_button_close"]["normal"]["color"], 
-            "background_hover": self.__data_theme["frame_header"]["push_button_close"]["hover"]["background"], 
-            "color_hover": self.__data_theme["frame_header"]["push_button_close"]["hover"]["color"],
-            "background_press": self.__data_theme["frame_header"]["push_button_close"]["press"]["background"], 
-            "color_press": self.__data_theme["frame_header"]["push_button_close"]["press"]["color"]
-        }
-
-        self._push_button_close.setStyleSheet("""
-        #push_button_close {
-            outline: 0;
-            border: none;
-            background: %(background_normal)s; 
-            color: %(color_normal)s;
-        }
-        #push_button_close::hover {
-            background: %(background_hover)s; 
-            color: %(color_hover)s;
-        }
-        #push_button_close::pressed {
-            background: %(background_press)s; 
-            color: %(color_press)s; 
-        } """ % temp_data_theme)
-
         # рамка для виджетов
-        self._frame_widgets.setStyleSheet("""
+        self.__frame_widgets.setStyleSheet("""
         #frame_widgets {
             background: %(background)s;
         } """ % self.__data_theme["frame_widgets"])

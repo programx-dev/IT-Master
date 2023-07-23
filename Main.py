@@ -94,7 +94,6 @@ class Main(Window.Window):
             ) """)
 
         super().__init__(self.__path_images, data_theme = self.__data_theme["window"])
-        self.toolbar.tool_button_test.hide()
 
         Dialogs.__parent__ = self
         StackTesting.__parent__ = self
