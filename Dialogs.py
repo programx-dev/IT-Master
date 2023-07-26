@@ -1,7 +1,155 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
+import Window
 import re
+import enum
+import typing
 
 __parent__ = None
+
+class ButtonRole(enum.Enum):
+    accept = 0
+    reject = 1
+    
+class Dialog(Window.Dialog):
+    """Настраиваемое диалоговое окно"""
+    
+    def __init__(self, data_theme: dict, parent = None):
+        self.__data_theme = data_theme
+        self.__parent = parent
+        self.__icon = None
+        self.__text = None
+        self.__description = None
+        self.__list_push_buttons = list()
+        self.__value = None
+        self.__event_loop = None
+
+        super().__init__(data_theme = self.__data_theme, parent = self.__parent)
+        super().set_window_flags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.WindowCloseButtonHint)
+        super().setModal(True)
+        super().set_resizeable(False)
+
+        # главная рамка
+        self.__frame_main = QtWidgets.QFrame()
+        self.__frame_main.setObjectName("frame_main")
+
+        self.add_widget(self.__frame_main)
+
+        # главный макет
+        self.__vbox_layout_main = QtWidgets.QVBoxLayout()
+        self.__vbox_layout_main.setSpacing(0)
+        self.__vbox_layout_main.setContentsMargins(0, 0, 0, 0)
+
+        self.__frame_main.setLayout(self.__vbox_layout_main)
+
+        # макет с информацией
+        self.__hbox_layout_info = QtWidgets.QHBoxLayout()
+        self.__hbox_layout_info.setSpacing(0)
+        self.__hbox_layout_info.setContentsMargins(15, 15, 15, 15)
+
+        self.__vbox_layout_main.addLayout(self.__hbox_layout_info)
+
+        # метка со значком
+        self.__label_icon = QtWidgets.QLabel()
+        self.__label_icon.setObjectName("label_icon")
+        self.__label_icon.setFixedSize(40, 40)
+
+        self.__label_icon.hide()
+        self.__hbox_layout_info.addWidget(self.__label_icon)
+        self.__hbox_layout_info.addSpacing(20)
+
+        # внутренний макет
+        self.__vbox_layout_internal = QtWidgets.QVBoxLayout()
+        self.__vbox_layout_internal.setSpacing(0)
+        self.__vbox_layout_internal.setContentsMargins(0, 0, 0, 0)
+
+        self.__hbox_layout_info.addLayout(self.__vbox_layout_internal)
+
+        # метка с текстом
+        self.__label_text = QtWidgets.QLabel()
+        self.__label_text.setFont(QtGui.QFont("Segoe UI", 10))
+        self.__label_text.setObjectName("label_text")
+        self.__label_text.setWordWrap(True)
+        self.__label_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
+
+        self.__label_text.hide()
+        self.__vbox_layout_internal.addWidget(self.__label_text)
+        self.__vbox_layout_internal.addSpacing(10)
+
+        # метка с описанием
+        self.__label_description = QtWidgets.QLabel()
+        self.__label_description.setFont(QtGui.QFont("Segoe UI", 10))
+        self.__label_description.setObjectName("label_description")
+        self.__label_description.setWordWrap(True)
+        self.__label_description.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
+
+        self.__label_description.hide()
+        self.__vbox_layout_internal.addWidget(self.__label_description)
+
+        # макет с кнопками
+        self.__hbox_layout_push_buttons = QtWidgets.QHBoxLayout()
+        self.__hbox_layout_push_buttons.setSpacing(0)
+        self.__hbox_layout_push_buttons.setContentsMargins(15, 0, 15, 15)
+        self.__hbox_layout_push_buttons.addStretch(1)
+
+        self.__vbox_layout_main.addLayout(self.__hbox_layout_push_buttons)
+
+        # подключение слотов к сигналам
+        self.__title_bar_window.window_close.connect(self.__exit_window)
+    
+    def __exit_window(self):
+        if self.__event_loop:
+            self.__event_loop.exit()
+        
+    def run_modal(self):
+        self.__event_loop = QtCore.QEventLoop()
+        self.show()
+        self.__event_loop.exec()
+        self.close()
+        return self.__value
+
+    def set_window_title(self, title: str):
+        super().set_window_title(title)
+
+    def set_icon(self, icon: QtGui.QIcon | QtWidgets.QStyle.StandardPixmap):
+        if isinstance(icon, QtGui.QIcon):
+            self.__icon = icon.pixmap(40, 40)
+        elif isinstance(icon, QtWidgets.QStyle.StandardPixmap):
+            self.__icon =  QtWidgets.QApplication.style().standardIcon(icon).pixmap(40, 40)
+        self.__label_icon.setPixmap(self.__icon)
+        self.__label_icon.show()
+
+    def set_text(self, text: str):
+        self.__text = text
+        self.__label_text.setText(self.__text)
+        self.__label_text.show()
+
+    def set_description(self, description: str):
+        self.__description = description
+        self.__label_description.setText(self.__description)
+        self.__label_description.show()
+
+    def __push_button_pressed(self, role: ButtonRole | typing.Any):
+        self.__value = role
+        if self.__event_loop:
+            self.__event_loop.exit()
+
+    def get_value(self) -> ButtonRole | typing.Any:
+        return self.__value
+
+    def add_push_button(self, text: str, role: ButtonRole | typing.Any = None, default: bool = False):
+        push_button = QtWidgets.QPushButton()
+        push_button.setText(text)
+        push_button.clicked.connect(lambda: self.__push_button_pressed(role))
+        if len(self.__list_push_buttons) == 0:
+            push_button.setDefault(True)
+        else:
+            push_button.setDefault(default)
+        self.__list_push_buttons.append(push_button)
+
+        self.__hbox_layout_push_buttons.addWidget(push_button)
+
+    def set_style_sheet(self):
+        super().set_style_sheet()
 
 class DialogImage(QtWidgets.QDialog):
     dialog_close = QtCore.pyqtSignal()

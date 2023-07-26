@@ -95,14 +95,15 @@ class Main(Window.Window):
 
         super().__init__(self.__path_images, data_theme = self.__data_theme["window"])
 
+        # панель инструментов
+        self.toolbar = Window.ToolBar(self.__path_images, self.__data_theme["window"]["frame_tool_bar"])
+        self.add_widget(self.toolbar)
+
         Dialogs.__parent__ = self
         StackTesting.__parent__ = self
 
         self.setWindowTitle("IT Master")
         self.setWindowIcon(QtGui.QIcon(self.__path_image_logo))
-
-        self.set_title("IT Master")
-        self.set_icon(QtGui.QPixmap(self.__path_image_logo))
 
         # виджет стеков для страниц
         self.__stacked_widget = QtWidgets.QStackedWidget()
@@ -119,7 +120,21 @@ class Main(Window.Window):
     def __open_home_page(self):
         if type(self.__current_stack) == StackHomePage.StackHomePage:
             return
-           
+        
+        if self.__test_started:
+            dialog = Dialogs.Dialog(self.__data_theme["window"])
+            dialog.set_window_title("Покинуть тестирование")
+            dialog.set_window_icon(QtGui.QIcon(self.__path_image_logo))
+            dialog.set_icon(QtWidgets.QStyle.StandardPixmap.SP_MessageBoxQuestion)
+            dialog.set_text("Покинуть тестирование?")
+            dialog.set_description("Результаты не сохраниятся")
+            dialog.add_push_button("ОК", Dialogs.ButtonRole.accept, True)
+            dialog.add_push_button("Отмена", Dialogs.ButtonRole.reject)
+
+            if dialog.run_modal() != Dialogs.ButtonRole.accept:
+                self.toolbar.tool_button_test.set_selected()
+                return  
+
         # удаление старого окна
         if self.__current_stack!= None:
             self.__stacked_widget.removeWidget(self.__current_stack)
@@ -380,9 +395,16 @@ if __name__ == "__main__":
     #     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
     os.environ["QT_QUICK_BACKEND"] = "software"
 
+    # QtWidgets.QApplication.setHighDpiScaleFactorRoundingPolicy(QtCore.Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
+    # os.environ["QT_ENABLE_HIGHDPI_SCALING"]   = "1"
+    # os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+    # os.environ["QT_SCALE_FACTOR"]             = "1"
+
     app = QtWidgets.QApplication(sys.argv)
+    # app.setAttribute(QtCore.Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
 
     window_main = Main()
+    # window_main.set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.WindowMinimizeButtonHint)
     window_main.show_maximized()
 
     sys.exit(app.exec())

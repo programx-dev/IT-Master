@@ -5,8 +5,8 @@ import win32api
 import win32con
 import win32gui
 
-from PyQt6.QtCore import QOperatingSystemVersion
-from PyQt6.QtGui import QGuiApplication
+from qtpy.QtCore import QOperatingSystemVersion
+from qtpy.QtGui import QGuiApplication
 from win32comext.shell import shellcon
 
 
@@ -42,6 +42,8 @@ def getResizeBorderThickness(hWnd):
         return 0
 
     result = win32api.GetSystemMetrics(win32con.SM_CXSIZEFRAME) + win32api.GetSystemMetrics(92)
+
+    print(result)
 
     if result > 0:
         return result
