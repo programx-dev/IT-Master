@@ -690,24 +690,25 @@ class AbstractWindow(QtWidgets.QWidget):
         xPos, yPos = mpos.x(), mpos.y()
         geometry = super().geometry()
         x, y, w, h = geometry.x(), geometry.y(), geometry.width(), geometry.height()
+
         if self.__direction == Direction.LeftTop:          
             if w - xPos >= super().minimumWidth() and w - xPos <= super().maximumWidth():
                 x += xPos
                 w -= xPos
-            elif w - xPos < super().minimumWidth(): 
+            elif w - xPos < super().minimumWidth():
                 x -= super().minimumWidth() - w
                 w = super().minimumWidth()
-            elif w - xPos > super().maximumWidth(): 
+            else: 
                 x -= super().maximumWidth() - w
                 w = super().maximumWidth()
 
-            if h - yPos > super().minimumHeight() and h - yPos < super().maximumHeight():
+            if h - yPos >= super().minimumHeight() and h - yPos <= super().maximumHeight():
                 y += yPos
                 h -= yPos
             elif h - yPos < super().minimumHeight(): 
                 y -= super().minimumHeight() - h
                 h = super().minimumHeight()
-            elif h - yPos > super().maximumHeight(): 
+            else: 
                 y -= super().maximumHeight() - h
                 h = super().maximumHeight()
         
@@ -718,58 +719,106 @@ class AbstractWindow(QtWidgets.QWidget):
             elif w + xPos < super().minimumWidth():
                 w = super().minimumWidth()
                 self.__mouse_pos.setX(super().minimumWidth())
-            elif w + xPos > super().maximumWidth():
+            else:
                 w = super().maximumWidth()
                 self.__mouse_pos.setX(super().maximumWidth())
 
-            if h + yPos >= super().minimumHeight() and h + yPos <= super().maximumWidth():
+            if h + yPos >= super().minimumHeight() and h + yPos <= super().maximumHeight():
                 h += yPos
                 self.__mouse_pos.setY(h)
             elif h + yPos < super().minimumHeight():
                 h = super().minimumHeight()
-                self.__mouse_pos.setY(super().minimumHeight())
-            elif h + yPos > super().maximumWidth():
-                h = super().maximumWidth()
-                self.__mouse_pos.setY(super().maximumWidth())
+                self.__mouse_pos.setY(h)
+            else:
+                h = super().maximumHeight()
+                self.__mouse_pos.setY(h)
         
-        elif self.__direction == Direction.RightTop:    
-            if h - yPos > super().minimumHeight() and h - yPos < super().maximumHeight():
+        elif self.__direction == Direction.RightTop:
+            if w + xPos >= super().minimumWidth() and w + xPos <= super().maximumWidth():
+                w += xPos
+                self.__mouse_pos.setX(pos.x())
+            elif w + xPos < super().minimumWidth():
+                w = super().minimumWidth()
+                self.__mouse_pos.setX(w)
+            else:
+                w = super().maximumWidth()
+                self.__mouse_pos.setX(w)
+
+            if h - yPos >= super().minimumHeight() and h - yPos <= super().maximumHeight():
                 y += yPos
                 h -= yPos
-            if w + xPos > super().minimumWidth() and w + xPos < super().maximumWidth():
-                w += xPos
-            self.__mouse_pos.setX(pos.x())
+            elif h - yPos < super().minimumHeight():
+                y -= super().minimumHeight() - h
+                h = super().minimumHeight()
+            else:
+                y -= super().maximumHeight() - h
+                h = super().maximumHeight()
+
         elif self.__direction == Direction.LeftBottom:     
-            if w - xPos > super().minimumWidth() and w - xPos < super().maximumWidth():
+            if w - xPos >= super().minimumWidth() and w - xPos <= super().maximumWidth():
                 x += xPos
                 w -= xPos
-            if h + yPos > super().minimumHeight() and h + yPos < super().maximumHeight():
+            elif w - xPos < super().minimumWidth():
+                x -= super().minimumWidth() - w
+                w = super().minimumWidth()
+            else:
+                x -= super().maximumWidth() - w
+                w = super().maximumWidth()
+
+            if h + yPos >= super().minimumHeight() and h + yPos <= super().maximumHeight():
                 h += yPos
                 self.__mouse_pos.setY(pos.y())
+            elif h + yPos < super().minimumHeight():
+                h += super().minimumHeight() - h
+                self.__mouse_pos.setY(h)
+            else:
+                h += super().maximumHeight() - h
+                self.__mouse_pos.setY(h)
+
         elif self.__direction == Direction.Left:            
-            if w - xPos > super().minimumWidth() and w - xPos < super().maximumWidth():
+            if w - xPos >= super().minimumWidth() and w - xPos <= super().maximumWidth():
                 x += xPos
                 w -= xPos
+            elif w - xPos < super().minimumWidth():
+                x -= super().minimumWidth() - w
+                w = super().minimumWidth()
             else:
-                return
+                x -= super().maximumWidth() - w
+                w = super().maximumWidth()
+            
         elif self.__direction == Direction.Right:           
-            if w + xPos > super().minimumWidth() and w + xPos < super().maximumWidth():
+            if w + xPos >= super().minimumWidth() and w + xPos <= super().maximumWidth():
                 w += xPos
                 self.__mouse_pos = pos
+            elif w + xPos < super().minimumWidth():
+                w = super().minimumWidth()
+                self.__mouse_pos.setX(w)
             else:
-                return
+                w = super().maximumWidth()
+                self.__mouse_pos.setX(w)
+            
         elif self.__direction == Direction.Top:             
-            if h - yPos > super().minimumHeight() and h - yPos < super().maximumHeight():
+            if h - yPos >= super().minimumHeight() and h - yPos <= super().maximumHeight():
                 y += yPos
                 h -= yPos
+            elif h - yPos < super().minimumHeight():
+                y -= super().minimumHeight() - h
+                h = super().minimumHeight()
             else:
-                return
+                y -= super().maximumHeight() - h
+                h = super().maximumHeight()
+            
         elif self.__direction == Direction.Bottom:          
-            if h + yPos > super().minimumHeight() and h + yPos < super().maximumHeight():
+            if h + yPos >= super().minimumHeight() and h + yPos <= super().maximumHeight():
                 h += yPos
                 self.__mouse_pos = pos
+            elif h + yPos < super().minimumHeight():
+                h = super().minimumHeight()
+                self.__mouse_pos.setY(h)
             else:
-                return
+                h = super().maximumHeight()
+                self.__mouse_pos.setY(h)
+            
         self.setGeometry(x, y, w, h)
 
     def eventFilter(self, obj, event):
