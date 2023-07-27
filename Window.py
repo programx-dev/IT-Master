@@ -511,8 +511,8 @@ class ToolBar(QtWidgets.QFrame):
             background: {self.__data_theme["test_page"]["background"]};
         }} """ )
 
-class Dialog(QtWidgets.QDialog):
-    """Главное окно"""
+class AbstractWindow(QtWidgets.QWidget):
+    """Класс для абстрактного окна"""
     Margins = 5
     
     def __init__(self, data_theme: dict, parent = None):
@@ -550,8 +550,8 @@ class Dialog(QtWidgets.QDialog):
         self.__frame_main.setLayout(self.__vbox_layout_main)
 
         # рамка с заголовком
-        self.__title_bar_window = TitileBarWindow(data_theme = self.__data_theme["frame_header"])
-        self.__vbox_layout_main.addWidget(self.__title_bar_window)
+        self.title_bar_window = TitileBarWindow(data_theme = self.__data_theme["frame_header"])
+        self.__vbox_layout_main.addWidget(self.title_bar_window)
 
         # рамка для виджетов
         self.__frame_widgets = QtWidgets.QFrame()
@@ -569,28 +569,28 @@ class Dialog(QtWidgets.QDialog):
         self.__frame_widgets.setLayout(self.__hbox_layout_widgets)
 
         # присоединения слотов к сигналам
-        self.__title_bar_window.window_close.connect(self.close_window)
-        self.__title_bar_window.window_show_maximized.connect(self.show_maximized)
-        self.__title_bar_window.window_show_minimized.connect(self.show_minimized)
-        self.__title_bar_window.window_show_normal.connect(self.show_normal)
+        self.title_bar_window.window_close.connect(self.close_window)
+        self.title_bar_window.window_show_maximized.connect(self.show_maximized)
+        self.title_bar_window.window_show_minimized.connect(self.show_minimized)
+        self.title_bar_window.window_show_normal.connect(self.show_normal)
 
-        self.__title_bar_window.mouse_double_click.connect(self.__mouse_double_click)
+        self.title_bar_window.mouse_double_click.connect(self.__mouse_double_click)
         # self.__title_bar_window.mouse_move.connect(self.__move)
-        self.__title_bar_window.mouse_press.connect(self.__start_system_move)
+        self.title_bar_window.mouse_press.connect(self.__start_system_move)
         
         self.windowTitleChanged.connect(self.__title_chaged)
         self.windowIconChanged.connect(self.__icon_changed)
 
-        self.set_style_sheet()
+        self.__set_style_sheet()
 
     def __title_chaged(self, title: str):
-        self.__title_bar_window.set_window_title(title)
+        self.title_bar_window.set_window_title(title)
 
     def __icon_changed(self, icon: QtGui.QIcon):
-        self.__title_bar_window.set_icon(icon)
+        self.title_bar_window.set_icon(icon)
 
     def set_window_flags(self, flags: QtCore.Qt.WindowType):
-        self.__title_bar_window.window_type_changed(QtCore.Qt.WindowType.FramelessWindowHint | flags)
+        self.title_bar_window.window_type_changed(QtCore.Qt.WindowType.FramelessWindowHint | flags)
         super().setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | flags)
 
     def show_maximized(self):
@@ -611,12 +611,12 @@ class Dialog(QtWidgets.QDialog):
 
     def changeEvent(self, event):
         if isinstance(event, QtGui.QWindowStateChangeEvent):
-            self.__title_bar_window.window_state_changed(self.windowState())
+            self.title_bar_window.window_state_changed(self.windowState())
         super().changeEvent(event)
 
     def resizeEvent(self, event):
         if hasattr(self, "__title_bar_window"):
-            self.__title_bar_window.update_title()
+            self.title_bar_window.update_title()
 
     def paintEvent(self, event):
         super().paintEvent(event)
@@ -632,298 +632,7 @@ class Dialog(QtWidgets.QDialog):
 
     def mouseReleaseEvent(self, event):
         super().mouseReleaseEvent(event)
-        self.__pressed = False
-        self.__direction = None
-
-    def mouseMoveEvent(self, event):
-        super().mouseMoveEvent(event)
-        if not self.__is_resizable():
-            return
-        pos = event.pos()
-        xPos, yPos = pos.x(), pos.y()
-        wm, hm = self.width() - self.Margins, self.height() - self.Margins
-        if self.isMaximized() or self.isFullScreen():
-            self.__direction = None
-            self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
-            return
-        if event.buttons() == QtCore.Qt.MouseButton.LeftButton and self.__pressed:
-            self.__resize_window(pos)
-            return
-        if xPos <= self.Margins and yPos <= self.Margins:
-            # Верхний левый угол
-            self.__direction = Direction.LeftTop
-            self.setCursor(QtCore.Qt.CursorShape.SizeFDiagCursor)
-        elif wm <= xPos <= self.width() and hm <= yPos <= self.height():
-            # Нижний правый угол
-            self.__direction = Direction.RightBottom
-            self.setCursor(QtCore.Qt.CursorShape.SizeFDiagCursor)
-        elif wm <= xPos and yPos <= self.Margins:
-            # верхний правый угол
-            self.__direction = Direction.RightTop
-            self.setCursor(QtCore.Qt.CursorShape.SizeBDiagCursor)
-        elif xPos <= self.Margins and hm <= yPos:
-            # Нижний левый угол
-            self.__direction = Direction.LeftBottom
-            self.setCursor(QtCore.Qt.CursorShape.SizeBDiagCursor)
-        elif 0 <= xPos <= self.Margins and self.Margins <= yPos <= hm:
-            # Влево
-            self.__direction = Direction.Left
-            self.setCursor(QtCore.Qt.CursorShape.SizeHorCursor)
-        elif wm <= xPos <= self.width() and self.Margins <= yPos <= hm:
-            # Право
-            self.__direction = Direction.Right
-            self.setCursor(QtCore.Qt.CursorShape.SizeHorCursor)
-        elif self.Margins <= xPos <= wm and 0 <= yPos <= self.Margins:
-            # выше
-            self.__direction = Direction.Top
-            self.setCursor(QtCore.Qt.CursorShape.SizeVerCursor)
-        elif self.Margins <= xPos <= wm and hm <= yPos <= self.height():
-            # ниже
-            self.__direction = Direction.Bottom
-            self.setCursor(QtCore.Qt.CursorShape.SizeVerCursor)
-
-    def __resize_window(self, pos):
-        if self.__direction == None:
-            return
-        mpos = pos - self.__mouse_pos
-        xPos, yPos = mpos.x(), mpos.y()
-        geometry = super().geometry()
-        x, y, w, h = geometry.x(), geometry.y(), geometry.width(), geometry.height()
-        if self.__direction == Direction.LeftTop:          
-            if w - xPos > super().minimumWidth() and w - xPos < super().maximumWidth():
-                x += xPos
-                w -= xPos
-            if h - yPos > super().minimumHeight() and h - yPos < super().maximumHeight():
-                y += yPos
-                h -= yPos
-        elif self.__direction == Direction.RightBottom:    
-            if w + xPos > super().minimumWidth() and w + xPos < super().maximumWidth():
-                w += xPos
-                self.__mouse_pos = pos
-            if h + yPos > super().minimumHeight() and h + yPos < super().maximumHeight():
-                h += yPos
-                self.__mouse_pos = pos
-        elif self.__direction == Direction.RightTop:    
-            if h - yPos > super().minimumHeight() and h - yPos < super().maximumHeight():
-                y += yPos
-                h -= yPos
-            if w + xPos > super().minimumWidth() and w + xPos < super().maximumWidth():
-                w += xPos
-                self.__mouse_pos.setX(pos.x())
-        elif self.__direction == Direction.LeftBottom:     
-            if w - xPos > super().minimumWidth() and w - xPos < super().maximumWidth():
-                x += xPos
-                w -= xPos
-            if h + yPos > super().minimumHeight() and h + yPos < super().maximumHeight():
-                h += yPos
-                self.__mouse_pos.setY(pos.y())
-        elif self.__direction == Direction.Left:            
-            if w - xPos > super().minimumWidth() and w - xPos < super().maximumWidth():
-                x += xPos
-                w -= xPos
-            else:
-                return
-        elif self.__direction == Direction.Right:           
-            if w + xPos > super().minimumWidth() and w + xPos < super().maximumWidth():
-                w += xPos
-                self.__mouse_pos = pos
-            else:
-                return
-        elif self.__direction == Direction.Top:             
-            if h - yPos > super().minimumHeight() and h - yPos < super().maximumHeight():
-                y += yPos
-                h -= yPos
-            else:
-                return
-        elif self.__direction == Direction.Bottom:          
-            if h + yPos > super().minimumHeight() and h + yPos < super().maximumHeight():
-                h += yPos
-                self.__mouse_pos = pos
-            else:
-                return
-        self.setGeometry(x, y, w, h)
-
-    def eventFilter(self, obj, event):
-        if isinstance(event, QtGui.QEnterEvent):
-            self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
-        return super().eventFilter(obj, event)
-
-    def close_window(self):
-        self.close()
-
-    def set_resizeable(self, resizeable: bool):
-        self.__resizable = resizeable
-
-    def __mouse_double_click(self):
-        if not self.__is_maxizeable() or not self.__is_resizable():
-            return
-        if super().isMaximized():
-            super().showNormal()
-        else:
-            super().showMaximized()
-   
-    def __start_system_move(self):
-        if super().windowState() == QtCore.Qt.WindowState.WindowMaximized or super().windowState() == QtCore.Qt.WindowState.WindowFullScreen:
-            return
-        super().windowHandle().startSystemMove()
-   
-    def __is_maxizeable(self) -> bool:
-        return super().windowFlags() & QtCore.Qt.WindowType.WindowMaximizeButtonHint
-
-    def __is_minimizeable(self) -> bool:
-        return super().windowFlags() & QtCore.Qt.WindowType.WindowMinimizeButtonHint
-
-    def __is_resizable(self) -> bool:
-        return super().minimumSize() != super().maximumSize() and self.__resizable
-
-    def set_window_icon(self, icon: QtGui.QIcon):
-        self.__title_bar_window.set_icon(icon = icon)
-
-    def set_window_title(self, title: str):
-        self.__title_bar_window.set_window_title(title = title)
-
-    def add_widget(self, widget: QtWidgets.QWidget):
-        self.__hbox_layout_widgets.addWidget(widget)
-
-    def add_layout(self, layout: QtWidgets.QLayout):
-        self.__hbox_layout_widgets.addLayout(layout)
-
-    def set_style_sheet(self):
-        # рамка для виджетов
-        self.__frame_widgets.setStyleSheet("""
-        #frame_widgets {
-            background: %(background)s;
-        } """ % self.__data_theme["frame_widgets"])
-
-class Window(QtWidgets.QMainWindow):
-    """Главное окно"""
-    Margins = 5
-    
-    def __init__(self, path_images: dict, data_theme: dict):
-        super().__init__()
-
-        self.__path_images = path_images
-        self.__data_theme = data_theme
-        
-        self.__pressed  = False
         self.__mouse_pos = None
-        self.__direction = None
-        self.__resizeable = True
-
-        self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.setMouseTracking(True)
-
-        # рамка окна
-        self.__frame_window = QtWidgets.QFrame()
-        self.__frame_window.setObjectName("frame_window")
-        self.__frame_window.setMouseTracking(True)
-
-        self.setCentralWidget(self.__frame_window)
-
-        # макет окна
-        self.__layout_window = QtWidgets.QVBoxLayout()
-        self.__layout_window.setSpacing(0)
-        self.__layout_window.setContentsMargins(self.Margins, self.Margins, self.Margins, self.Margins)
-
-        self.__frame_window.setLayout(self.__layout_window)
-
-        # главная рамка
-        self.__frame_main = QtWidgets.QFrame()
-        self.__frame_main.setObjectName("frame_main")
-
-        self.__layout_window.addWidget(self.__frame_main)
-
-        # главный макет
-        self.__vbox_layout_main = QtWidgets.QVBoxLayout()
-        self.__vbox_layout_main.setContentsMargins(0, 0, 0, 0)
-        self.__vbox_layout_main.setSpacing(0)
-
-        self.__frame_main.setLayout(self.__vbox_layout_main)
-
-        # рамка с заголовком
-        self.__title_bar_window = TitileBarWindow(data_theme = self.__data_theme["frame_header"])
-        self.__vbox_layout_main.addWidget(self.__title_bar_window)
-
-        # рамка для виджетов
-        self.__frame_widgets = QtWidgets.QFrame()
-        self.__frame_widgets.setObjectName("frame_widgets")
-        self.__frame_widgets.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
-        self.__frame_widgets.installEventFilter(self)
-
-        self.__vbox_layout_main.addWidget(self.__frame_widgets)
-
-        # макет рамки для виджетов
-        self.__hbox_layout_widgets = QtWidgets.QHBoxLayout()
-        self.__hbox_layout_widgets.setContentsMargins(0, 0, 0, 0)
-        self.__hbox_layout_widgets.setSpacing(0)
-
-        self.__frame_widgets.setLayout(self.__hbox_layout_widgets)
-
-        # присоединения слотов к сигналам
-        self.__title_bar_window.window_close.connect(self.close_window)
-        self.__title_bar_window.window_show_maximized.connect(self.show_maximized)
-        self.__title_bar_window.window_show_minimized.connect(self.show_minimized)
-        self.__title_bar_window.window_show_normal.connect(self.show_normal)
-
-        self.__title_bar_window.mouse_double_click.connect(self.__mouse_double_click)
-        # self.__title_bar_window.mouse_move.connect(self.__move)
-        self.__title_bar_window.mouse_press.connect(self.__start_system_move)
-        
-        self.windowTitleChanged.connect(self.__title_chaged)
-        self.windowIconChanged.connect(self.__icon_changed)
-
-        self.set_style_sheet()
-
-    def __title_chaged(self, title: str):
-        self.__title_bar_window.set_window_title(title)
-
-    def __icon_changed(self, icon: QtGui.QIcon):
-        self.__title_bar_window.set_icon(icon)
-
-    def set_window_flags(self, flags: QtCore.Qt.WindowType):
-        self.__title_bar_window.window_type_changed(QtCore.Qt.WindowType.FramelessWindowHint | flags)
-        super().setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | flags)
-
-    def show_maximized(self):
-        self.__layout_window.setContentsMargins(0, 0, 0, 0)
-        super().showMaximized()
-
-    def show_minimized(self):
-        super().showMinimized()
-
-    def show_normal(self):
-        self.__layout_window.setContentsMargins(self.Margins, self.Margins, self.Margins, self.Margins)
-        super().showNormal()
-
-    def __move(self, pos: QtCore.QPoint):
-        if self.windowState() == QtCore.Qt.WindowState.WindowMaximized or self.windowState() == QtCore.Qt.WindowState.WindowFullScreen:
-            return
-        super().move(pos)
-
-    def changeEvent(self, event):
-        if isinstance(event, QtGui.QWindowStateChangeEvent):
-            self.__title_bar_window.window_state_changed(self.windowState())
-        super().changeEvent(event)
-
-    def resizeEvent(self, event):
-        if hasattr(self, "__title_bar_window"):
-            self.__title_bar_window.update_title()
-
-    def paintEvent(self, event):
-        super().paintEvent(event)
-        painter = QtGui.QPainter(self)
-        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 1), 2 * self.Margins))
-        painter.drawRect(self.rect())
-
-    def mousePressEvent(self, event):
-        super().mousePressEvent(event)
-        if event.button() == QtCore.Qt.MouseButton.LeftButton:
-            self.__mouse_pos = event.pos()
-            self.__pressed = True
-
-    def mouseReleaseEvent(self, event):
-        super().mouseReleaseEvent(event)
         self.__pressed = False
         self.__direction = None
 
@@ -982,26 +691,54 @@ class Window(QtWidgets.QMainWindow):
         geometry = super().geometry()
         x, y, w, h = geometry.x(), geometry.y(), geometry.width(), geometry.height()
         if self.__direction == Direction.LeftTop:          
-            if w - xPos > super().minimumWidth() and w - xPos < super().maximumWidth():
+            if w - xPos >= super().minimumWidth() and w - xPos <= super().maximumWidth():
                 x += xPos
                 w -= xPos
+            elif w - xPos < super().minimumWidth(): 
+                x -= super().minimumWidth() - w
+                w = super().minimumWidth()
+            elif w - xPos > super().maximumWidth(): 
+                x -= super().maximumWidth() - w
+                w = super().maximumWidth()
+
             if h - yPos > super().minimumHeight() and h - yPos < super().maximumHeight():
                 y += yPos
                 h -= yPos
-        elif self.__direction == Direction.RightBottom:    
-            if w + xPos > super().minimumWidth() and w + xPos < super().maximumWidth():
+            elif h - yPos < super().minimumHeight(): 
+                y -= super().minimumHeight() - h
+                h = super().minimumHeight()
+            elif h - yPos > super().maximumHeight(): 
+                y -= super().maximumHeight() - h
+                h = super().maximumHeight()
+        
+        elif self.__direction == Direction.RightBottom: 
+            if w + xPos >= super().minimumWidth() and w + xPos <= super().maximumWidth():
                 w += xPos
-                self.__mouse_pos = pos
-            if h + yPos > super().minimumHeight() and h + yPos < super().maximumHeight():
+                self.__mouse_pos.setX(w)
+            elif w + xPos < super().minimumWidth():
+                w = super().minimumWidth()
+                self.__mouse_pos.setX(super().minimumWidth())
+            elif w + xPos > super().maximumWidth():
+                w = super().maximumWidth()
+                self.__mouse_pos.setX(super().maximumWidth())
+
+            if h + yPos >= super().minimumHeight() and h + yPos <= super().maximumWidth():
                 h += yPos
-                self.__mouse_pos = pos
+                self.__mouse_pos.setY(h)
+            elif h + yPos < super().minimumHeight():
+                h = super().minimumHeight()
+                self.__mouse_pos.setY(super().minimumHeight())
+            elif h + yPos > super().maximumWidth():
+                h = super().maximumWidth()
+                self.__mouse_pos.setY(super().maximumWidth())
+        
         elif self.__direction == Direction.RightTop:    
             if h - yPos > super().minimumHeight() and h - yPos < super().maximumHeight():
                 y += yPos
                 h -= yPos
             if w + xPos > super().minimumWidth() and w + xPos < super().maximumWidth():
                 w += xPos
-                self.__mouse_pos.setX(pos.x())
+            self.__mouse_pos.setX(pos.x())
         elif self.__direction == Direction.LeftBottom:     
             if w - xPos > super().minimumWidth() and w - xPos < super().maximumWidth():
                 x += xPos
@@ -1044,7 +781,7 @@ class Window(QtWidgets.QMainWindow):
         self.close()
 
     def set_resizeable(self, resizeable: bool):
-        self.__resizable = resizeable
+        self.__resizeable = resizeable
 
     def __mouse_double_click(self):
         if not self.__is_maxizeable() or not self.__is_resizable():
@@ -1069,10 +806,10 @@ class Window(QtWidgets.QMainWindow):
         return super().minimumSize() != super().maximumSize() and self.__resizeable
 
     def set_window_icon(self, icon: QtGui.QIcon):
-        self.__title_bar_window.set_icon(icon = icon)
+        self.title_bar_window.set_icon(icon = icon)
 
     def set_window_title(self, title: str):
-        self.__title_bar_window.set_window_title(title = title)
+        self.title_bar_window.set_window_title(title = title)
 
     def add_widget(self, widget: QtWidgets.QWidget):
         self.__hbox_layout_widgets.addWidget(widget)
@@ -1080,9 +817,23 @@ class Window(QtWidgets.QMainWindow):
     def add_layout(self, layout: QtWidgets.QLayout):
         self.__hbox_layout_widgets.addLayout(layout)
 
-    def set_style_sheet(self):
+    def __set_style_sheet(self):
         # рамка для виджетов
         self.__frame_widgets.setStyleSheet("""
         #frame_widgets {
             background: %(background)s;
         } """ % self.__data_theme["frame_widgets"])
+
+class Dialog(AbstractWindow):
+    """Класс для базового диалогового окна"""
+    
+    def __init__(self, data_theme: dict, parent = None):
+        super().__init__(data_theme, parent)
+        super().setWindowFlags(super().windowFlags() | QtCore.Qt.WindowType.Dialog)
+
+class Window(AbstractWindow):
+    """Класс для главного окна"""
+   
+    def __init__(self, data_theme: dict):
+        super().__init__(data_theme, None)
+        super().setWindowFlags(super().windowFlags() | QtCore.Qt.WindowType.Window)

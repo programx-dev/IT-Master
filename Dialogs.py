@@ -24,8 +24,8 @@ class Dialog(Window.Dialog):
         self.__event_loop = None
 
         super().__init__(data_theme = self.__data_theme, parent = self.__parent)
-        super().set_window_flags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.WindowCloseButtonHint)
-        super().setModal(True)
+        super().set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint)
+        super().setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         super().set_resizeable(False)
 
         # главная рамка
@@ -94,7 +94,9 @@ class Dialog(Window.Dialog):
         self.__vbox_layout_main.addLayout(self.__hbox_layout_push_buttons)
 
         # подключение слотов к сигналам
-        self.__title_bar_window.window_close.connect(self.__exit_window)
+        self.title_bar_window.window_close.connect(self.__exit_window)
+
+        # self.set_style_sheet()
     
     def __exit_window(self):
         if self.__event_loop:
@@ -148,8 +150,8 @@ class Dialog(Window.Dialog):
 
         self.__hbox_layout_push_buttons.addWidget(push_button)
 
-    def set_style_sheet(self):
-        super().set_style_sheet()
+    def __set_style_sheet(self):
+        pass
 
 class DialogImage(QtWidgets.QDialog):
     dialog_close = QtCore.pyqtSignal()

@@ -93,7 +93,7 @@ class Main(Window.Window):
                 result INTEGER
             ) """)
 
-        super().__init__(self.__path_images, data_theme = self.__data_theme["window"])
+        super().__init__(data_theme = self.__data_theme["window"])
 
         # панель инструментов
         self.toolbar = Window.ToolBar(self.__path_images, self.__data_theme["window"]["frame_tool_bar"])
@@ -405,6 +405,9 @@ if __name__ == "__main__":
 
     window_main = Main()
     # window_main.set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.WindowMinimizeButtonHint)
-    window_main.show_maximized()
+    # window_main.show_maximized()
+    window_main.show_normal()
+
+    window_main.setMaximumSize(800, 500)
 
     sys.exit(app.exec())
