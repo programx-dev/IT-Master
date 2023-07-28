@@ -96,7 +96,7 @@ class Main(Window.Window):
         super().__init__(data_theme = self.__data_theme["window"])
 
         # панель инструментов
-        self.toolbar = Window.ToolBar(self.__path_images, self.__data_theme["window"]["frame_tool_bar"])
+        self.toolbar = Window.ToolBar(self.__path_images, self.__data_theme["frame_tool_bar"])
         self.add_widget(self.toolbar)
 
         Dialogs.__parent__ = self
@@ -122,18 +122,20 @@ class Main(Window.Window):
             return
         
         if self.__test_started:
-            dialog = Dialogs.Dialog(self.__data_theme["window"])
+            dialog = Dialogs.Dialog(data_theme = self.__data_theme["dialog"], parent = self.window())
             dialog.set_window_title("Покинуть тестирование")
             dialog.set_window_icon(QtGui.QIcon(self.__path_image_logo))
             dialog.set_icon(QtWidgets.QStyle.StandardPixmap.SP_MessageBoxQuestion)
             dialog.set_text("Покинуть тестирование?")
-            dialog.set_description("Результаты не сохраниятся")
-            dialog.add_push_button("ОК", Dialogs.ButtonRole.accept, True)
-            dialog.add_push_button("Отмена", Dialogs.ButtonRole.reject)
+            dialog.set_description("Результаты не сохранятся")
+            dialog.add_push_button("ОК", Dialogs.ButtonRole.accept)
+            dialog.add_push_button("Отмена", Dialogs.ButtonRole.reject, True)
 
             if dialog.run_modal() != Dialogs.ButtonRole.accept:
                 self.toolbar.tool_button_test.set_selected()
                 return  
+
+        self.toolbar.update_style_sheet(Window.PropertyPages.home_page)        
 
         # удаление старого окна
         if self.__current_stack!= None:
@@ -253,7 +255,7 @@ class Main(Window.Window):
             path_course = self.__data_loggin.path_course,
             path_images = self.__path_images, 
             icon_dialogs = QtGui.QPixmap(self.__path_image_logo),
-            data_theme = self.__data_theme["stack_test"] 
+            data_theme = self.__data_theme["stack_testing"] 
         )
         self.__current_stack.push_button_finish_cliced.connect(self.__finish_test)
 
@@ -405,9 +407,7 @@ if __name__ == "__main__":
 
     window_main = Main()
     # window_main.set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.WindowMinimizeButtonHint)
-    # window_main.show_maximized()
-    window_main.show_normal()
-
-    window_main.setMaximumSize(800, 500)
+    window_main.show_maximized()
+    # window_main.show_normal()
 
     sys.exit(app.exec())

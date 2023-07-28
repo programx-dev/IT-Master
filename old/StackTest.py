@@ -1,4 +1,4 @@
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 import os
 import datetime
 import xml.etree.ElementTree as ET
@@ -17,82 +17,84 @@ class DataPassage:
     dict_result: dict
 
 class PushButtonNavigation(QtWidgets.QPushButton):
+    """Класс для кнопки для навигации по вопросам"""
     push_button_current = None
     push_button_clicked = QtCore.pyqtSignal(int)
+
     def __init__(self, number: int, data_theme: dict):
         super().__init__()
 
         self.number = number
         self.data_theme = data_theme
 
-        self.init_variables()
-
         self.setObjectName("push_button_navigation")
         self.setText(f"{self.number + 1}")
         self.setFont(QtGui.QFont("Segoe UI", 12))
         self.setFixedSize(50, 50)
         self.clicked.connect(self.push_button_press)
+        self.setProperty("answered", False)
+        self.setProperty("current", False)
 
         self.set_style_sheet()
-
-    def init_variables(self):
-        self.dict_state = {
-            "answered": False,
-            "current": False
-        }
 
     def push_button_press(self):
         if self != PushButtonNavigation.push_button_current and PushButtonNavigation.push_button_current != None:
-            PushButtonNavigation.push_button_current.set_not_current()
+            PushButtonNavigation.push_button_current.set_current(False)
 
         if self != PushButtonNavigation.push_button_current:
             PushButtonNavigation.push_button_current = self
-            self.set_current()
+            self.set_current(True)
 
             self.push_button_clicked.emit(self.number)
 
-    def set_current(self):
-        self.dict_state["current"] = True
+    def set_current(self, current: bool):
+        self.setProperty("current", current)
+        self.style().unpolish(self)
+        self.style().polish(self)
 
-        self.set_style_sheet()
-
-    def set_not_current(self):
-        self.dict_state["current"] = False
-
-        self.set_style_sheet()
-
-    def set_answered(self):
-        self.dict_state["answered"] = True
-
-        self.set_style_sheet()
-
-    def set_not_answered(self):
-        self.dict_state["answered"] = False
-
-        self.set_style_sheet()
+    def set_answered(self, answered: bool):
+        self.setProperty("answered", answered)
+        self.style().unpolish(self)
+        self.style().polish(self)
 
     def set_style_sheet(self):
-        if self.dict_state["current"]:
-            temp_style_sheet = self.data_theme["current"]
-        else:
-            temp_style_sheet = self.data_theme["not_current"]
-        
-        if self.dict_state["answered"]:
-            temp_style_sheet = temp_style_sheet["answered"]
-        else:
-            temp_style_sheet = temp_style_sheet["not_answered"]
-
-        self.setStyleSheet("""
-        #push_button_navigation {
+        self.setStyleSheet(f"""
+        #push_button_navigation[current="false"][answered="false"] {{
             outline: 0;
             border: 3px solid;
             border-radius: 25px;
-            background: %(background)s;
-            border-color: %(color_border)s;
-            color: %(color)s;
-        } """ % temp_style_sheet)
+            background: {self.data_theme["not_current"]["not_answered"]["background"]};
+            border-color: {self.data_theme["not_current"]["not_answered"]["color_border"]};
+            color: {self.data_theme["not_current"]["not_answered"]["color"]};
+        }} 
+        #push_button_navigation[current="false"][answered="true"] {{
+            outline: 0;
+            border: 3px solid;
+            border-radius: 25px;
+            background: {self.data_theme["not_current"]["answered"]["background"]};
+            border-color: {self.data_theme["not_current"]["answered"]["color_border"]};
+            color: {self.data_theme["not_current"]["answered"]["color"]};
+        }} 
+        #push_button_navigation[current="true"][answered="false"] {{
+            outline: 0;
+            border: 3px solid;
+            border-radius: 25px;
+            background: {self.data_theme["current"]["not_answered"]["background"]};
+            border-color: {self.data_theme["current"]["not_answered"]["color_border"]};
+            color: {self.data_theme["current"]["not_answered"]["color"]};
+        }} 
+        #push_button_navigation[current="true"][answered="true"] {{
+            outline: 0;
+            border: 3px solid;
+            border-radius: 25px;
+            background: {self.data_theme["current"]["answered"]["background"]};
+            border-color: {self.data_theme["current"]["answered"]["color_border"]};
+            color: {self.data_theme["current"]["answered"]["color"]};
+        }} """)
 
 class BarNavigation(QtWidgets.QWidget):
+    """Класс для панели навигации по вопросам"""
+
     def __init__(self, len_course: int, data_theme: dict, func: callable):
         super().__init__()
 
@@ -117,7 +119,7 @@ class BarNavigation(QtWidgets.QWidget):
 
     def change_answered(self, number: int):
         self.list_answered[number][1] = True
-        self.list_answered[number][0].set_answered()
+        self.list_answered[number][0].set_answered(Ture)
 
     def push_button_press(self, number: int):
         self.list_answered[number][0].push_button_press()
@@ -126,7 +128,9 @@ class BarNavigation(QtWidgets.QWidget):
         self.list_answered = {i: [None, False] for i in range(self.len_course)}
 
 class RadiobuttonAnswers(QtWidgets.QWidget):
+    """Класс для радиокнопки"""
     radio_button_checked = QtCore.pyqtSignal()
+
     def __init__(self, text: str, path_images: str, data_theme: dict):
         self.__text = text
         self.data_theme = data_theme
@@ -217,31 +221,33 @@ class RadiobuttonAnswers(QtWidgets.QWidget):
 
     def set_style_sheet(self):
         # кнопка с флажком
-        self.push_button_flag.setStyleSheet("""
-        #push_button_flag {
+        self.push_button_flag.setStyleSheet(f"""
+        #push_button_flag {{
             outline: 0;
             border: none;
-            background: %(background)s;
-        } """ % self.data_theme)
+            background: {self.data_theme["background"]};
+        }} """)
 
         # кнопка с текстом
-        self.push_button_text.setStyleSheet("""
-        #push_button_text {
+        self.push_button_text.setStyleSheet(f"""
+        #push_button_text {{
             text-align: left;
             outline: 0;
             border: none;
-            background: %(background)s;
-        } """ % self.data_theme)
+            background: {self.data_theme["background"]};
+        }} """)
 
         # метка внутри кнопки
-        self.label_text.setStyleSheet("""
-        #label_text {
-            background: %(background)s;
-            color: %(color)s;
-        } """ % self.data_theme)
+        self.label_text.setStyleSheet(f"""
+        #label_text {{
+            background: {self.data_theme["background"]};
+            color: {self.data_theme["color"]};
+        }} """)
 
 class GroupRadiobuttons(QtCore.QObject):
+    """Класс для группирования радиокнопок"""
     radio_button_checked = QtCore.pyqtSignal(RadiobuttonAnswers)
+
     def __init__(self):
         super().__init__()
 
@@ -261,7 +267,9 @@ class GroupRadiobuttons(QtCore.QObject):
         self.__list_radio_buttons.append(radio_button)
 
 class CheckboxAnswers(QtWidgets.QWidget):
+    """Класс для флажка"""
     checkbox_checked = QtCore.pyqtSignal()
+
     def __init__(self, text: str, path_images: str, data_theme: dict):
         self.__text = text
         self.data_theme = data_theme
@@ -355,31 +363,33 @@ class CheckboxAnswers(QtWidgets.QWidget):
 
     def set_style_sheet(self):
         # кнопка с флажком
-        self.push_button_flag.setStyleSheet("""
-        #push_button_flag {
+        self.push_button_flag.setStyleSheet(f"""
+        #push_button_flag {{
             outline: 0;
             border: none;
-            background: %(background)s;
-        } """ % self.data_theme)
+            background: {self.data_theme["background"]};
+        }} """)
 
         # кнопка с текстом
-        self.push_button_text.setStyleSheet("""
-        #push_button_text {
+        self.push_button_text.setStyleSheet(f"""
+        #push_button_text {{
             text-align: left;
             outline: 0;
             border: none;
-            background: %(background)s;
-        } """ % self.data_theme)
+            background: {self.data_theme["background"]};
+        }} """ % self.data_theme)
 
         # метка внутри кнопки
-        self.label_text.setStyleSheet("""
-        #label_text {
-            background: %(background)s;
-            color: %(color)s;
-        } """ % self.data_theme)
+        self.label_text.setStyleSheet(f"""
+        #label_text {{
+            background: {self.data_theme["background"]};
+            color: {self.data_theme["color"]};
+        }} """ % self.data_theme)
 
 class PushButtonImage(QtWidgets.QPushButton):
+    """Класс для кнопки с изображением"""
     push_button_clicked = QtCore.pyqtSignal()
+
     def __init__(self, path_image: str,  data_theme: dict):
         super().__init__()
 
@@ -411,17 +421,19 @@ class PushButtonImage(QtWidgets.QPushButton):
         self.push_button_clicked.emit()
 
     def set_style_sheet(self):
-        self.setStyleSheet("""
-        #push_button_image {
+        self.setStyleSheet(f"""
+        #push_button_image {{
             outline: 0;
             border-radius: 7px; 
-            background: %(background)s; 
-        } """ % self.data_theme)
+            background: {self.data_theme["background"]}; 
+        }} """)
         
         self.setIcon(self.image)
         self.setIconSize(QtCore.QSize(300, 200))
 
 class WidgetTest(QtWidgets.QWidget):
+    """Класс предостравляющий виджет одного вопроса"""
+
     def __init__(self, path_course: str, icon_dialogs: QtGui.QPixmap, question: str, path_images: str, started: bool, answer, data_theme: dict, number: int, len_course: int, func_changed: callable, parent = None):
         super().__init__()
 
@@ -632,30 +644,32 @@ class WidgetTest(QtWidgets.QWidget):
 
     def set_style_sheet(self):
         # главная рамка
-        self.frame_main.setStyleSheet("""
-        #frame_main {
-            background: %(background)s;
-        } """ % self.data_theme["frame_main"])
+        self.frame_main.setStyleSheet(f"""
+        #frame_main {{
+            background: {self.data_theme["frame_main"]["background"]};
+        }} """)
 
         # метка номера задания
-        self.label_question.setStyleSheet("""
-        #label_question {
-            color: %(color)s;
-        } """ % self.data_theme["frame_main"]["label_question"])
+        self.label_question.setStyleSheet(f"""
+        #label_question {{
+            color: {self.data_theme["frame_main"]["label_question"]["color"]};
+        }} """)
 
         # метка вопроса
-        self.label_numder_question.setStyleSheet("""
-        #label_numder_question {
-            color: %(color)s;
-        } """ % self.data_theme["frame_main"]["label_numder_question"])
+        self.label_numder_question.setStyleSheet(f"""
+        #label_numder_question {{
+            color: {self.data_theme["frame_main"]["label_numder_question"]["color"]};
+        }} """)
 
         # метка типа задания
-        self.label_type_question.setStyleSheet("""
-        #label_type_question { 
-            color: %(color)s;
-        }""" % self.data_theme["frame_main"]["label_type_question"])
+        self.label_type_question.setStyleSheet(f"""
+        #label_type_question {{ 
+            color: {self.data_theme["frame_main"]["label_type_question"]["color"]};
+        }} """)
 
 class StackTest(QtWidgets.QWidget):
+    """Класс для тестирования"""
+
     def __init__(self, data_theme: dict, icon_dialogs: QtGui.QPixmap, path_images: str, path_course: str, func: callable, parent = None):
         super().__init__()
 
@@ -900,22 +914,22 @@ class StackTest(QtWidgets.QWidget):
 
     def set_style_sheet(self):
         # панель инструментов и навигации
-        self.frame_tools.setStyleSheet("""
-        #frame_tools {
+        self.frame_tools.setStyleSheet(f"""
+        #frame_tools {{
             border-top-left-radius: 40px;
             border-top-right-radius: 40px;
-            background: %(background)s;
-        } """ % self.data_theme["frame_main"]["frame_tools"])
+            background: {self.data_theme["frame_main"]["frame_tools"]["background"]};
+        }} """)
 
         # главная рамка
-        self.frame_main.setStyleSheet("""
-        #frame_main {
-            background: %(background)s;
-        } """ % self.data_theme["frame_main"])
+        self.frame_main.setStyleSheet(f"""
+        #frame_main {{
+            background: {self.data_theme["frame_main"]["background"]};
+        }} """)
 
         # кнопка завершить тест
-        self.push_button_finish.setStyleSheet("""
-        #push_button_finish {
+        self.push_button_finish.setStyleSheet(f"""
+        #push_button_finish {{
             outline: 0;
             border-top-left-radius: 7px;
             border-top-right-radius: 25px;
@@ -923,6 +937,6 @@ class StackTest(QtWidgets.QWidget):
             border-bottom-right-radius: 7px;
             padding-left: 10px;
             padding-right: 10px;
-            color: %(color)s;
-            background: %(background)s; 
-        } """ % self.data_theme["frame_main"]["frame_tools"]["push_button_finish"])
+            color: {self.data_theme["frame_main"]["frame_tools"]["push_button_finish"]["color"]};
+            background: {self.data_theme["frame_main"]["frame_tools"]["push_button_finish"]["background"]}; 
+        }} """)

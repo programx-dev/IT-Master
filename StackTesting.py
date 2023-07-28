@@ -1213,37 +1213,37 @@ class StackTesting(QtWidgets.QWidget):
         self.__dict_questions_started_passing[number] = answered
 
     def set_style_sheet(self):
+        # главная рамка
+        self.__frame_main.setStyleSheet(f"""
+        #frame_main {{
+            background: {self.__data_theme["frame_main"]["background"]};
+        }} """)
+
         # панель инструментов и навигации
         self.__frame_tools.setStyleSheet(f"""
         #frame_tools {{               
             border-top-left-radius: 0px;
             border-top-right-radius: 0px;
-            background: #8C8C8C;
-        }} """) # % self.__data_theme["frame_main"]["frame_tools"]
-
-        # главная рамка
-        self.__frame_main.setStyleSheet(f"""
-        #frame_main {{
-            background: #FFFFFF;
-        }} """)# % self.__data_theme["frame_main"]
+            background: {self.__data_theme["frame_main"]["frame_tools"]["background"]};
+        }} """)
         
         # прокручиваемая область для станица теста
         self.__scroll_area_page_test.setStyleSheet(f"""
         #scroll_area_page_test {{
-            background: #FFFFFF;
+            background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["background"]};
             border: none;
         }}
         
         QScrollBar:vertical {{              
             border: transparent;
-            background: #F2F2F2;
+            background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["background"]};
             width: 14px;
             border-radius: 6px;
             padding: 4px;
             margin: 0px 0px 0px 0px;
         }}
         QScrollBar::handle:vertical {{
-            background: #888888;
+            background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["handle"]["background"]};
             border-radius: 3px;
             min-height: 30px;
         }}
@@ -1257,14 +1257,14 @@ class StackTesting(QtWidgets.QWidget):
 
         QScrollBar:horizontal {{              
             border: transparent;
-            background: #F2F2F2;
+            background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["background"]};
             height: 14px;
             border-radius: 6px;
             padding: 4px;
             margin: 0px 0px 0px 0px;
         }}
         QScrollBar::handle:horizontal {{
-            background: #888888;
+            background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["handle"]["background"]};
             border-radius: 3px;
             min-width: 30px;
         }}
@@ -1279,7 +1279,7 @@ class StackTesting(QtWidgets.QWidget):
         # прокручиваемая область для кнопок навигации по вопросам
         self.__scroll_area_push_button_questions.setStyleSheet(f"""
         #scroll_area_push_button_questions {{
-            background: #8C8C8C;
+            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["background"]};
             border: none;
             margin: 0px, 0px, 0px, 0px;
         }} 
@@ -1290,14 +1290,14 @@ class StackTesting(QtWidgets.QWidget):
         
         QScrollBar:horizontal {{              
             border: transparent;
-            background: #F2F2F2;
+            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["scrollbar"]["background"]};
             height: 14px;
             border-radius: 6px;
             padding: 4px;
             margin: 0px 0px 0px 0px;
         }}
         QScrollBar::handle:horizontal {{
-            background: #888888;
+            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["scrollbar"]["handle"]["background"]};
             border-radius: 3px;
             min-width: 30px;
         }}
@@ -1311,7 +1311,7 @@ class StackTesting(QtWidgets.QWidget):
    
         self.__frame_push_button_questions.setStyleSheet(f"""
         #frame_push_button_questions {{
-            background: #8C8C8C;
+            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["frame_push_button_questions"]};
             margin: 0px, 17px, 0px, 0px;
         }} """)
 
@@ -1322,6 +1322,6 @@ class StackTesting(QtWidgets.QWidget):
             padding-left: 15px;
             padding-right: 15px;
             border-radius: 15px;
-            background: #037BFB; 
-            color: #FFFFFF;
-        }} """)# % self.__data_theme["frame_main"]["frame_tools"]["push_button_finish"]
+            background: {self.__data_theme["frame_main"]["frame_tools"]["push_button_finish"]["background"]}; 
+            color: {self.__data_theme["frame_main"]["frame_tools"]["push_button_finish"]["color"]};
+        }} """)

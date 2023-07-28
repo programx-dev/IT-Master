@@ -4,8 +4,8 @@ import os
 import enum
 
 class PropertyPages(enum.Enum):
-    home_page = "home_page"
-    test_page = "test_page"
+    home_page = 0
+    test_page = 1
 
 class Direction(enum.Enum):
     Left = 0
@@ -220,84 +220,64 @@ class TitileBarWindow(QtWidgets.QWidget):
 
     def set_style_sheet(self):
         # рамка заголовка
-        self.__frame_header.setStyleSheet("""
-        #frame_header {
-            background: %(background)s;
-        } """ % self.__data_theme)
+        self.__frame_header.setStyleSheet(f"""
+        #frame_header {{
+            background: {self.__data_theme["background"]};
+        }} """)
 
         # метка титла
-        self.__label_title.setStyleSheet("""
-        #label_title {
-            color: %(color)s;
-        } """ % self.__data_theme["label_title"])
+        self.__label_title.setStyleSheet(f"""
+        #label_title {{
+            color: {self.__data_theme["label_title"]["color"]};
+        }} """)
 
-        # кнопка свернуть
-        temp_data_theme = {
-            "background_normal": self.__data_theme["push_button"]["normal"]["background"],
-            "color_normal": self.__data_theme["push_button"]["normal"]["color"], 
-            "background_hover": self.__data_theme["push_button"]["hover"]["background"], 
-            "color_hover": self.__data_theme["push_button"]["hover"]["color"],
-            "background_press": self.__data_theme["push_button"]["press"]["background"], 
-            "color_press": self.__data_theme["push_button"]["press"]["color"]
-        }
-
-        self.__push_button_minimize.setStyleSheet("""
-        #push_button_minimize {
+        self.__push_button_minimize.setStyleSheet(f"""
+        #push_button_minimize {{
             outline: 0;
             border: none;
-            background: %(background_normal)s; 
-            color: %(color_normal)s;
-        }
-        #push_button_minimize::hover {
-            background: %(background_hover)s; 
-            color: %(color_hover)s;
-        }
-        #push_button_minimize::pressed {
-            background: %(background_press)s; 
-            color: %(color_press)s; 
-        } """ % temp_data_theme)
+            background: {self.__data_theme["push_button"]["normal"]["background"]}; 
+            color: {self.__data_theme["push_button"]["normal"]["color"]};
+        }}
+        #push_button_minimize::hover {{
+            background: {self.__data_theme["push_button"]["hover"]["background"]}; 
+            color: {self.__data_theme["push_button"]["hover"]["color"]};
+        }}
+        #push_button_minimize::pressed {{
+            background: {self.__data_theme["push_button"]["pressed"]["background"]}; 
+            color: {self.__data_theme["push_button"]["pressed"]["color"]}; 
+        }} """)
 
-        self.__push_button_maximize.setStyleSheet("""
-        #push_button_maximize {
+        self.__push_button_maximize.setStyleSheet(f"""
+        #push_button_maximize {{
             outline: 0;
             border: none;
-            background: %(background_normal)s; 
-            color: %(color_normal)s;
-        }
-        #push_button_maximize::hover {
-            background: %(background_hover)s; 
-            color: %(color_hover)s;
-        }
-        #push_button_maximize::pressed {
-            background: %(background_press)s; 
-            color: %(color_press)s; 
-        } """ % temp_data_theme)
+            background: {self.__data_theme["push_button"]["normal"]["background"]}; 
+            color: {self.__data_theme["push_button"]["normal"]["color"]};
+        }}
+        #push_button_maximize::hover {{
+            background: {self.__data_theme["push_button"]["hover"]["background"]}; 
+            color: {self.__data_theme["push_button"]["hover"]["color"]};
+        }}
+        #push_button_maximize::pressed {{
+            background: {self.__data_theme["push_button"]["pressed"]["background"]}; 
+            color: {self.__data_theme["push_button"]["pressed"]["color"]}; 
+        }} """)
 
-        # кнопка закрыть программу
-        temp_data_theme = {
-            "background_normal": self.__data_theme["push_button_close"]["normal"]["background"],
-            "color_normal": self.__data_theme["push_button_close"]["normal"]["color"], 
-            "background_hover": self.__data_theme["push_button_close"]["hover"]["background"], 
-            "color_hover": self.__data_theme["push_button_close"]["hover"]["color"],
-            "background_press": self.__data_theme["push_button_close"]["press"]["background"], 
-            "color_press": self.__data_theme["push_button_close"]["press"]["color"]
-        }
-
-        self.__push_button_close.setStyleSheet("""
-        #push_button_close {
+        self.__push_button_close.setStyleSheet(f"""
+        #push_button_close {{
             outline: 0;
             border: none;
-            background: %(background_normal)s; 
-            color: %(color_normal)s;
-        }
-        #push_button_close::hover {
-            background: %(background_hover)s; 
-            color: %(color_hover)s;
-        }
-        #push_button_close::pressed {
-            background: %(background_press)s; 
-            color: %(color_press)s; 
-        } """ % temp_data_theme)
+            background: {self.__data_theme["push_button_close"]["normal"]["background"]}; 
+            color: {self.__data_theme["push_button_close"]["normal"]["color"]};
+        }}
+        #push_button_close::hover {{
+            background: {self.__data_theme["push_button_close"]["hover"]["background"]}; 
+            color: {self.__data_theme["push_button_close"]["hover"]["color"]};
+        }}
+        #push_button_close::pressed {{
+            background: {self.__data_theme["push_button_close"]["pressed"]["background"]}; 
+            color: {self.__data_theme["push_button_close"]["pressed"]["color"]}; 
+        }} """)
 
 class ToolButtonToolbar(QtWidgets.QToolButton):
     """Кнопка панели инструментов"""
@@ -359,14 +339,14 @@ class ToolButtonToolbar(QtWidgets.QToolButton):
 
     def set_style_sheet(self):
         self.setStyleSheet(f"""
-        #tool_button[page={PropertyPages.home_page.value}][selected="true"] {{ 
+        #tool_button[page=\"{PropertyPages.home_page.value}\"][selected="true"] {{ 
             padding: 0px;
             outline: 0;
             border-radius: 10px; 
             background: {self.__data_theme["home_page"]["selected"]["background"]};
             color: {self.__data_theme["home_page"]["selected"]["color"]};
-        }}
-        #tool_button[page={PropertyPages.home_page.value}][selected="false"] {{ 
+        }} 
+         #tool_button[page=\"{PropertyPages.home_page.value}\"][selected="false"] {{ 
             padding: 0px;
             outline: 0;
             border-radius: 10px; 
@@ -374,14 +354,14 @@ class ToolButtonToolbar(QtWidgets.QToolButton):
             color: {self.__data_theme["home_page"]["not_selected"]["color"]};
         }}
 
-        #tool_button[page={PropertyPages.test_page.value}][selected="true"] {{ 
+        #tool_button[page=\"{PropertyPages.test_page.value}\"][selected="true"] {{ 
             padding: 0px;
             outline: 0;
             border-radius: 10px; 
             background: {self.__data_theme["test_page"]["selected"]["background"]};
             color: {self.__data_theme["test_page"]["selected"]["color"]};
         }}
-        #tool_button[page={PropertyPages.test_page.value}][selected="false"] {{ 
+        #tool_button[page=\"{PropertyPages.test_page.value}\"][selected="false"] {{ 
             padding: 0px;
             outline: 0;
             border-radius: 10px; 
@@ -415,8 +395,8 @@ class ToolBar(QtWidgets.QFrame):
         self.setLayout(self.__vbox_layout_toolbar)
 
         data_theme_tool_buttons = {
-            PropertyPages.home_page.value: self.__data_theme["home_page"]["tool_button"],
-            PropertyPages.test_page.value: self.__data_theme["test_page"]["tool_button"]
+            "home_page": self.__data_theme["home_page"]["tool_button"],
+            "test_page": self.__data_theme["test_page"]["tool_button"]
         }
 
         # кнопка Домашняя страница
@@ -504,10 +484,10 @@ class ToolBar(QtWidgets.QFrame):
 
     def set_style_sheet(self):
         self.setStyleSheet(f"""
-        #tool_bar[page={PropertyPages.home_page.value}] {{
+        #tool_bar[page=\"{PropertyPages.home_page.value}\"] {{
             background: {self.__data_theme["home_page"]["background"]};
         }} 
-        #tool_bar[page={PropertyPages.test_page.value}] {{
+        #tool_bar[page=\"{PropertyPages.test_page.value}\"] {{
             background: {self.__data_theme["test_page"]["background"]};
         }} """ )
 
@@ -542,6 +522,13 @@ class AbstractWindow(QtWidgets.QWidget):
 
         self.__layout_window.addWidget(self.__frame_main)
 
+        # тень
+        self.__shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.__shadow.setBlurRadius(17)
+        self.__shadow.setOffset(0, 0)
+        self.__shadow.setColor(QtGui.QColor(0, 0, 0, 100))
+        self.__frame_main.setGraphicsEffect(self.__shadow)
+
         # главный макет
         self.__vbox_layout_main = QtWidgets.QVBoxLayout()
         self.__vbox_layout_main.setContentsMargins(0, 0, 0, 0)
@@ -550,7 +537,7 @@ class AbstractWindow(QtWidgets.QWidget):
         self.__frame_main.setLayout(self.__vbox_layout_main)
 
         # рамка с заголовком
-        self.title_bar_window = TitileBarWindow(data_theme = self.__data_theme["frame_header"])
+        self.title_bar_window = TitileBarWindow(data_theme = self.__data_theme["frame_title_bar"])
         self.__vbox_layout_main.addWidget(self.title_bar_window)
 
         # рамка для виджетов

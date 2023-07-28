@@ -20,6 +20,7 @@ class Dialog(Window.Dialog):
         self.__text = None
         self.__description = None
         self.__list_push_buttons = list()
+        self.__defaul_push_button = None
         self.__value = None
         self.__event_loop = None
 
@@ -66,7 +67,7 @@ class Dialog(Window.Dialog):
 
         # метка с текстом
         self.__label_text = QtWidgets.QLabel()
-        self.__label_text.setFont(QtGui.QFont("Segoe UI", 10))
+        self.__label_text.setFont(QtGui.QFont("Segoe UI", 11))
         self.__label_text.setObjectName("label_text")
         self.__label_text.setWordWrap(True)
         self.__label_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
@@ -77,7 +78,7 @@ class Dialog(Window.Dialog):
 
         # метка с описанием
         self.__label_description = QtWidgets.QLabel()
-        self.__label_description.setFont(QtGui.QFont("Segoe UI", 10))
+        self.__label_description.setFont(QtGui.QFont("Segoe UI", 11))
         self.__label_description.setObjectName("label_description")
         self.__label_description.setWordWrap(True)
         self.__label_description.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
@@ -96,7 +97,7 @@ class Dialog(Window.Dialog):
         # подключение слотов к сигналам
         self.title_bar_window.window_close.connect(self.__exit_window)
 
-        # self.set_style_sheet()
+        self.set_style_sheet()
     
     def __exit_window(self):
         if self.__event_loop:
@@ -141,17 +142,55 @@ class Dialog(Window.Dialog):
     def add_push_button(self, text: str, role: ButtonRole | typing.Any = None, default: bool = False):
         push_button = QtWidgets.QPushButton()
         push_button.setText(text)
+        push_button.setFont(QtGui.QFont("Segoe UI", 10))
+        push_button.setFixedHeight(28)
+        push_button.setMinimumWidth(75)
+        push_button.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+
         push_button.clicked.connect(lambda: self.__push_button_pressed(role))
-        if len(self.__list_push_buttons) == 0:
+        if self.__defaul_push_button == None:
+            self.__defaul_push_button = push_button
             push_button.setDefault(True)
-        else:
-            push_button.setDefault(default)
+        elif default:
+            self.__defaul_push_button.setDefault(False)
+            push_button.setDefault(True)
         self.__list_push_buttons.append(push_button)
 
+        push_button.setStyleSheet(f"""
+        QPushButton {{
+            border: none;
+            outline: 0;
+            padding-left: 15px;
+            padding-right: 15px;
+            border-radius: 5px; 
+            background: #F1F1F1; 
+            color: #000000;
+        }} 
+        QPushButton:default {{
+            background: #95C8FF;
+        }}""")
+
+        if self.__hbox_layout_push_buttons.count() > 0:
+            self.__hbox_layout_push_buttons.addSpacing(10)
         self.__hbox_layout_push_buttons.addWidget(push_button)
 
-    def __set_style_sheet(self):
-        pass
+    def set_style_sheet(self):
+        self.__frame_main.setStyleSheet(f"""
+        #frame_main {{
+            background: #FFFFFF;
+        }} """)
+
+        self.__label_text.setStyleSheet(f"""
+        #label_text {{
+            background: transparent;
+            color: #000000;
+        }} """)
+
+        self.__label_description.setStyleSheet(f"""
+        #label_description {{
+            background: transparent;
+            color: #000000;
+        }} """)
 
 class DialogImage(QtWidgets.QDialog):
     dialog_close = QtCore.pyqtSignal()
