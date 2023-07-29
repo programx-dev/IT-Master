@@ -1308,10 +1308,10 @@ class StackTesting(QtWidgets.QWidget):
         QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
             background: transparent;
         }} """)
-   
+
         self.__frame_push_button_questions.setStyleSheet(f"""
         #frame_push_button_questions {{
-            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["frame_push_button_questions"]};
+            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["frame_push_button_questions"]["background"]};
             margin: 0px, 17px, 0px, 0px;
         }} """)
 
