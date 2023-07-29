@@ -912,17 +912,17 @@ class PageTest(QtWidgets.QWidget):
         # главная рамка
         self.__frame_main.setStyleSheet(f"""
         #frame_main {{
-            background: #FFFFFF;
-        }} """)# % self.__data_theme["frame_main"]
+            background: {self.__data_theme["frame_main"]["background"]};
+        }} """)
 
         # метка вопроса
         self.__label_question.setStyleSheet(f"""
         #label_question {{
-            color: #000000;
+            color: {self.__data_theme["frame_main"]["label_question"]["color"]};
             background: transparent;
-            selection-color: #FFFFFF;
-            selection-background-color: #3087EF;
-        }} """) #  % self.__data_theme["frame_main"]["label_question"]
+            selection-color: {self.__data_theme["frame_main"]["label_question"]["selection_color"]};
+            selection-background-color: {self.__data_theme["frame_main"]["label_question"]["selection_background_color"]};
+        }} """)
 
         # метка номера вопроса
         self.__label_numder_question.setStyleSheet(f"""
@@ -1199,7 +1199,7 @@ class StackTesting(QtWidgets.QWidget):
             started_passing = self.__dict_questions_started_passing[number],
             icon_dialogs = self.__icon_dialogs,
             path_images = self.__path_images, 
-            data_theme = self.__data_theme["frame_main"]["test_tab"]            
+            data_theme = self.__data_theme["frame_main"]["page_test"]            
         )
         self.__page_question.answer_changed.connect(self.__on_change_answer)
 

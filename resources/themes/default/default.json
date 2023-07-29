@@ -220,14 +220,16 @@
           }
         }
       },
-      "test_tab": {
+      "page_test": {
         "frame_main": {
-          "background": "rgb(255, 255, 255)",
+          "background": "#FFFFFF",
           "label_numder_question": {
             "color": "rgb(158, 158, 158)"
           },
           "label_question": {
-            "color": "rgb(0, 0, 0)"
+            "color": "#000000",
+            "selection_color": "#FFFFFF",
+            "selection_background_color": "#3087EF"
           },
           "label_type_question": {
             "color": "rgb(158, 158, 158)"
