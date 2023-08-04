@@ -4,8 +4,6 @@ import re
 import enum
 import typing
 
-__parent__ = None
-
 class ButtonRole(enum.Enum):
     accept = 0
     reject = 1
@@ -13,9 +11,8 @@ class ButtonRole(enum.Enum):
 class Dialog(Window.Dialog):
     """Настраиваемое диалоговое окно"""
     
-    def __init__(self, data_theme: dict, parent = None):
+    def __init__(self, data_theme: dict):
         self.__data_theme = data_theme
-        self.__parent = parent
         self.__icon = None
         self.__text = None
         self.__description = None
@@ -24,7 +21,7 @@ class Dialog(Window.Dialog):
         self.__value = None
         self.__event_loop = None
 
-        super().__init__(data_theme = self.__data_theme, parent = self.__parent)
+        super().__init__(data_theme = self.__data_theme)
         super().set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint)
         super().setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         super().set_resizeable(False)
@@ -163,11 +160,12 @@ class Dialog(Window.Dialog):
             padding-left: 15px;
             padding-right: 15px;
             border-radius: 5px; 
-            background: #F1F1F1; 
-            color: #000000;
+            background: {self.__data_theme["frame_widgets"]["frame_main"]["push_button"]["normal"]["background"]}; 
+            color: {self.__data_theme["frame_widgets"]["frame_main"]["push_button"]["normal"]["color"]};
         }} 
         QPushButton:default {{
-            background: #95C8FF;
+            background: {self.__data_theme["frame_widgets"]["frame_main"]["push_button"]["default"]["background"]}; 
+            color: {self.__data_theme["frame_widgets"]["frame_main"]["push_button"]["default"]["color"]};
         }}""")
 
         if self.__hbox_layout_push_buttons.count() > 0:
@@ -177,212 +175,20 @@ class Dialog(Window.Dialog):
     def set_style_sheet(self):
         self.__frame_main.setStyleSheet(f"""
         #frame_main {{
-            background: #FFFFFF;
+            background: {self.__data_theme["frame_widgets"]["frame_main"]["background"]};
         }} """)
 
         self.__label_text.setStyleSheet(f"""
         #label_text {{
             background: transparent;
-            color: #000000;
+            color: {self.__data_theme["frame_widgets"]["frame_main"]["label_text"]["color"]};
         }} """)
 
         self.__label_description.setStyleSheet(f"""
         #label_description {{
             background: transparent;
-            color: #000000;
+            color: {self.__data_theme["frame_widgets"]["frame_main"]["label_description"]["color"]};
         }} """)
-
-class DialogImage(QtWidgets.QDialog):
-    dialog_close = QtCore.pyqtSignal()
-    def __init__(self, path_image: str, data_theme: dict):
-        self.__parent = __parent__
-        self.data_theme = data_theme
-        self.path_image = path_image
-
-        super().__init__(self.__parent)
-        self.setContentsMargins(7, 7, 7, 7)
-        
-        self.setWindowTitle('Изображение')
-        self.setModal(True)
-
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
-
-        # главная сетка
-        self.grid_layout_main = QtWidgets.QGridLayout()
-        self.grid_layout_main.setSpacing(0)
-        self.grid_layout_main.setContentsMargins(0, 0, 0, 0)
-        self.grid_layout_main.setColumnStretch(0, 0)
-        self.grid_layout_main.setColumnStretch(1, 1)
-        self.grid_layout_main.setColumnStretch(2, 0)
-        self.grid_layout_main.setRowStretch(0, 0)
-        self.grid_layout_main.setRowStretch(1, 1)
-        self.grid_layout_main.setRowStretch(2, 0)
-
-        self.setLayout(self.grid_layout_main)
-
-        # главная рамка
-        self.frame_main = QtWidgets.QFrame()
-        self.frame_main.setFixedSize(700, 600)
-        self.frame_main.setObjectName("frame_main")
-
-        self.grid_layout_main.addWidget(self.frame_main, 1, 1)
-
-        # внутренний макет
-        self.vbox_layout_internal = QtWidgets.QVBoxLayout()
-        self.vbox_layout_internal.setContentsMargins(0, 0, 0, 0)
-        self.vbox_layout_internal.setSpacing(0)
-
-        self.frame_main.setLayout(self.vbox_layout_internal)
-
-        # рамка заголовка
-        self.frame_title = QtWidgets.QFrame()
-        self.frame_title.setObjectName("frame_title")
-        self.frame_title.setFixedHeight(36)
-
-        self.vbox_layout_internal.addWidget(self.frame_title)
-
-        # макет рамки заголовка
-        self.hbox_layout_title = QtWidgets.QHBoxLayout()
-        self.hbox_layout_title.setContentsMargins(5, 0, 0, 0)
-        self.hbox_layout_title.setSpacing(0)
-
-        self.frame_title.setLayout(self.hbox_layout_title)
-
-        # метка иконки
-        self.label_icon = QtWidgets.QLabel()
-        self.label_icon.setObjectName("label_icon")
-        self.label_icon.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.label_icon.setFixedSize(25, 25)
-
-        self.hbox_layout_title.addWidget(self.label_icon)
-        self.hbox_layout_title.addSpacing(5)
-
-        # метка титла
-        self.label_title = QtWidgets.QLabel()
-        self.label_title.setObjectName("label_title")
-        self.label_title.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
-        self.label_title.setFont(QtGui.QFont("Trebuchet MS", 10, weight = QtGui.QFont.Weight.Bold))
-
-        self.hbox_layout_title.addWidget(self.label_title)
-        self.hbox_layout_title.addStretch(1)
-
-        # кнопка закрыть
-        self.push_button_close = QtWidgets.QPushButton()
-        self.push_button_close.setObjectName("push_button_close")
-        self.push_button_close.clicked.connect(self.clicked_push_button_exit)
-        self.push_button_close.setFont(QtGui.QFont("Webdings", 9))
-        self.push_button_close.setText("r")
-        self.push_button_close.setFixedSize(58, 36)
-        self.push_button_close.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-
-        self.hbox_layout_title.addWidget(self.push_button_close)
-
-        # рамка для виджетов
-        self.frame_widgets = QtWidgets.QFrame()
-        self.frame_widgets.setObjectName("frame_widgets")
-
-        self.vbox_layout_internal.addWidget(self.frame_widgets)
-
-        # сетка для виджетов
-        self.grid_layout_widget = QtWidgets.QGridLayout()
-        self.grid_layout_widget.setSpacing(0)
-        self.grid_layout_widget.setContentsMargins(5, 5, 5, 5)
-        self.grid_layout_widget.setColumnStretch(0, 0)
-        self.grid_layout_widget.setColumnStretch(1, 1)
-        self.grid_layout_widget.setColumnStretch(2, 0)
-        self.grid_layout_widget.setRowStretch(0, 0)
-        self.grid_layout_widget.setRowStretch(1, 1)
-        self.grid_layout_widget.setRowStretch(2, 0)
-
-        self.frame_widgets.setLayout(self.grid_layout_widget)
-
-        # виджет просмотра изображений
-        self.image_viewer = ImageGraphicsView(path_image = self.path_image, data_theme = self.data_theme["frame_widgets"]["image_graphics_view"])
-
-        self.grid_layout_widget.addWidget(self.image_viewer, 1, 1)
-
-        # присоединения слотов к сигналам
-        self.window_close.connect(self.close_window)
-
-        self.set_style_sheet()
-
-        self.show()
-  
-        self.move(QtCore.QPoint(self.__parent.geometry().getCoords()[0], self.__parent.geometry().getCoords()[1]) + self.__parent.rect().center() - self.rect().center())
-
-    def load_lesson(self):
-        self.image_viewer.set_image()
-
-    def clicked_push_button_exit(self):
-        self.window_close.emit()
-
-    def close_window(self):
-        self.close()
-
-    def set_icon(self, icon: QtGui.QPixmap):
-        icon = icon.scaled(25, 25, transformMode = QtCore.Qt.TransformationMode.SmoothTransformation)
-        self.label_icon.setPixmap(icon)
-
-    def set_title(self, title: str):
-        self.label_title.setText(title)
-
-    def set_style_sheet(self):
-        # рамка заголовка
-        self.frame_title.setStyleSheet("""
-        #frame_title {
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            background: %(background)s;
-        } """ % self.data_theme["frame_title"])
-
-        # метка титла
-        self.label_title.setStyleSheet("""
-        #label_title {
-            color: %(color)s;
-        } """ % self.data_theme["frame_title"]["label_title"])
-
-        # кнопка закрыть программу
-        temp_data_theme = {
-            "background_normal": self.data_theme["frame_title"]["push_button_close"]["normal"]["background"],
-            "color_normal": self.data_theme["frame_title"]["push_button_close"]["normal"]["color"], 
-            "background_hover": self.data_theme["frame_title"]["push_button_close"]["hover"]["background"], 
-            "color_hover": self.data_theme["frame_title"]["push_button_close"]["hover"]["color"],
-            "background_press": self.data_theme["frame_title"]["push_button_close"]["press"]["background"], 
-            "color_press": self.data_theme["frame_title"]["push_button_close"]["press"]["color"]
-        }
-
-        self.push_button_close.setStyleSheet("""
-        #push_button_close {
-            border-top-right-radius: 10px;
-            outline: 0;
-            border: none;
-            background: %(background_normal)s; 
-            color: %(color_normal)s;
-        }
-        #push_button_close::hover {
-            background: %(background_hover)s; 
-            color: %(color_hover)s;
-        }
-        #push_button_close::pressed {
-            background: %(background_press)s; 
-            color: %(color_press)s; 
-        } """ % temp_data_theme)
-
-        # макет для виджетов
-        self.frame_widgets.setStyleSheet("""
-        #frame_widgets {
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-            background: %(background)s;
-        } """ % self.data_theme["frame_widgets"])
-
-        # тень
-        self.frame_main.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.frame_main.shadow.setBlurRadius(17)
-        self.frame_main.shadow.setOffset(0, 0)
-        self.frame_main.shadow.setColor(QtGui.QColor(0, 0, 0, 100))
-        self.frame_main.setGraphicsEffect(self.frame_main.shadow)
 
 class DialogTableResultsEmpty(QtWidgets.QDialog):
     push_button_clicked_ok = QtCore.pyqtSignal()

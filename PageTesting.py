@@ -8,9 +8,6 @@ from PIL import Image
 from dataclasses import dataclass
 import Dialogs
 
-__parent__ = None
-
-@enum.unique
 class AnswerStatus(enum.Enum):
     wrong = 0
     skip = 1
@@ -20,12 +17,12 @@ class AnswerStatus(enum.Enum):
 class DataResult:
     status: AnswerStatus
     user_answer: str | list | None
-    right_answer: str | list
 
 @dataclass
-class DataPassage:
+class DataResultTesting:
     date_start: datetime.datetime
     date_end: datetime.datetime
+    path_course: str
     list_data_result: list[DataResult]
 
 @dataclass
@@ -49,6 +46,7 @@ class PushButtonNavigation(QtWidgets.QPushButton):
         self.setFixedSize(50, 50)
         self.clicked.connect(self.push_button_navigation_press)
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+        self.setProperty("current", self.current())
 
     def push_button_navigation_press(self):
         if self != PushButtonNavigation.push_button_navigation_current and PushButtonNavigation.push_button_navigation_current != None:
@@ -87,7 +85,6 @@ class PushButtonQuestion(PushButtonNavigation):
         self.setText(f"{self.__number + 1}")
         self.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_navigation_clicked.connect(self.__push_button_question_press)
-        self.setProperty("current", self.current())
         self.setProperty("answered", self.answered())
 
         self.set_style_sheet()
@@ -154,7 +151,6 @@ class PushButtonLesson(PushButtonNavigation):
         self.setIcon(QtGui.QIcon(os.path.join(self.__path_images, r"lesson.png")))
         self.setIconSize(QtCore.QSize(35, 35))
         self.push_button_navigation_clicked.connect(self.__push_button_lesson_press)
-        self.setProperty("current", self.current())
 
         self.set_style_sheet()
 
@@ -247,21 +243,21 @@ class LabelPromt(QtWidgets.QFrame):
     def set_style_sheet(self):
         self.setStyleSheet(f"""
         #label_promt {{
-            background: #FFF7A0;
+            background: {self.__data_theme["background"]};
             border-radius: 3px;
         }} """)
 
         # метка с полоской
         self.__label_line.setStyleSheet(f"""
         #label_line {{
-            background: #FFB200;
+            background:{self.__data_theme["line"]["background"]};
             border-top-left-radius: 3px;
             border-bottom-left-radius: 3px;
         }} """)
 
         # метка с иконкой
         self.__label_icon.setStyleSheet(f"""
-        #label_text {{
+        #label_icon {{
             background: transparent;
         }} """)
 
@@ -269,7 +265,7 @@ class LabelPromt(QtWidgets.QFrame):
         self.__label_text.setStyleSheet(f"""
         #label_text {{
             background: transparent;
-            color: #000000;
+            color: {self.__data_theme["color"]};
         }} """)
 
 class LabelClickable(QtWidgets.QLabel):
@@ -294,6 +290,8 @@ class CheckboxAnswer(QtWidgets.QWidget):
         self.__data_theme = data_theme
         self.__path_images = path_images
         self.__checked = False
+
+        # self.__enabled = True
 
         self.__image_checked = QtGui.QIcon(os.path.join(self.__path_images, "checkbox_checked.png"))
         self.__image_unchecked = QtGui.QIcon(os.path.join(self.__path_images, "checkbox_unchecked.png"))        
@@ -331,6 +329,14 @@ class CheckboxAnswer(QtWidgets.QWidget):
 
         self.set_checked(checked = False)
 
+    def is_enabled(self) -> bool:
+        # return self.__enabled
+        return super().isEnabled()
+
+    def set_enabled(self, enabled: bool):
+        # self.__enabled = enabled
+        super().setEnabled(enabled)
+
     def is_checked(self) -> bool:
         return self.__checked
 
@@ -338,30 +344,34 @@ class CheckboxAnswer(QtWidgets.QWidget):
         return self.__text
 
     def __checkbox_clicked(self):
+        if not self.is_enabled():
+            return
         if self.__checked == True:
             self.set_checked(checked = False)
         else:
             self.set_checked(checked = True)
 
     def enterEvent(self, event: QtGui.QEnterEvent):
-        self.__push_button_flag.setProperty("hover", True)
-        self.__push_button_flag.style().unpolish(self.__push_button_flag)
-        self.__push_button_flag.style().polish(self.__push_button_flag)
+        if self.is_enabled():
+            self.__push_button_flag.setProperty("hover", True)
+            self.__push_button_flag.style().unpolish(self.__push_button_flag)
+            self.__push_button_flag.style().polish(self.__push_button_flag)
 
-        self.__label_text.setProperty("hover", True)
-        self.__label_text.style().unpolish(self.__label_text)
-        self.__label_text.style().polish(self.__label_text)
+            self.__label_text.setProperty("hover", True)
+            self.__label_text.style().unpolish(self.__label_text)
+            self.__label_text.style().polish(self.__label_text)
 
         return super().enterEvent(event)
 
     def leaveEvent(self, event: QtGui.QEnterEvent):
-        self.__push_button_flag.setProperty("hover", False)
-        self.__push_button_flag.style().unpolish(self.__push_button_flag)
-        self.__push_button_flag.style().polish(self.__push_button_flag)
+        if self.is_enabled():
+            self.__push_button_flag.setProperty("hover", False)
+            self.__push_button_flag.style().unpolish(self.__push_button_flag)
+            self.__push_button_flag.style().polish(self.__push_button_flag)
 
-        self.__label_text.setProperty("hover", False)
-        self.__label_text.style().unpolish(self.__label_text)
-        self.__label_text.style().polish(self.__label_text)
+            self.__label_text.setProperty("hover", False)
+            self.__label_text.style().unpolish(self.__label_text)
+            self.__label_text.style().polish(self.__label_text)
 
         return super().leaveEvent(event)
 
@@ -390,8 +400,8 @@ class CheckboxAnswer(QtWidgets.QWidget):
             background: transparent;
         }}
         #push_button_flag[hover="true"] {{
-            background: #CCE8FF;
-        }} """)#  % self.__data_theme
+            background: {self.__data_theme["hover"]["background"]};
+        }} """)
 
         # кликабельная метка c текстом
         self.__label_text.setStyleSheet(f"""
@@ -403,8 +413,9 @@ class CheckboxAnswer(QtWidgets.QWidget):
             color: #000000;
         }}
         #label_text[hover="true"] {{
-            background: #CCE8FF;
-        }} """)#  % self.__data_theme
+            color: {self.__data_theme["hover"]["color"]};
+            background: {self.__data_theme["hover"]["background"]};
+        }} """)
 
 class RadiobuttonAnswer(QtWidgets.QWidget):
     """Класс для радиокнопок для ответов с возможностью переноса слов"""
@@ -417,9 +428,10 @@ class RadiobuttonAnswer(QtWidgets.QWidget):
         self.__text = text
         self.__data_theme = data_theme
         self.__path_images = path_images
-
         self.__checked = False
 
+        # self.__enabled = True
+        
         self.__image_checked = QtGui.QIcon(os.path.join(self.__path_images, "radio_button_checked.png"))
         self.__image_unchecked = QtGui.QIcon(os.path.join(self.__path_images, "radio_button_unchecked.png"))
 
@@ -456,6 +468,14 @@ class RadiobuttonAnswer(QtWidgets.QWidget):
 
         self.set_checked(checked = False)
 
+    def is_enabled(self) -> bool:
+        # return self.__enabled
+        return super().isEnabled()
+
+    def set_enabled(self, enabled: bool):
+        # self.__enabled = enabled
+        super().setEnabled(enabled)
+
     def text(self) -> str:
         return self.__text
 
@@ -463,28 +483,32 @@ class RadiobuttonAnswer(QtWidgets.QWidget):
         return self.__checked
 
     def __radio_button_clicked(self):
+        if not self.is_enabled():
+            return
         if self.__checked == False:
             self.set_checked(checked = True)
 
     def enterEvent(self, event: QtGui.QEnterEvent):
-        self.__push_button_flag.setProperty("hover", True)
-        self.__push_button_flag.style().unpolish(self.__push_button_flag)
-        self.__push_button_flag.style().polish(self.__push_button_flag)
+        if self.is_enabled():
+            self.__push_button_flag.setProperty("hover", True)
+            self.__push_button_flag.style().unpolish(self.__push_button_flag)
+            self.__push_button_flag.style().polish(self.__push_button_flag)
 
-        self.__label_text.setProperty("hover", True)
-        self.__label_text.style().unpolish(self.__label_text)
-        self.__label_text.style().polish(self.__label_text)
+            self.__label_text.setProperty("hover", True)
+            self.__label_text.style().unpolish(self.__label_text)
+            self.__label_text.style().polish(self.__label_text)
 
         return super().enterEvent(event)
 
     def leaveEvent(self, event: QtGui.QEnterEvent):
-        self.__push_button_flag.setProperty("hover", False)
-        self.__push_button_flag.style().unpolish(self.__push_button_flag)
-        self.__push_button_flag.style().polish(self.__push_button_flag)
+        if self.is_enabled():
+            self.__push_button_flag.setProperty("hover", False)
+            self.__push_button_flag.style().unpolish(self.__push_button_flag)
+            self.__push_button_flag.style().polish(self.__push_button_flag)
 
-        self.__label_text.setProperty("hover", False)
-        self.__label_text.style().unpolish(self.__label_text)
-        self.__label_text.style().polish(self.__label_text)
+            self.__label_text.setProperty("hover", False)
+            self.__label_text.style().unpolish(self.__label_text)
+            self.__label_text.style().polish(self.__label_text)
 
         return super().leaveEvent(event)
 
@@ -512,8 +536,8 @@ class RadiobuttonAnswer(QtWidgets.QWidget):
             background: transparent;
         }}
         #push_button_flag[hover="true"] {{
-            background: #CCE8FF;
-        }} """)#  % self.__data_theme
+            background: {self.__data_theme["hover"]["background"]};
+        }} """)
 
         # кликабельная метка c текстом
         self.__label_text.setStyleSheet(f"""
@@ -522,11 +546,12 @@ class RadiobuttonAnswer(QtWidgets.QWidget):
             border-top-right-radius: 6px;
             border-bottom-right-radius: 6px;
             background: transparent;
-            color: #000000;
+            color: {self.__data_theme["normal"]["color"]};
         }}
         #label_text[hover="true"] {{
-            background: #CCE8FF;
-        }} """)#  % self.__data_theme
+            color: {self.__data_theme["hover"]["color"]};
+            background: {self.__data_theme["hover"]["background"]};
+        }} """)
 
 class GroupRadiobuttonsAnswer(QtCore.QObject):
     """Класс для группирования RadiobuttonAnswer"""
@@ -551,6 +576,55 @@ class GroupRadiobuttonsAnswer(QtCore.QObject):
     def add_radio_button_answer(self, radio_button: RadiobuttonAnswer):
         radio_button.radio_button_answer_toggled.connect(self.__toggle_radio_button_answer)
         self.__list_radio_buttons.append(radio_button)
+
+class LineEditAnswer(QtWidgets.QLineEdit):
+    """Класс для строки ввода ответов"""
+    line_edit_answer_text_changed = QtCore.pyqtSignal()
+
+    def __init__(self, data_theme: dict):
+        super().__init__()
+
+        self.__data_theme = data_theme
+
+        # self.__enabled = True
+
+        self.setObjectName("line_edit_answer")
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+        self.textChanged.connect(self.__line_edit_text_changed)
+        self.setFont(QtGui.QFont("Segoe UI", 14))
+        self.setFixedHeight(42)
+
+        self.set_style_sheet()
+
+    def is_enabled(self) -> bool:
+        # return self.__enabled
+        return super().isEnabled()
+
+    def set_enabled(self, enabled: bool):
+        self.__enabled = enabled
+        # if self.is_enabled():
+        #     self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+        # else:
+        #     self.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        super().setEnabled(enabled)
+
+    def __line_edit_text_changed(self):
+        self.line_edit_answer_text_changed.emit()
+
+    def set_style_sheet(self):
+        self.setStyleSheet(f"""
+        #line_edit_answer {{
+            border-radius: 7px; 
+            border: 2px solid; 
+            border-color: {self.__data_theme["normal"]["color_border"]};
+            background: {self.__data_theme["normal"]["background"]}; 
+            color: {self.__data_theme["normal"]["color"]};
+        }} 
+        #line_edit_answer:focus {{
+            border-color: {self.__data_theme["focus"]["color_border"]};
+            background: {self.__data_theme["focus"]["background"]}; 
+            color: {self.__data_theme["focus"]["color"]};
+        }} """)
 
 class PushButtonImage(QtWidgets.QPushButton):
     """Класс для кнопки с изображением"""
@@ -644,7 +718,7 @@ class PushButtonImage(QtWidgets.QPushButton):
         file_formats = ";;".join([f".{i} (*.{i})" for i in file_formats])
 
         path_image, filter = QtWidgets.QFileDialog.getSaveFileName(
-            __parent__, 
+            self.window(), 
             "Сохранение изображения", 
             os.path.join(directory_desktop, os.path.basename(self.__path_pixmap)),
             file_formats,
@@ -660,7 +734,7 @@ class PushButtonImage(QtWidgets.QPushButton):
                 pixmap = Image.open(self.__path_pixmap)
                 pixmap.save(path_image)
             except Exception as error:
-                msg = QtWidgets.QMessageBox(__parent__)
+                msg = QtWidgets.QMessageBox(self.window())
                 msg.setWindowTitle("Ошибка")
                 msg.setIcon(QtWidgets.QMessageBox.Icon.Critical)
                 msg.setText("Неудалось сохранить изображение")
@@ -674,9 +748,9 @@ class PushButtonImage(QtWidgets.QPushButton):
             border-radius: 14px;
             border-style: solid;
             border-width: 1px;
-            border-color: #888888;
+            border-color: {self.__data_theme["border_color"]};
             background: transparent; 
-        }} """)#  % self.__data_theme
+        }} """)
 
         self.__push_buttton_save_image.setStyleSheet(f"""
         #push_buttton_save_image {{
@@ -685,19 +759,18 @@ class PushButtonImage(QtWidgets.QPushButton):
             background: transparent; 
         }} """)
 
-class PageTest(QtWidgets.QWidget):
+class PageQuestion(QtWidgets.QWidget):
     """Класс для страницы с вопросом"""
     answer_changed = QtCore.pyqtSignal(int, bool)
 
-    def __init__(self, number: int, path_course: str, question: str, answer: str | list | None, started_passing: bool, icon_dialogs: QtGui.QPixmap, path_images: str, data_theme: dict):
+    def __init__(self, number: int, path_course: str, element: str, answer: str | list | None, started_passing: bool, path_images: str, data_theme: dict):
         super().__init__()
 
         self.__number = number
         self.__path_course = path_course
-        self.__question = question
+        self.__question = element
         self.__answer = answer
         self.__started_passing = started_passing
-        self.__icon_dialogs = icon_dialogs
         self.__path_images = path_images
         self.__path_pixmap = None
         self.__data_theme = data_theme
@@ -753,14 +826,13 @@ class PageTest(QtWidgets.QWidget):
             self.__path_pixmap = os.path.join(os.path.split(self.__path_course)[0], path_pixmap.text) # .replace("\\", "/")
 
             self.__push_button_image = PushButtonImage(path_pixmap = self.__path_pixmap, path_images = self.__path_images, data_theme = self.__data_theme["frame_main"]["push_button_image"])
-            self.__push_button_image.push_button_image_clicked.connect(self.__show_image)
 
             self.__vbox_layout_internal.addWidget(self.__push_button_image)
             self.__vbox_layout_internal.addSpacing(5)
 
         # создание виджетов выбора или ввода ответов
         match self.__question.find("questions").find("type").text:
-            case "radio_button":
+            case "selectable_answer":
                 self.__label_type_question.setText("Укажите правильный вариант ответа:")
 
                 # группа радио кнопок
@@ -772,9 +844,9 @@ class PageTest(QtWidgets.QWidget):
                 self.__list_radio_buttons = list()
 
                 # создание и упаковка радиокнопок
-                for i, question in enumerate(list_questions):
+                for i, element in enumerate(list_questions):
                     radio_button = RadiobuttonAnswer(
-                        text = question.text,
+                        text = element.text,
                         path_images = self.__path_images,
                         data_theme = self.__data_theme["frame_main"]["radio_button"]
                     )
@@ -784,14 +856,14 @@ class PageTest(QtWidgets.QWidget):
                     self.__group_radio_buttons.add_radio_button_answer(radio_button)
                     self.__group_radio_buttons.radio_button_checked.connect(self.__radio_button_checked)
 
-                    if self.__started_passing and question.text == self.__answer:
+                    if self.__started_passing and element.text == self.__answer:
                         radio_button.set_checked(True)
 
                     self.__vbox_layout_internal.addWidget(radio_button)
                     # if i < amount_questions:
                     #     self.__vbox_layout_internal.addSpacing(10)
 
-            case "checkbox":
+            case "multiple_selectable_answers":
                 self.__label_type_question.setText("Укажите правильные варианты ответа:")
 
                 list_questions = self.__question.find("questions").findall("question")
@@ -799,7 +871,7 @@ class PageTest(QtWidgets.QWidget):
 
                 self.__list_checkboxes = list()
 
-                # создание и упаковка радиокнопок
+                # создание и упаковка чекбоксов
                 for i, element in enumerate(list_questions):
                     checkbox = CheckboxAnswer(
                         text = element.text, 
@@ -818,14 +890,11 @@ class PageTest(QtWidgets.QWidget):
                     # if i < amount_questions:
                     #     self.__vbox_layout_internal.addSpacing(10)
                     
-            case "input":
+            case "input_answer":
                 self.__label_type_question.setText("Введите правильный ответ:")
                 
-                self.__line_edit_answer = QtWidgets.QLineEdit()
-                self.__line_edit_answer.setObjectName("line_edit_answer")
-                self.__line_edit_answer.textChanged.connect(self.__line_edit_text_changed)
-                self.__line_edit_answer.setFont(QtGui.QFont("Segoe UI", 14))
-                self.__line_edit_answer.setFixedHeight(42)
+                self.__line_edit_answer = LineEditAnswer(data_theme = self.__data_theme["frame_main"]["line_edit"])
+                self.__line_edit_answer.line_edit_answer_text_changed.connect(self.__line_edit_answer_text_changed)
 
                 self.__vbox_layout_internal.addWidget(self.__line_edit_answer)
                 self.__vbox_layout_internal.addSpacing(5)
@@ -834,7 +903,7 @@ class PageTest(QtWidgets.QWidget):
                 self.__label_promt = LabelPromt(
                     "Для записи десятичных дробей используется запятая, а не точка.",
                     os.path.join(self.__path_images, "warning.png"),
-                    self.__data_theme
+                    self.__data_theme["frame_main"]["label_promt"]["warning"]
                 )
                 self.__label_promt.hide()
 
@@ -843,45 +912,12 @@ class PageTest(QtWidgets.QWidget):
                 if self.__started_passing:
                     self.__line_edit_answer.insert(self.__answer)
 
-                temp_data_theme = {
-                "color_border_not_focus": self.__data_theme["frame_main"]["line_edit"]["not_focus"]["color_border"],
-                "background_not_focus": self.__data_theme["frame_main"]["line_edit"]["not_focus"]["background"], 
-                "color_not_focus": self.__data_theme["frame_main"]["line_edit"]["not_focus"]["color"], 
-                "color_border_focus": self.__data_theme["frame_main"]["line_edit"]["focus"]["color_border"],
-                "background_focus": self.__data_theme["frame_main"]["line_edit"]["focus"]["background"], 
-                "color_focus": self.__data_theme["frame_main"]["line_edit"]["focus"]["color"]
-                }
-
-                self.__line_edit_answer.setStyleSheet("""
-                #line_edit_answer {
-                    border-radius: 7px; 
-                    border: 2px solid; 
-                    border-color: %(color_border_not_focus)s;
-                    background: %(background_not_focus)s; 
-                    color: %(color_not_focus)s;
-                } 
-                #line_edit_answer:focus {
-                    border-color: %(color_border_focus)s;
-                    background: %(background_focus)s; 
-                    color: %(color_focus)s;
-                } """ % temp_data_theme)
-
         self.__vbox_layout_internal.addStretch(1)
         
         self.set_style_sheet()
 
     def answer(self) -> str | list | None:
         return self.__answer
-
-    def __show_image(self):
-        self.__dialog_image = Dialogs.DialogImage(
-            path_image = self.__path_pixmap,
-            data_theme = self.__data_theme["frame_main"]["dialog_image"]
-        )
-        self.__dialog_image.set_icon(icon = self.__icon_dialogs)
-        self.__dialog_image.set_title(title = "Изображение")
-
-        self.__dialog_image.load_lesson()
 
     def __radio_button_checked(self, radio_button: RadiobuttonAnswer):
         self.__answer = radio_button.text()
@@ -898,7 +934,7 @@ class PageTest(QtWidgets.QWidget):
             self.__answer.remove(text_sender)
             self.answer_changed.emit(self.__number, True if len(self.__answer) != 0 else False)
 
-    def __line_edit_text_changed(self):
+    def __line_edit_answer_text_changed(self):
         self.__answer = self.__line_edit_answer.text()
 
         if re.search("(\d\.)", self.__answer):
@@ -915,6 +951,12 @@ class PageTest(QtWidgets.QWidget):
             background: {self.__data_theme["frame_main"]["background"]};
         }} """)
 
+        # метка номера вопроса
+        self.__label_numder_question.setStyleSheet(f"""
+        #label_numder_question {{
+            color: {self.__data_theme["frame_main"]["label_numder_question"]["color"]};   
+        }} """)
+
         # метка вопроса
         self.__label_question.setStyleSheet(f"""
         #label_question {{
@@ -924,29 +966,22 @@ class PageTest(QtWidgets.QWidget):
             selection-background-color: {self.__data_theme["frame_main"]["label_question"]["selection_background_color"]};
         }} """)
 
-        # метка номера вопроса
-        self.__label_numder_question.setStyleSheet(f"""
-        #label_numder_question {{
-            color: #9E9E9E;   
-        }} """)# % self.__data_theme["frame_main"]["label_numder_question"]
-
         # метка типа задания
         self.__label_type_question.setStyleSheet(f"""
         #label_type_question {{ 
-            color: #9E9E9E;
-        }} """)# % self.__data_theme["frame_main"]["label_type_question"]
+            color: {self.__data_theme["frame_main"]["label_type_question"]["color"]};
+        }} """)
 
-class StackTesting(QtWidgets.QWidget):
+class PageTesting(QtWidgets.QWidget):
     """Главный класс тестирования"""
-    push_button_finish_cliced = QtCore.pyqtSignal(DataPassage)
+    push_button_finish_cliced = QtCore.pyqtSignal(DataResultTesting)
 
-    def __init__(self, path_course: str, path_images: str, icon_dialogs: QtGui.QPixmap, data_theme: dict):
+    def __init__(self, path_course: str, path_images: str, data_theme: dict):
         super().__init__()
 
         self.__data_theme = data_theme
         self.__path_images = path_images
         self.__path_course = path_course
-        self.__icon_dialogs = icon_dialogs
         self.__path_lesson = None
 
         self.__tree = ET.parse(self.__path_course)
@@ -962,16 +997,15 @@ class StackTesting(QtWidgets.QWidget):
 
         self.__time_start = datetime.datetime.now()
         self.__len_course = len(self.__root.findall("exercise"))
-        self.__list_answers = list()
         self.__list_data_page_test: list[DataPageTest] = list()
         self.__list_push_button_questions = list()
         self.__dict_questions_started_passing = {i: False for i in range(self.__len_course)}
 
         for i in range(self.__len_course):
             type_question = self.__root.findall("exercise")[i].find("questions").find("type").text
-            if type_question == "checkbox":
+            if type_question == "multiple_selectable_answers":
                 self.__list_data_page_test.append(DataPageTest(list()))
-            elif type_question in ("radio_button", "input"):
+            elif type_question in ("selectable_answer", "input_answer"):
                 self.__list_data_page_test.append(DataPageTest(None))
 
         # главный макет
@@ -1056,7 +1090,7 @@ class StackTesting(QtWidgets.QWidget):
         self.__hbox_layout_button_questions.addStretch(1)
 
         for i in range(self.__len_course):
-            push_button_question = PushButtonQuestion(number = i, data_theme = self.__data_theme["frame_main"]["frame_tools"]["push_button_navigation"])
+            push_button_question = PushButtonQuestion(number = i, data_theme = self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["frame_push_button_questions"]["push_button_qestion"])
             push_button_question.push_button_question_clicked.connect(self.__switch_question)
             self.__list_push_button_questions.append(push_button_question)
 
@@ -1096,85 +1130,63 @@ class StackTesting(QtWidgets.QWidget):
         self.__stacked_widget.setCurrentWidget(self.__page_lesson)
 
     def __finish_test(self):
-        # получение ответа текущей страницы
-        self.__list_data_page_test[self.__current_number_question].answer = self.__page_question.answer()
-        self.__list_data_page_test[self.__current_number_question].horizontal_scrollbar_value = self.__scroll_area_page_test.horizontalScrollBar().value()
-        self.__list_data_page_test[self.__current_number_question].vertical__scrollbar_value = self.__scroll_area_page_test.verticalScrollBar().value()
-
-        # подсчёт количества верных, неверных и пропущенных ответ
-        points_right = 0
-        points_wrong = 0
-        points_skip = 0
+        if self.__page_question != None:
+            # получение ответа текущей страницы
+            self.__list_data_page_test[self.__current_number_question].answer = self.__page_question.answer()
 
         list_data_result = list()
 
         for i in range(self.__len_course):
             user_answer = self.__list_data_page_test[i].answer
             right_answer = list(i.text for i in self.__root.findall("exercise")[i].find("answers").findall("answer"))
-            type = self.__root.findall("exercise")[i].find("questions").find("type").text
+            type_question = self.__root.findall("exercise")[i].find("questions").find("type").text
             status = None
 
             if self.__dict_questions_started_passing[i]:
                 # если один выбираемый ответ
-                if type == "radio_button":
-                    if user_answer == right_answer[0]:
-                        points_right += 1
-                        status = AnswerStatus.right
-                    else:
-                        points_wrong += 1
-                        status = AnswerStatus.wrong
+                match type_question:
+                    case "selectable_answer":
+                        if user_answer == right_answer[0]:
+                            status = AnswerStatus.right
+                        else:
+                            status = AnswerStatus.wrong
 
-                # если несколько выбираемых ответов
-                elif type == "checkbox":
-                    right_answer.sort()
-                    user_answer.sort()
+                    # если несколько выбираемых ответов
+                    case "multiple_selectable_answers":
+                        right_answer.sort()
+                        user_answer.sort()
 
-                    if user_answer == right_answer:
-                        points_right += 1
-                        status = AnswerStatus.right
-                    else:
-                        points_wrong += 1
-                        status = AnswerStatus.wrong
+                        if user_answer == right_answer:
+                            status = AnswerStatus.right
+                        else:
+                            status = AnswerStatus.wrong
 
-                # если ввод ответа
-                elif type == "input":
-                    settings = None
-                    if (temp_setting := self.__root.findall("exercise")[i].find("answers").find("settings")) != None:
-                        settings = temp_setting
-                    
-                    if settings != None and user_answer != None:
-                        # убирает пробелы
-                        if "excluding_space" in settings:
-                            if settings["excluding_space"] == "true":
-                                pattern = re.compile(r"^\s*|\s*$")
+                    # если ввод ответа
+                    case "input_answer":
+                        # убирает пробелы в начале и конце
+                        right_answer = re.sub(r"^\s*|\s*$", r"", right_answer[0])
+                        user_answer = re.sub(r"^\s*|\s*$", r"", user_answer)
 
-                                right_answer = pattern.sub(r"", right_answer)
-                                user_answer = pattern.sub(r"", user_answer)
-
-                    if right_answer == user_answer:
-                        points_right += 1
-                        status = AnswerStatus.right
-                    else:
-                        points_wrong += 1
-                        status = AnswerStatus.wrong
-
+                        if right_answer == user_answer:
+                            status = AnswerStatus.right
+                        else:
+                            status = AnswerStatus.wrong
             else:
-                points_skip += 1
                 status = AnswerStatus.skip
 
             list_data_result.append(DataResult(
-                status = status,
-                user_answer = user_answer,
-                right_answer = right_answer
+                status = status, 
+                user_answer = user_answer
             ))
 
-        data_passage = DataPassage(
+        data_result_testing = DataResultTesting(
             date_start = self.__time_start,
             date_end = datetime.datetime.now(),
+            path_course = self.__path_course,
             list_data_result = list_data_result
         )
 
-        self.push_button_finish_cliced.emit(data_passage)
+        self.push_button_finish_cliced.emit(data_result_testing)
 
     def __switch_question(self, number: int):
         current_question = self.__root.findall("exercise")[number]
@@ -1191,15 +1203,14 @@ class StackTesting(QtWidgets.QWidget):
         self.__current_number_question = number
 
         # создание и упаковка новой страницы вопроса
-        self.__page_question = PageTest(
+        self.__page_question = PageQuestion(
             number = self.__current_number_question,
             path_course = self.__path_course, 
-            question = current_question,
+            element = current_question,
             answer = self.__list_data_page_test[number].answer, 
             started_passing = self.__dict_questions_started_passing[number],
-            icon_dialogs = self.__icon_dialogs,
             path_images = self.__path_images, 
-            data_theme = self.__data_theme["frame_main"]["page_test"]            
+            data_theme = self.__data_theme["frame_main"]["scroll_area_page_test"]["page_question"]            
         )
         self.__page_question.answer_changed.connect(self.__on_change_answer)
 

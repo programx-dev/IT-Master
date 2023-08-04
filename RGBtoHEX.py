@@ -14,4 +14,4 @@ while rgb_color != "-1":
         pyperclip.copy(hex_color)
     except Exception as e:
         print(e)
-    rgb_color = input()
+    rgb_color = input(">>> ")

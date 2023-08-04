@@ -1,354 +1,948 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtCharts import QChart, QChartView, QPieSeries
+import os
+import datetime
+import xml.etree.ElementTree as ET
 import re
+import enum
+from PIL import Image
+from dataclasses import dataclass
+import Dialogs
+from PyQt6.QtCharts import QChart, QChartView, QPieSeries
+import PageTesting
 
-class LabelLegend(QtWidgets.QWidget):
-    def __init__(self, text: str, data_theme: dict):
+@dataclass
+class DataPageResultTest:
+    horizontal_scrollbar_value: int = 0
+    vertical__scrollbar_value: int = 0
+
+class PushButtonResultQuestion(PageTesting.PushButtonNavigation):
+    """Класс для кнопок навигации по вопросам на панели инструменов"""
+    push_button_question_clicked = QtCore.pyqtSignal(int)
+    
+    def __init__(self, number: int, data_theme: dict):
         super().__init__()
-            
-        self.text = text
-        self.data_theme = data_theme
 
-        # главный макет
-        self.hbox_layout_main = QtWidgets.QHBoxLayout()
-        self.hbox_layout_main.setSpacing(0)
-        self.hbox_layout_main.setContentsMargins(0, 0, 0, 0)
+        self.__number = number
+        self.__data_theme = data_theme
+        self.__answered = False
 
-        self.setLayout(self.hbox_layout_main)
+        self.setObjectName("push_button_result_question")
+        self.setText(f"{self.__number + 1}")
+        self.setFont(QtGui.QFont("Segoe UI", 12))
+        self.push_button_navigation_clicked.connect(self.__push_button_question_press)
 
-        # метка индикатор
-        self.label_indicator = QtWidgets.QLabel()
-        self.label_indicator.setObjectName("label_indicator")
-        self.label_indicator.setFixedSize(24, 24)
+        self.set_style_sheet()
 
-        self.hbox_layout_main.addWidget(self.label_indicator)
-        self.hbox_layout_main.addSpacing(10)
+    def set_status(self, status: PageTesting.AnswerStatus):
+        self.setProperty("status", status.value)
+        self.style().unpolish(self)
+        self.style().polish(self)
+
+    def __push_button_question_press(self):
+        self.push_button_question_clicked.emit(self.__number)
+
+    def set_style_sheet(self):
+        self.setStyleSheet(f"""
+        #push_button_result_question {{
+            outline: 0;
+            border: 3px solid;
+            border-radius: 25px;
+        }}
+        #push_button_result_question[current="true"][status=\"{PageTesting.AnswerStatus.right.value}\"] {{
+            background: {self.__data_theme["current"]["right"]["background"]};
+            border-color: {self.__data_theme["current"]["right"]["color_border"]};
+            color: {self.__data_theme["current"]["right"]["color"]};
+        }} 
+        #push_button_result_question[current="true"][status=\"{PageTesting.AnswerStatus.wrong.value}\"] {{
+            background: {self.__data_theme["current"]["wrong"]["background"]};
+            border-color: {self.__data_theme["current"]["wrong"]["color_border"]};
+            color: {self.__data_theme["current"]["wrong"]["color"]};
+        }} 
+        #push_button_result_question[current="true"][status=\"{PageTesting.AnswerStatus.skip.value}\"] {{
+            background: {self.__data_theme["current"]["skip"]["background"]};
+            border-color: {self.__data_theme["current"]["skip"]["color_border"]};
+            color: {self.__data_theme["current"]["skip"]["color"]};
+        }} 
+        #push_button_result_question[current="false"][status=\"{PageTesting.AnswerStatus.right.value}\"] {{
+            background: {self.__data_theme["not_current"]["right"]["background"]};
+            border-color: {self.__data_theme["not_current"]["right"]["color_border"]};
+            color: {self.__data_theme["not_current"]["right"]["color"]};
+        }} 
+        #push_button_result_question[current="false"][status=\"{PageTesting.AnswerStatus.wrong.value}\"] {{
+            background: {self.__data_theme["not_current"]["wrong"]["background"]};
+            border-color: {self.__data_theme["not_current"]["wrong"]["color_border"]};
+            color: {self.__data_theme["not_current"]["wrong"]["color"]};
+        }} 
+        #push_button_result_question[current="false"][status=\"{PageTesting.AnswerStatus.skip.value}\"] {{
+            background: {self.__data_theme["not_current"]["skip"]["background"]};
+            border-color: {self.__data_theme["not_current"]["skip"]["color_border"]};
+            color: {self.__data_theme["not_current"]["skip"]["color"]};
+        }} """)
+
+class PushButtonResultTesting(PageTesting.PushButtonNavigation):
+    """Класс для кнопки для открытия результатов  тестирования"""
+    push_button_result_testing_clicked = QtCore.pyqtSignal()
+    
+    def __init__(self, path_images: str, data_theme: dict):
+        super().__init__()
+
+        self.__path_images = path_images
+        self.__data_theme = data_theme
+
+        self.setObjectName("push_button_result_testing")
+        self.setIcon(QtGui.QIcon(os.path.join(self.__path_images, r"results.png")))
+        self.setIconSize(QtCore.QSize(35, 35))
+        self.push_button_navigation_clicked.connect(self.__push_button_result_testing_press)
+
+        self.set_style_sheet()
+
+    def __push_button_result_testing_press(self):
+        self.push_button_result_testing_clicked.emit()
+
+    def set_style_sheet(self):
+        self.setStyleSheet(f"""
+        #push_button_result_testing {{
+            outline: 0;
+            border: 3px solid;
+            border-radius: 10px;
+        }}
+        #push_button_result_testing[current="true"] {{
+            background: {self.__data_theme["current"]["background"]};
+            border-color: {self.__data_theme["current"]["color_border"]};
+            color: {self.__data_theme["current"]["color"]};
+        }} 
+        #push_button_result_testing[current="false"] {{
+            background: {self.__data_theme["not_current"]["background"]};
+            border-color: {self.__data_theme["not_current"]["color_border"]};
+            color: {self.__data_theme["not_current"]["color"]};
+        }} """)
+
+class LabelLegend(QtWidgets.QLabel):
+    """Класс для метки леенды диаграммы с задавыемым цветом кружка"""
+
+    def __init__(self, color: QtGui.QColor, data_theme: dict, text: str = ""):
+        super().__init__()
+        
+        self.__color = color
+        self.__text = text
+        self.__data_theme = data_theme
 
         # метка с текстом
-        self.label_text = QtWidgets.QLabel()
-        self.label_text.setObjectName("label_text")
-        self.label_text.setFont(QtGui.QFont("Segoe UI", 16))
-        self.label_text.setText(self.text)
+        self.setObjectName("label_legend")
+        self.setFont(QtGui.QFont("Segoe UI", 16))
+        # self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.setText(self.__text)
 
-        self.hbox_layout_main.addWidget(self.label_text)
+        # изображение с цветным кружком
+        self.__pixmap = QtGui.QPixmap(40, 40)
+        
+        # self.__painter = QtGui.QPainter(self.__pixmap)
+        # self.__painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        # self.__painter.setPen(QtGui.QPen(QtGui.QColor(), 0, QtCore.Qt.PenStyle.NoPen))
+        # self.__painter.setBrush(QtGui.QBrush(self.__color, QtCore.Qt.BrushStyle.SolidPattern))
+        # self.__painter.drawEllipse(0, 0, 40, 40)
+        # self.__painter.end()
+
+        self.setPixmap(self.__pixmap)
 
         self.set_style_sheet()
 
     def set_style_sheet(self):
-        # метка индикатор
-        self.label_indicator.setStyleSheet("""
-        #label_indicator {
-            background: %(background)s;
-            border-radius: 12px;
-        } """ % self.data_theme["indicator"])
+        self.setStyleSheet(f"""
+        #label_legend {{
+            background: transparent;
+            color: {self.__data_theme["color"]};
+        }} """)
 
-        # метка с текстом
-        self.label_text.setStyleSheet("""
-        #label_text {
-            color: %(color)s;
-        } """ % self.data_theme)
+class PageViewerResultTesting(QtWidgets.QWidget):
+    """Класс просмотра результатов тестирования"""
 
-class BarNavigation(QtWidgets.QWidget):
-    def __init__(self, dict_result: dict , data_theme: dict):
+    def __init__(self, data_result_testing: PageTesting.DataResultTesting, data_theme: dict):
         super().__init__()
 
-        self.dict_result = dict_result
-        self.data_theme = data_theme
+        self.__data_result_testing = data_result_testing
+        self.__data_theme = data_theme
 
-        # главный макет
-        self.hbox_layout_main = QtWidgets.QHBoxLayout()
-        self.hbox_layout_main.setSpacing(0)
-        self.hbox_layout_main.setContentsMargins(0, 0, 0, 0)
+        self.__parser_rgb = re.compile("rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)")
 
-        self.setLayout(self.hbox_layout_main)
+        self.__points_right = 0
+        self.__points_wrong = 0
+        self.__points_skip = 0
+        self.__amount_question = len(self.__data_result_testing.list_data_result)
 
-        # панель инструментов и навигации
-        self.frame_tools = QtWidgets.QFrame()
-        self.frame_tools.setObjectName("frame_tools")
+        for i in self.__data_result_testing.list_data_result:
+            match i.status:
+                case PageTesting.AnswerStatus.right:
+                    self.__points_right += 1
+                case PageTesting.AnswerStatus.wrong:
+                    self.__points_wrong += 1
+                case _:
+                    self.__points_skip += 1
 
-        self.hbox_layout_main.addWidget(self.frame_tools)
+        parsing_result = self.__parser_rgb.search(self.__data_theme["frame_main"]["chart"]["pie_slice_right"]["color"])
+        if parsing_result != None:
+            color_right = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
+        else:
+            color_right = QtGui.QColor(self.__data_theme["frame_main"]["chart"]["pie_slice_right"]["color"])
 
-        # макет панели инстументов
-        self.hbox_layout_tools = QtWidgets.QHBoxLayout()
-        self.hbox_layout_tools.setSpacing(10)
-        self.hbox_layout_tools.setContentsMargins(20, 10, 20, 10)
+        parsing_result = self.__parser_rgb.search(self.__data_theme["frame_main"]["chart"]["pie_slice_wrong"]["color"])
+        if parsing_result != None:
+            color_wrong = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
+        else:
+            color_wrong = QtGui.QColor(self.__data_theme["frame_main"]["chart"]["pie_slice_wrong"]["color"])
 
-        self.frame_tools.setLayout(self.hbox_layout_tools)
+        parsing_result = self.__parser_rgb.search(self.__data_theme["frame_main"]["chart"]["pie_slice_skip"]["color"])
+        if parsing_result != None:
+            color_skip = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
+        else:
+            color_skip = QtGui.QColor(self.__data_theme["frame_main"]["chart"]["pie_slice_skip"]["color"])
 
-        self.hbox_layout_tools.addStretch(1)
-
-        for i in range(max(self.dict_result.keys()) + 1):
-            label_number = QtWidgets.QLabel()
-            label_number.setObjectName("label_number")
-            label_number.setText(f"{i + 1}")
-            label_number.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-            label_number.setFont(QtGui.QFont("Segoe UI", 12))
-            label_number.setFixedSize(50, 50)
-
-            self.hbox_layout_tools.addWidget(label_number)
-
-            if self.dict_result[i] == "right":
-                temp_data_theme = self.data_theme["label_number_right"]
-            elif self.dict_result[i] == "wrong":
-                temp_data_theme = self.data_theme["label_number_wrong"]
-            elif self.dict_result[i] == "skip":
-                temp_data_theme = self.data_theme["label_number_skip"]
-
-            label_number.setStyleSheet("""
-            #label_number {
-                border-radius: 25px;
-                background: %(background)s;
-                color: %(color)s;
-            } """ % temp_data_theme)
-
-        self.hbox_layout_tools.addStretch(1)
-
-        self.set_style_sheet()
-
-    def set_style_sheet(self):
-        # панель инструментов и навигации
-        self.frame_tools.setStyleSheet("""
-        #frame_tools {
-            border-radius: 20px;
-            background: %(background)s;
-        } """ % self.data_theme)
-
-class StackResult(QtWidgets.QWidget):
-    def __init__(self, data_result, data_theme: dict, func: callable):
-        super().__init__()
-
-        self.data_result = data_result
-        self.data_theme = data_theme
-        self.func = func
-
-        self.init_variables()
+        self.__tree = ET.parse(self.__data_result_testing.path_course)
+        self.__root = self.__tree.getroot()
 
         # главная сетка
-        self.grid_layout_main = QtWidgets.QGridLayout()
-        self.grid_layout_main.setSpacing(0)
-        self.grid_layout_main.setContentsMargins(0, 0, 0, 0)
-        self.grid_layout_main.setColumnStretch(0, 0)
-        self.grid_layout_main.setColumnStretch(1, 1)
-        self.grid_layout_main.setColumnStretch(2, 0)
-        self.grid_layout_main.setRowStretch(0, 0)
-        self.grid_layout_main.setRowStretch(1, 1)
-        self.grid_layout_main.setRowStretch(2, 0)
+        self.__hbox_layout_main = QtWidgets.QHBoxLayout()
+        self.__hbox_layout_main.setSpacing(0)
+        self.__hbox_layout_main.setContentsMargins(0, 0, 0, 0)
 
-        self.setLayout(self.grid_layout_main)
+        self.setLayout(self.__hbox_layout_main)
 
         # главная рамка
-        self.frame_main = QtWidgets.QFrame()
-        self.frame_main.setObjectName("frame_main")
+        self.__frame_main = QtWidgets.QFrame()
+        self.__frame_main.setObjectName("frame_main")
 
-        self.grid_layout_main.addWidget(self.frame_main, 1, 1)
+        self.__hbox_layout_main.addWidget(self.__frame_main)
 
         # внутренний макет
-        self.vbox_layout_internal = QtWidgets.QVBoxLayout()
-        self.vbox_layout_internal.setSpacing(0)
-        self.vbox_layout_internal.setContentsMargins(0, 0, 0, 0)
+        self.__vbox_layout_internal = QtWidgets.QVBoxLayout()
+        self.__vbox_layout_internal.setSpacing(0)
+        self.__vbox_layout_internal.setContentsMargins(0, 0, 0, 0)
 
-        self.frame_main.setLayout(self.vbox_layout_internal)
+        self.__frame_main.setLayout(self.__vbox_layout_internal)
 
-        self.vbox_layout_internal.addStretch(1)
+        # макет строки с информацией о прохождении
+        self.__hbox_layout_info = QtWidgets.QHBoxLayout()
+        self.__hbox_layout_info.setSpacing(0)
+        self.__hbox_layout_info.setContentsMargins(0, 0, 0, 0)
+        self.__hbox_layout_info.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
+
+        self.__vbox_layout_internal.addLayout(self.__hbox_layout_info)
+        self.__vbox_layout_internal.addStretch(1)
+
+        # метка названия теста
+        name_test = self.__root.find("name").text
+        self.__label_name_test = QtWidgets.QLabel()
+        self.__label_name_test.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.__label_name_test.setObjectName("label_name_test")
+        self.__label_name_test.setFont(QtGui.QFont("Segoe UI", 11))
+        self.__label_name_test.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.__label_name_test.setText(f"{name_test[:40] + (name_test[40:] and '…')}")
+
+        self.__hbox_layout_info.addWidget(self.__label_name_test)
+        self.__hbox_layout_info.addSpacing(10)
+
+        # метка даты прохождения
+        self.__label_date_passing = QtWidgets.QLabel()
+        self.__label_date_passing.setObjectName("label_date_passing")
+        self.__label_date_passing.setFont(QtGui.QFont("Segoe UI", 11))
+        self.__label_date_passing.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.__label_date_passing.setText(f"Дата прохождения: {self.__data_result_testing.date_start.strftime(r'%d-%m-%Y %H:%M')}")
+
+        self.__hbox_layout_info.addWidget(self.__label_date_passing)
+        self.__hbox_layout_info.addSpacing(10)
+
+        # метка времени выполнения
+        duration = (self.__data_result_testing.date_end - self.__data_result_testing.date_start).total_seconds()
+        hours, remains = divmod(duration, 3600)
+        minutes, remains = divmod(remains, 60)
+        seconds = remains
+
+        self.__label_time_passing = QtWidgets.QLabel()
+        self.__label_time_passing.setObjectName("label_time_passing")
+        self.__label_time_passing.setFont(QtGui.QFont("Segoe UI", 11))
+        self.__label_time_passing.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.__label_time_passing.setText(f"Время прохождения: {round(hours):0>2}:{round(minutes):0>2}:{round(seconds):0>2}")
+
+        self.__hbox_layout_info.addWidget(self.__label_time_passing)
 
         # макет диаграммы и легенды
-        self.hbox_layout_chart = QtWidgets.QHBoxLayout()
-        self.hbox_layout_chart.setSpacing(0)
-        self.hbox_layout_chart.setContentsMargins(0, 0, 0, 0)
+        self.__hbox_layout_chart = QtWidgets.QHBoxLayout()
+        self.__hbox_layout_chart.setSpacing(0)
+        self.__hbox_layout_chart.setContentsMargins(0, 0, 0, 0)
+        self.__hbox_layout_chart.addStretch(2)
 
-        self.hbox_layout_chart.addStretch(2)
-
-        self.vbox_layout_internal.addLayout(self.hbox_layout_chart)
-        self.vbox_layout_internal.addStretch(1)
+        self.__vbox_layout_internal.addLayout(self.__hbox_layout_chart)
+        self.__vbox_layout_internal.addStretch(1)
 
         # диаграмма
-        self.series = QPieSeries()
-        self.series.setHoleSize(0.4)
+        self.__pie_series = QPieSeries()
+        self.__pie_series.setHoleSize(0.4)
 
-        self.slice_right = self.series.append("Правильные", round(self.data_result.points_right / self.data_result.points_max * 100))
-        self.slice_wrong = self.series.append("Неправильные", round(self.data_result.points_wrong / self.data_result.points_max * 100))
-        self.slice_skip = self.series.append("Пропущенные", round(self.data_result.points_skip / self.data_result.points_max * 100))
+        self.__pie_slice_right = self.__pie_series.append("Правильные", round(self.__points_right / self.__amount_question * 100))
+        self.__pie_slice_right.setBrush(color_right)
 
-        self.chart = QChart()
-        self.chart.legend().hide()
-        self.chart.layout().setContentsMargins(0, 0, 0, 0)
-        self.chart.setBackgroundRoundness(0)
-        self.chart.setContentsMargins(-82,-82,-82, -82)
-        self.chart.addSeries(self.series)
+        self.__pie_slice_wrong = self.__pie_series.append("Неправильные", round(self.__points_wrong / self.__amount_question * 100))
+        self.__pie_slice_wrong.setBrush(color_wrong)
+        
+        self.__pie_slice_skip = self.__pie_series.append("Пропущенные", round(self.__points_skip / self.__amount_question * 100))
+        self.__pie_slice_skip.setBrush(color_skip)
 
-        self.chartview = QChartView(self.chart)
-        self.chartview.setFixedSize(QtCore.QSize(293, 293))
-        self.chartview.setObjectName("chartview")
+        self.__chart = QChart()
+        self.__chart.legend().hide()
+        self.__chart.layout().setContentsMargins(0, 0, 0, 0)
+        self.__chart.setBackgroundRoundness(0)
+        self.__chart.setContentsMargins(-82,-82,-82, -82)
+        self.__chart.addSeries(self.__pie_series)
 
-        self.hbox_layout_chart.addWidget(self.chartview)
-        self.hbox_layout_chart.addStretch(1)
+        self.__chart__view = QChartView(self.__chart)
+        self.__chart__view.setFixedSize(QtCore.QSize(293, 293))
+        self.__chart__view.setObjectName("chart_view")
+
+        self.__hbox_layout_chart.addWidget(self.__chart__view)
+        self.__hbox_layout_chart.addStretch(1)
 
         # рамка легенды
-        self.frame_legend = QtWidgets.QFrame()
-        self.frame_legend.setObjectName("frame_legend")
+        self.__frame_legend = QtWidgets.QFrame()
+        self.__frame_legend.setObjectName("frame_legend")
         
-        self.hbox_layout_chart.addWidget(self.frame_legend)
-        self.hbox_layout_chart.addStretch(2)
+        self.__hbox_layout_chart.addWidget(self.__frame_legend)
+        self.__hbox_layout_chart.addStretch(2)
 
         # макет легенды
-        self.vbox_layout_legend = QtWidgets.QVBoxLayout()
-        self.vbox_layout_legend.setSpacing(0)
-        self.vbox_layout_legend.setContentsMargins(30, 30, 30, 30)
+        self.__vbox_layout_legend = QtWidgets.QVBoxLayout()
+        self.__vbox_layout_legend.setContentsMargins(0, 0, 0, 0)
+        self.__vbox_layout_legend.setSpacing(0)
 
-        self.frame_legend.setLayout(self.vbox_layout_legend)
+        self.__frame_legend.setLayout(self.__vbox_layout_legend)
 
         # метка количества баллов
-        self.label_result = QtWidgets.QLabel()
-        self.label_result.setObjectName("label_result")
-        self.label_result.setText(f"{round(self.data_result.points_right / self.data_result.points_max * 100)} / 100")
-        self.label_result.setFont(QtGui.QFont("Segoe UI", 20))
-        self.label_result.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.__label_result = QtWidgets.QLabel()
+        self.__label_result.setObjectName("label_result")
+        self.__label_result.setText(f"{round(self.__points_right / self.__amount_question * 100)} / 100")
+        self.__label_result.setFont(QtGui.QFont("Segoe UI", 20))
+        self.__label_result.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
-        self.vbox_layout_legend.addWidget(self.label_result)
-        self.vbox_layout_legend.addSpacing(10)
+        self.__vbox_layout_legend.addWidget(self.__label_result)
+        self.__vbox_layout_legend.addSpacing(10)
 
         # метка заголовка
-        self.label_header = QtWidgets.QLabel()
-        self.label_header.setObjectName("label_header")
-        self.label_header.setText(f"Результат теста в баллах")
-        self.label_header.setFont(QtGui.QFont("Segoe UI", 16))
-        self.label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.__label_header = QtWidgets.QLabel()
+        self.__label_header.setObjectName("label_header")
+        self.__label_header.setText("Результат теста в баллах")
+        self.__label_header.setFont(QtGui.QFont("Segoe UI", 16))
+        self.__label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
-        self.vbox_layout_legend.addWidget(self.label_header)
-        self.vbox_layout_legend.addSpacing(10)
+        self.__vbox_layout_legend.addWidget(self.__label_header)
+        self.__vbox_layout_legend.addSpacing(10)
 
         # метка легенды правильно
-        self.label_legent_right = LabelLegend(
-            text = f"Правильные: {self.data_result.points_right} ({round(self.data_result.points_right / self.data_result.points_max * 100)}%)",
-            data_theme = self.data_theme["frame_main"]["frame_legend"]["label_legend_right"]
-        )
+        self.label_legent_right = LabelLegend(color = color_right, data_theme = self.__data_theme["frame_main"]["frame_legend"]["label_legend_right"])
+        self.label_legent_right.setText(f"Правильные: {self.__points_right} ({round(self.__points_right / self.__amount_question * 100)}%)")
 
-        self.vbox_layout_legend.addWidget(self.label_legent_right)
-        self.vbox_layout_legend.addSpacing(10)
+        self.__vbox_layout_legend.addWidget(self.label_legent_right)
+        self.__vbox_layout_legend.setAlignment(self.label_legent_right, QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.__vbox_layout_legend.addSpacing(10)
 
         # метка легенды неправильно
-        self.label_legent_right = LabelLegend(
-            text = f"Неправильные: {self.data_result.points_wrong} ({round(self.data_result.points_wrong / self.data_result.points_max * 100)}%)",
-            data_theme = self.data_theme["frame_main"]["frame_legend"]["label_legend_wrong"]
-        )
+        self.label_legent_wrong = LabelLegend(color = color_wrong, data_theme = self.__data_theme["frame_main"]["frame_legend"]["label_legend_wrong"])
+        self.label_legent_wrong.setText(f"Неправильные: {self.__points_wrong} ({round(self.__points_wrong / self.__amount_question * 100)}%)")
 
-        self.vbox_layout_legend.addWidget(self.label_legent_right)
-        self.vbox_layout_legend.addSpacing(10)
+        self.__vbox_layout_legend.addWidget(self.label_legent_wrong)
+        self.__vbox_layout_legend.setAlignment(self.label_legent_wrong, QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.__vbox_layout_legend.addSpacing(10)
 
         # метка легенды пропущенно
-        self.label_legent_right = LabelLegend(
-            text = f"Пропущенные: {self.data_result.points_skip} ({round(self.data_result.points_skip / self.data_result.points_max * 100)}%)",
-            data_theme = self.data_theme["frame_main"]["frame_legend"]["label_legend_skip"]
-        )
+        self.label_legent_skip = LabelLegend(color = color_skip, data_theme = self.__data_theme["frame_main"]["frame_legend"]["label_legend_skip"])
+        self.label_legent_skip.setText(f"Пропущенные: {self.__points_skip} ({round(self.__points_skip / self.__amount_question * 100)}%)")
 
-        self.vbox_layout_legend.addWidget(self.label_legent_right)
+        self.__vbox_layout_legend.addWidget(self.label_legent_skip)
+        self.__vbox_layout_legend.setAlignment(self.label_legent_skip, QtCore.Qt.AlignmentFlag.AlignLeft)
 
-        # макет панель навигации
-        self.hbox_layout_bar_navigation = QtWidgets.QHBoxLayout()
-        self.hbox_layout_bar_navigation.setSpacing(0)
-        self.hbox_layout_bar_navigation.setContentsMargins(20, 20, 20, 20)
+class PageResultQuestion(QtWidgets.QWidget):
+    """Класс для просмотра результата выполнения отдельного вопроса"""
 
-        self.vbox_layout_internal.addLayout(self.hbox_layout_bar_navigation)
+    def __init__(self, number: int, path_course: str, question: str, answer: str | list | None, status: PageTesting.AnswerStatus, path_images: str, data_theme: dict):
+        super().__init__()
 
-        # панель навигации
-        self.bar_navigation = BarNavigation(
-            dict_result = self.data_result.dict_result,
-            data_theme = self.data_theme["frame_main"]["bar_navigation"] 
-        )
+        self.__number = number
+        self.__path_course = path_course
+        self.__question = question
+        self.__answer = answer
+        self.__status = status
+        self.__path_images = path_images
+        self.__path_pixmap = None
+        self.__data_theme = data_theme
 
-        self.hbox_layout_bar_navigation.addWidget(self.bar_navigation)
+        self.__rigth_answer = list(i.text for i in self.__question.find("answers").findall("answer"))
+        
+        # главный макет
+        self.__vbox_layout_main = QtWidgets.QGridLayout()
+        self.__vbox_layout_main.setSpacing(0)
+        self.__vbox_layout_main.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(self.__vbox_layout_main)
+
+        # главная рамка
+        self.__frame_main = QtWidgets.QFrame()
+        self.__frame_main.setObjectName("frame_main")
+
+        self.__vbox_layout_main.addWidget(self.__frame_main)
+
+        # внутренний макет
+        self.__vbox_layout_internal = QtWidgets.QVBoxLayout()
+        self.__vbox_layout_internal.setSpacing(0)
+        self.__vbox_layout_internal.setContentsMargins(20, 20, 20, 20)
+
+        self.__frame_main.setLayout(self.__vbox_layout_internal)
+
+        # макет номера задания и статуса выполнения
+        self.__hbox_layout_number_and_status = QtWidgets.QHBoxLayout()
+        self.__hbox_layout_number_and_status.setSpacing(0)
+        self.__hbox_layout_number_and_status.setContentsMargins(0, 0, 0, 0)
+        self.__hbox_layout_number_and_status.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
+
+        self.__vbox_layout_internal.addLayout(self.__hbox_layout_number_and_status)
+
+        # метка номера задания
+        self.__label_numder_question = QtWidgets.QLabel()
+        self.__label_numder_question.setObjectName("label_numder_question")
+        self.__label_numder_question.setFont(QtGui.QFont("Segoe UI", 12))
+        self.__label_numder_question.setText(f"Вопрос {self.__number + 1}")
+
+        self.__hbox_layout_number_and_status.addWidget(self.__label_numder_question)
+        self.__hbox_layout_number_and_status.addSpacing(10)
+
+        self.__label_status = QtWidgets.QLabel()
+        self.__label_status.setObjectName("label_status")
+        self.__label_status.setFont(QtGui.QFont("Segoe UI", 12))
+
+        # метка статуса выполнения
+        match self.__status:
+            case PageTesting.AnswerStatus.right:
+                text_status = "Верный ответ"
+                self.__label_status.setProperty("status", "right")
+            case PageTesting.AnswerStatus.wrong:
+                text_status = "Неверный ответ"
+                self.__label_status.setProperty("status", "wrong")
+            case _:
+                text_status = "Пропущено"
+                self.__label_status.setProperty("status", "skip")
+
+        self.__label_status.setText(text_status)
+
+        self.__hbox_layout_number_and_status.addWidget(self.__label_status)
+
+        # метка с вопросом
+        self.__label_question = QtWidgets.QLabel()
+        self.__label_question.setObjectName("label_question")
+        self.__label_question.setWordWrap(True)
+        self.__label_question.setFont(QtGui.QFont("Segoe UI", 14))
+        self.__label_question.setText(self.__question.find("title").text)
+        self.__label_question.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
+
+        self.__vbox_layout_internal.addWidget(self.__label_question)
+
+        # метка типа задания
+        self.__label_type_question = QtWidgets.QLabel()
+        self.__label_type_question.setObjectName("label_type_question")
+        self.__label_type_question.setFont(QtGui.QFont("Segoe UI", 12))
+
+        self.__vbox_layout_internal.addWidget(self.__label_type_question)
+        self.__vbox_layout_internal.addSpacing(5)
+
+        # добавление кнопки с изображением, если оно присутствует
+        if (path_pixmap := self.__question.find("questions").find("image")) != None:
+            self.__path_pixmap = os.path.join(os.path.split(self.__path_course)[0], path_pixmap.text) # .replace("\\", "/")
+
+            self.__push_button_image = PageTesting.PushButtonImage(path_pixmap = self.__path_pixmap, path_images = self.__path_images, data_theme = self.__data_theme["frame_main"]["push_button_image"])
+
+            self.__vbox_layout_internal.addWidget(self.__push_button_image)
+            self.__vbox_layout_internal.addSpacing(5)
+
+        # метка верный ответ
+        self.__label_right_answer = QtWidgets.QLabel()
+        self.__label_right_answer.setObjectName("label_right_answer")
+        self.__label_right_answer.setFont(QtGui.QFont("Segoe UI", 14))
+        self.__label_right_answer.setText("Верный ответ:")
+
+        self.__vbox_layout_internal.addWidget(self.__label_right_answer)
+
+         # метка Ваш ответ
+        self.__label_user_answer = QtWidgets.QLabel()
+        self.__label_user_answer.setObjectName("label_user_answer")
+        self.__label_user_answer.setFont(QtGui.QFont("Segoe UI", 14))
+        self.__label_user_answer.setText("Ваш ответ:")
+
+        # создание виджетов выбора или ввода ответов
+        match self.__question.find("questions").find("type").text:
+            case "selectable_answer":
+                self.__label_type_question.setText("Укажите правильный вариант ответа:")
+
+                # группа радио кнопок
+                self.__group_radio_buttons_rigth_answer = PageTesting.GroupRadiobuttonsAnswer()
+
+                list_questions = self.__question.find("questions").findall("question")
+                amount_questions = len(list_questions)
+
+                self.__list_radio_buttons_right_answer = list()
+
+                # создание и упаковка радиокнопок верных ответов
+                for i, question in enumerate(list_questions):
+                    radio_button_right = PageTesting.RadiobuttonAnswer(
+                        text = question.text,
+                        path_images = self.__path_images,
+                        data_theme = self.__data_theme["frame_main"]["radio_button"]
+                    )
+                    radio_button_right.set_enabled(False)
+
+                    self.__list_radio_buttons_right_answer.append(radio_button_right)
+
+                    self.__group_radio_buttons_rigth_answer.add_radio_button_answer(radio_button_right)
+
+                    if question.text == self.__rigth_answer[0]:
+                        radio_button_right.set_checked(True)
+
+                    self.__vbox_layout_internal.addWidget(radio_button_right)
+                    # if i < amount_questions:
+                    #     self.__vbox_layout_internal.addSpacing(10)
+
+                self.__vbox_layout_internal.addWidget(self.__label_user_answer)
+
+                # группа радио кнопок
+                self.__group_radio_buttons_user_answer = PageTesting.GroupRadiobuttonsAnswer()
+
+                self.__list_radio_buttons_user_answer = list()
+
+                 # создание и упаковка радиокнопок пользовательских ответов
+                for i, question in enumerate(list_questions):
+                    radio_button_user = PageTesting.RadiobuttonAnswer(
+                        text = question.text,
+                        path_images = self.__path_images,
+                        data_theme = self.__data_theme["frame_main"]["radio_button"]
+                    )
+                    radio_button_user.set_enabled(False)
+
+                    self.__list_radio_buttons_user_answer.append(radio_button_user)
+
+                    self.__group_radio_buttons_user_answer.add_radio_button_answer(radio_button_user)
+
+                    if question.text == self.__answer:
+                        radio_button_user.set_checked(True)
+
+                    self.__vbox_layout_internal.addWidget(radio_button_user)
+                    # if i < amount_questions:
+                    #     self.__vbox_layout_internal.addSpacing(10)
+
+            case "multiple_selectable_answers":
+                self.__label_type_question.setText("Укажите правильные варианты ответа:")
+
+                list_questions = self.__question.find("questions").findall("question")
+                amount_questions = len(list_questions)
+
+                self.__list_checkboxes_right = list()
+
+                # создание и упаковка чекбоксов верных ответов
+                for i, element in enumerate(list_questions):
+                    checkbox_right = PageTesting.CheckboxAnswer(
+                        text = element.text, 
+                        path_images = self.__path_images, 
+                        data_theme = self.__data_theme["frame_main"]["checkbox"]
+                    )
+                    checkbox_right.set_enabled(False)
+
+                    self.__list_checkboxes_right.append(checkbox_right)
+
+                    if element.text in self.__rigth_answer:
+                        checkbox_right.set_checked(True)
+
+                    self.__vbox_layout_internal.addWidget(checkbox_right)
+                    # if i < amount_questions:
+                    #     self.__vbox_layout_internal.addSpacing(10)
+
+                self.__vbox_layout_internal.addWidget(self.__label_user_answer)
+
+                self.__list_checkboxes_user = list()
+
+                # создание и упаковка чекбоксов пользовательских ответов
+                for i, element in enumerate(list_questions):
+                    checkbox_user = PageTesting.CheckboxAnswer(
+                        text = element.text, 
+                        path_images = self.__path_images, 
+                        data_theme = self.__data_theme["frame_main"]["checkbox"]
+                    )
+                    checkbox_user.set_enabled(False)
+
+                    self.__list_checkboxes_user.append(checkbox_user)
+
+                    if element.text in self.__answer:
+                        checkbox_user.set_checked(True)
+
+                    self.__vbox_layout_internal.addWidget(checkbox_user)
+                    # if i < amount_questions:
+                    #     self.__vbox_layout_internal.addSpacing(10)    
+                    
+            case "input_answer":
+                self.__label_type_question.setText("Введите правильный ответ:")
+                
+                self.__line_edit_right_answer = PageTesting.LineEditAnswer(data_theme = self.__data_theme["frame_main"]["line_edit"])
+                self.__line_edit_right_answer.set_enabled(False)
+
+                self.__vbox_layout_internal.addWidget(self.__line_edit_right_answer)
+                self.__vbox_layout_internal.addSpacing(5)
+
+                self.__line_edit_right_answer.insert(self.__rigth_answer[0])
+
+                # self.__line_edit_right_answer.setStyleSheet(f"""
+                # #line_edit_right_answer {{
+                #     border-radius: 7px; 
+                #     border: 2px solid; 
+                #     border-color: {self.__data_theme["frame_main"]["line_edit"]["normal"]["color_border"]};
+                #     background: {self.__data_theme["frame_main"]["line_edit"]["normal"]["background"]}; 
+                #     color: {self.__data_theme["frame_main"]["line_edit"]["normal"]["color"]};
+                # }} 
+                # #line_edit_right_answer:focus {{
+                #     border-color: {self.__data_theme["frame_main"]["line_edit"]["focus"]["color_border"]};
+                #     background: {self.__data_theme["frame_main"]["line_edit"]["focus"]["background"]}; 
+                #     color: {self.__data_theme["frame_main"]["line_edit"]["focus"]["color"]};
+                # }} """)
+
+                self.__vbox_layout_internal.addWidget(self.__label_user_answer)
+
+                self.__line_edit_user_answer = PageTesting.LineEditAnswer(data_theme = self.__data_theme["frame_main"]["line_edit"])
+                self.__line_edit_user_answer.set_enabled(False)
+
+                self.__vbox_layout_internal.addWidget(self.__line_edit_user_answer)
+
+                if self.__answer != None:
+                    self.__line_edit_user_answer.insert(self.__answer)
+
+        self.__vbox_layout_internal.addStretch(1)
+        
+        self.set_style_sheet()
+
+    def answer(self) -> str | list | None:
+        return self.__answer
+
+    def set_style_sheet(self):
+        # главная рамка
+        self.__frame_main.setStyleSheet(f"""
+        #frame_main {{
+            background: {self.__data_theme["frame_main"]["background"]};
+        }} """)
+
+        # метка номера вопроса
+        self.__label_numder_question.setStyleSheet(f"""
+        #label_numder_question {{
+            background: transparent;
+            color: {self.__data_theme["frame_main"]["label_numder_question"]["color"]};   
+        }} """)
+
+        # метка статуса выполнения
+        self.__label_status.setStyleSheet(f"""
+        #label_status {{
+            border-radius: 7px;
+            padding-left: 7px;
+            padding-right: 7px; 
+        }}
+        #label_status[status="right"] {{
+            background: {self.__data_theme["frame_main"]["label_status"]["right"]["background"]};
+            color: {self.__data_theme["frame_main"]["label_status"]["right"]["color"]};   
+        }} 
+        #label_status[status="wrong"] {{
+           background: {self.__data_theme["frame_main"]["label_status"]["wrong"]["background"]};
+            color: {self.__data_theme["frame_main"]["label_status"]["wrong"]["color"]};
+        }} 
+        #label_status[status="skip"] {{
+            background: {self.__data_theme["frame_main"]["label_status"]["skip"]["background"]};
+            color: {self.__data_theme["frame_main"]["label_status"]["skip"]["color"]}; 
+        }} """)
+
+        # метка вопроса
+        self.__label_question.setStyleSheet(f"""
+        #label_question {{
+            color: {self.__data_theme["frame_main"]["label_question"]["color"]};
+            background: transparent;
+            selection-color: {self.__data_theme["frame_main"]["label_question"]["selection_color"]};
+            selection-background-color: {self.__data_theme["frame_main"]["label_question"]["selection_background_color"]};
+        }} """)
+
+        # метка типа задания
+        self.__label_type_question.setStyleSheet(f"""
+        #label_type_question {{ 
+            color: {self.__data_theme["frame_main"]["label_type_question"]["color"]};
+        }} """)
+
+class PageResultTesting(QtWidgets.QWidget):
+    """Главный класс для просмотра результатов тестирования"""
+
+    def __init__(self, data_result_testing: PageTesting.DataResultTesting, path_images: str, data_theme: dict):
+        super().__init__()
+
+        self.__data_theme = data_theme
+        self.__path_images = path_images
+        self.__data_result_testing = data_result_testing
+
+        self.__path_course = self.__data_result_testing.path_course
+        self.__list_data_result = self.__data_result_testing.list_data_result
+
+        self.__tree = ET.parse(self.__path_course)
+        self.__root = self.__tree.getroot()
+
+        self.__page_result_question = None
+        self.__page_result_testing = None
+        self.__current_number_page_result_question = 0
+
+        self.__len_course = len(self.__root.findall("exercise"))
+        self.__list_data_page_result_test: list[DataPageResultTest] = list()
+        self.__list_push_button_questions = list()
+
+        for i in range(self.__len_course):
+            self.__list_data_page_result_test.append(DataPageResultTest())
+
+        # главный макет
+        self.__vbox_layout_main = QtWidgets.QGridLayout()
+        self.__vbox_layout_main.setSpacing(0)
+        self.__vbox_layout_main.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(self.__vbox_layout_main)
+
+        # главная рамка
+        self.__frame_main = QtWidgets.QFrame()
+        self.__frame_main.setObjectName("frame_main")
+
+        self.__vbox_layout_main.addWidget(self.__frame_main)
+
+        # внутренний макет
+        self.__vbox_layout_internal = QtWidgets.QVBoxLayout()
+        self.__vbox_layout_internal.setSpacing(0)
+        self.__vbox_layout_internal.setContentsMargins(0, 0, 0, 0)
+
+        self.__frame_main.setLayout(self.__vbox_layout_internal)
+
+        # виджет стеков для страниц результатов вопросов теста
+        self.__stacked_widget = QtWidgets.QStackedWidget()
+        self.__stacked_widget.setObjectName("stacked_widget")
+
+        self.__vbox_layout_internal.addWidget(self.__stacked_widget)
+
+        # прокручиваемая область для станица результатов теста
+        self.__scroll_area_page_result_test = QtWidgets.QScrollArea()
+        self.__scroll_area_page_result_test.setObjectName("scroll_area_page_result_test")
+        self.__scroll_area_page_result_test.setWidgetResizable(True)
+
+        self.__stacked_widget.addWidget(self.__scroll_area_page_result_test)
 
         # панель инструментов
-        self.frame_tools = QtWidgets.QFrame()
-        self.frame_tools.setObjectName("frame_tools")
+        self.__frame_tools = QtWidgets.QFrame()
+        self.__frame_tools.setObjectName("frame_tools")
         
-        self.vbox_layout_internal.addWidget(self.frame_tools)
+        self.__vbox_layout_internal.addWidget(self.__frame_tools)
 
-        # макет инструментов
-        self.hbox_layout_tools = QtWidgets.QHBoxLayout()
-        self.hbox_layout_tools.setSpacing(0)
-        self.hbox_layout_tools.setContentsMargins(20, 10, 20, 10)
+        # макет панели инстументов
+        self.__hbox_layout_tools = QtWidgets.QHBoxLayout()
+        self.__hbox_layout_tools.setSpacing(0)
+        self.__hbox_layout_tools.setContentsMargins(20, 10, 20, 0)
 
-        self.frame_tools.setLayout(self.hbox_layout_tools)
+        self.__frame_tools.setLayout(self.__hbox_layout_tools)
 
-        self.hbox_layout_tools.addStretch(1)
+        # кнопка для открытия результатов тестирования
+        self.__push_button_result_testing = PushButtonResultTesting(self.__path_images, self.__data_theme["frame_main"]["frame_tools"]["push_button_resul_testing"])
+        self.__push_button_result_testing.push_button_result_testing_clicked.connect(self.__open_result_testing)
 
-        # кнопка вернуться на главную
-        self.push_button_to_main = QtWidgets.QPushButton()
-        self.push_button_to_main.setObjectName("push_button_to_main")
-        self.push_button_to_main.clicked.connect(self.func)
-        self.push_button_to_main.setFont(QtGui.QFont("Segoe UI", 14))
-        self.push_button_to_main.setText("На главную")
-        self.push_button_to_main.setFixedHeight(42)
+        self.__hbox_layout_tools.addWidget(self.__push_button_result_testing)
+        self.__hbox_layout_tools.addSpacing(10)
+        self.__hbox_layout_tools.setAlignment(self.__push_button_result_testing, QtCore.Qt.AlignmentFlag.AlignTop)
 
-        self.hbox_layout_tools.addWidget(self.push_button_to_main)
-        self.hbox_layout_tools.addStretch(1)
+        # прокручиваемая область для кнопок навигации по вопросам
+        self.__scroll_area_push_button_result_questions = QtWidgets.QScrollArea()
+        self.__scroll_area_push_button_result_questions.setObjectName("scroll_area_push_button_result_questions")
+        self.__scroll_area_push_button_result_questions.setSizePolicy(QtWidgets.QSizePolicy.Policy.MinimumExpanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.__scroll_area_push_button_result_questions.verticalScrollBar().setEnabled(False)
+        self.__scroll_area_push_button_result_questions.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.__scroll_area_push_button_result_questions.setWidgetResizable(True)
+
+        self.__hbox_layout_tools.addWidget(self.__scroll_area_push_button_result_questions)
+        self.__hbox_layout_tools.addSpacing(10)
+
+        # рамка для кнопок навигации по вопросам
+        self.__frame_push_button_result_questions = QtWidgets.QFrame()
+        self.__frame_push_button_result_questions.setObjectName("frame_push_button_result_questions")
+
+        self.__scroll_area_push_button_result_questions.setWidget(self.__frame_push_button_result_questions)
+
+        # макет для кнопок навигации по вопросам
+        self.__hbox_layout_button_result_questions = QtWidgets.QHBoxLayout()
+        self.__hbox_layout_button_result_questions.setSpacing(0)
+        self.__hbox_layout_button_result_questions.setContentsMargins(0, 0, 0, 0)
+
+        self.__frame_push_button_result_questions.setLayout(self.__hbox_layout_button_result_questions)
+
+        self.__hbox_layout_button_result_questions.addStretch(1)
+
+        for i in range(self.__len_course):
+            push_button_result_question = PushButtonResultQuestion(number = i, data_theme = self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_result_questions"]["frame_push_button_result_questions"]["push_button_resul_question"])
+            push_button_result_question.set_status(self.__list_data_result[i].status)
+            push_button_result_question.push_button_question_clicked.connect(self.__switch_result_question)
+            self.__list_push_button_questions.append(push_button_result_question)
+
+            self.__hbox_layout_button_result_questions.addWidget(push_button_result_question)
+            if i < self.__len_course:
+                self.__hbox_layout_button_result_questions.addSpacing(10)
+
+        self.__hbox_layout_button_result_questions.addStretch(1)
+
+        self.__push_button_result_testing.push_button_navigation_press()
 
         self.set_style_sheet()
 
-    def init_variables(self):
-        pattern = re.compile(r"^\s*rgb\s*\(\s*|\s*,\s*|\s*\)\s*$")
+    def __open_result_testing(self):
+        print(self.__page_result_testing)
+        if self.__page_result_testing == None:
+            self.__page_result_testing = PageViewerResultTesting(self.__data_result_testing, self.__data_theme["frame_main"]["scroll_area_page_result_test"]["page_result_testing"])
+            print(self.__page_result_testing)
+            self.__stacked_widget.addWidget(self.__page_result_testing)
 
-        self.indicator_background_right = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["frame_main"]["frame_legend"]["label_legend_right"]["indicator"]["background"])[1:-1]])
-        self.indicator_background_wrong = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["frame_main"]["frame_legend"]["label_legend_wrong"]["indicator"]["background"])[1:-1]])
-        self.indicator_background_skip = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["frame_main"]["frame_legend"]["label_legend_skip"]["indicator"]["background"])[1:-1]])
-        self.chartview_background = QtGui.QColor(*[int(i) for i in pattern.split(self.data_theme["frame_main"]["chartview"]["background"])[1:-1]])
+        self.__stacked_widget.setCurrentWidget(self.__page_result_testing)
+
+    def __switch_result_question(self, number: int):
+        current_question = self.__root.findall("exercise")[number]
+
+        if self.__page_result_question != None:
+            # сохранение информации о текущей страницы в список
+            self.__list_data_page_result_test[self.__current_number_page_result_question].horizontal_scrollbar_value = self.__scroll_area_page_result_test.horizontalScrollBar().value()
+            self.__list_data_page_result_test[self.__current_number_page_result_question].vertical__scrollbar_value = self.__scroll_area_page_result_test.verticalScrollBar().value()
+
+            # удаление старой страницы
+            self.__scroll_area_page_result_test.widget().deleteLater()
+
+        self.__current_number_page_result_question = number
+
+        # создание и упаковка новой страницы вопроса
+        self.__page_result_question = PageResultQuestion(
+            number = self.__current_number_page_result_question,
+            path_course = self.__path_course, 
+            question = current_question,
+            answer = self.__list_data_result[self.__current_number_page_result_question].user_answer, 
+            status = self.__list_data_result[self.__current_number_page_result_question].status,
+            path_images = self.__path_images, 
+            data_theme = self.__data_theme["frame_main"]["scroll_area_page_result_test"]["page_result_question"]          
+        )
+
+        self.__scroll_area_page_result_test.setWidget(self.__page_result_question)
+        self.__scroll_area_page_result_test.horizontalScrollBar().setValue(self.__list_data_page_result_test[self.__current_number_page_result_question].horizontal_scrollbar_value)
+        self.__scroll_area_page_result_test.verticalScrollBar().setValue(self.__list_data_page_result_test[self.__current_number_page_result_question].vertical__scrollbar_value)
+        self.__stacked_widget.setCurrentWidget(self.__scroll_area_page_result_test)
 
     def set_style_sheet(self):
-        # диаграмма
-        self.chartview.chart().setBackgroundBrush(QtGui.QBrush(self.chartview_background))
-
-        self.slice_right.setBrush(self.indicator_background_right)
-        self.slice_wrong.setBrush(self.indicator_background_wrong)
-        self.slice_skip.setBrush(self.indicator_background_skip)
-
         # главная рамка
-        self.frame_main.setStyleSheet("""
-        #frame_main {
-            background: %(background)s;
-        } """ % self.data_theme["frame_main"])
+        self.__frame_main.setStyleSheet(f"""
+        #frame_main {{
+            background: {self.__data_theme["frame_main"]["background"]};
+        }} """)
 
-        # метка количества баллов
-        self.label_result.setStyleSheet("""
-        #label_result {
-            color: %(color)s;
-        } """ % self.data_theme["frame_main"]["frame_legend"]["label_result"])
+        # панель инструментов и навигации
+        self.__frame_tools.setStyleSheet(f"""
+        #frame_tools {{               
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+            background: {self.__data_theme["frame_main"]["frame_tools"]["background"]};
+        }} """)
+        
+        # прокручиваемая область для станица теста
+        self.__scroll_area_page_result_test.setStyleSheet(f"""
+        #scroll_area_page_result_test {{
+            background: {self.__data_theme["frame_main"]["scroll_area_page_result_test"]["background"]};
+            border: none;
+        }}
+        
+        QScrollBar:vertical {{              
+            border: transparent;
+            background: {self.__data_theme["frame_main"]["scroll_area_page_result_test"]["scrollbar"]["background"]};
+            width: 14px;
+            border-radius: 6px;
+            padding: 4px;
+            margin: 0px 0px 0px 0px;
+        }}
+        QScrollBar::handle:vertical {{
+            background: {self.__data_theme["frame_main"]["scroll_area_page_result_test"]["scrollbar"]["handle"]["background"]};
+            border-radius: 3px;
+            min-height: 30px;
+        }}
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+            background: transparent;
+            height: 0px;
+        }}
+        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
+            background: transparent;
+        }} 
 
-        # метка заголовка
-        self.label_header.setStyleSheet("""
-        #label_header {
-            color: %(color)s;
-        } """ % self.data_theme["frame_main"]["frame_legend"]["label_header"])
+        QScrollBar:horizontal {{              
+            border: transparent;
+            background: {self.__data_theme["frame_main"]["scroll_area_page_result_test"]["scrollbar"]["background"]};
+            height: 14px;
+            border-radius: 6px;
+            padding: 4px;
+            margin: 0px 0px 0px 0px;
+        }}
+        QScrollBar::handle:horizontal {{
+            background: {self.__data_theme["frame_main"]["scroll_area_page_result_test"]["scrollbar"]["handle"]["background"]};
+            border-radius: 3px;
+            min-width: 30px;
+        }}
+        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
+            background: transparent;
+            width: 0px;
+        }}
+        QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
+            background: transparent;
+        }} """)
 
-        # рамка легенды
-        self.frame_legend.setStyleSheet("""
-        #frame_legend {
-            border-radius: 14px;
-            background: %(background)s;
-        } """ % self.data_theme["frame_main"]["frame_legend"])
+        # прокручиваемая область для кнопок навигации по вопросам
+        self.__scroll_area_push_button_result_questions.setStyleSheet(f"""
+        #scroll_area_push_button_result_questions {{
+            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_result_questions"]["background"]};
+            border: none;
+            margin: 0px, 0px, 0px, 0px;
+        }} 
 
-        # тень рамки легенды
-        self.frame_legend.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.frame_legend.shadow.setBlurRadius(17)
-        self.frame_legend.shadow.setOffset(0, 0)
-        self.frame_legend.shadow.setColor(QtGui.QColor(0, 0, 0, 100))
-        self.frame_legend.setGraphicsEffect(self.frame_legend.shadow)
+        QScrollBar:vertical {{
+            width: 0px;
+        }}
+        
+        QScrollBar:horizontal {{              
+            border: transparent;
+            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_result_questions"]["scrollbar"]["background"]};
+            height: 14px;
+            border-radius: 6px;
+            padding: 4px;
+            margin: 0px 0px 0px 0px;
+        }}
+        QScrollBar::handle:horizontal {{
+            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_result_questions"]["scrollbar"]["handle"]["background"]};
+            border-radius: 3px;
+            min-width: 30px;
+        }}
+        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
+            background: transparent;
+            width: 0px;
+        }}
+        QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
+            background: transparent;
+        }} """)
 
-        # панель инструментов
-        self.frame_tools.setStyleSheet("""
-        #frame_tools {
-            border-top-left-radius: 40px;
-            border-top-right-radius: 40px;
-            background: %(background)s;
-        } """ % self.data_theme["frame_main"]["frame_tools"])
+        self.__frame_push_button_result_questions.setStyleSheet(f"""
+        #frame_push_button_result_questions {{
+            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_result_questions"]["frame_push_button_result_questions"]["background"]};
+            margin: 0px, 17px, 0px, 0px;
+        }} """)
 
-        # кнопка вернуться на главную
-        self.push_button_to_main.setStyleSheet("""
-        #push_button_to_main {
-            outline: 0;
-            padding-left: 10;
-            padding-right: 10;
-            border-radius: 7px;
-            background: %(background)s;
-            color: %(color)s;
-        } """ % self.data_theme["frame_main"]["frame_tools"]["push_button_to_main"])
+        # # кнопка завершить тест
+        # self.__push_button_finish.setStyleSheet(f"""
+        # #push_button_finish {{
+        #     outline: 0;
+        #     padding-left: 15px;
+        #     padding-right: 15px;
+        #     border-radius: 15px;
+        #     background: {self.__data_theme["frame_main"]["frame_tools"]["push_button_finish"]["background"]}; 
+        #     color: {self.__data_theme["frame_main"]["frame_tools"]["push_button_finish"]["color"]};
+        # }} """)

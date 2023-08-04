@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 
 @dataclass
-class DataHomePage:
+class DataPageHome:
     path_course: str
 
 @dataclass
@@ -13,9 +13,9 @@ class DataCourse:
     name: str
     path_course: str
 
-class StackHomePage(QtWidgets.QWidget):
+class PageHome(QtWidgets.QWidget):
     """Домашняя страница"""
-    push_button_clicked_start_test = QtCore.pyqtSignal(DataHomePage)
+    push_button_clicked_start_test = QtCore.pyqtSignal(DataPageHome)
 
     def __init__(self, path_courses: str, path_images: str, path_theme: str, data_theme: dict):
         super().__init__()
@@ -151,7 +151,7 @@ class StackHomePage(QtWidgets.QWidget):
         return list_data_courses
 
     def __start_test(self):
-        data_passage = DataHomePage(path_course = self.__path_selected_course)
+        data_passage = DataPageHome(path_course = self.__path_selected_course)
 
         self.push_button_clicked_start_test.emit(data_passage)
 

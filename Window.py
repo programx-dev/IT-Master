@@ -3,10 +3,6 @@ import sys
 import os
 import enum
 
-class PropertyPages(enum.Enum):
-    home_page = 0
-    test_page = 1
-
 class Direction(enum.Enum):
     Left = 0
     Top = 1
@@ -228,6 +224,7 @@ class TitileBarWindow(QtWidgets.QWidget):
         # метка титла
         self.__label_title.setStyleSheet(f"""
         #label_title {{
+            background: transparent;
             color: {self.__data_theme["label_title"]["color"]};
         }} """)
 
@@ -235,32 +232,32 @@ class TitileBarWindow(QtWidgets.QWidget):
         #push_button_minimize {{
             outline: 0;
             border: none;
-            background: {self.__data_theme["push_button"]["normal"]["background"]}; 
-            color: {self.__data_theme["push_button"]["normal"]["color"]};
+            background: {self.__data_theme["push_button_minimize"]["normal"]["background"]}; 
+            color: {self.__data_theme["push_button_minimize"]["normal"]["color"]};
         }}
         #push_button_minimize::hover {{
-            background: {self.__data_theme["push_button"]["hover"]["background"]}; 
-            color: {self.__data_theme["push_button"]["hover"]["color"]};
+            background: {self.__data_theme["push_button_minimize"]["hover"]["background"]}; 
+            color: {self.__data_theme["push_button_minimize"]["hover"]["color"]};
         }}
         #push_button_minimize::pressed {{
-            background: {self.__data_theme["push_button"]["pressed"]["background"]}; 
-            color: {self.__data_theme["push_button"]["pressed"]["color"]}; 
+            background: {self.__data_theme["push_button_minimize"]["pressed"]["background"]}; 
+            color: {self.__data_theme["push_button_minimize"]["pressed"]["color"]}; 
         }} """)
 
         self.__push_button_maximize.setStyleSheet(f"""
         #push_button_maximize {{
             outline: 0;
             border: none;
-            background: {self.__data_theme["push_button"]["normal"]["background"]}; 
-            color: {self.__data_theme["push_button"]["normal"]["color"]};
+            background: {self.__data_theme["push_button_maximize"]["normal"]["background"]}; 
+            color: {self.__data_theme["push_button_maximize"]["normal"]["color"]};
         }}
         #push_button_maximize::hover {{
-            background: {self.__data_theme["push_button"]["hover"]["background"]}; 
-            color: {self.__data_theme["push_button"]["hover"]["color"]};
+            background: {self.__data_theme["push_button_maximize"]["hover"]["background"]}; 
+            color: {self.__data_theme["push_button_maximize"]["hover"]["color"]};
         }}
         #push_button_maximize::pressed {{
-            background: {self.__data_theme["push_button"]["pressed"]["background"]}; 
-            color: {self.__data_theme["push_button"]["pressed"]["color"]}; 
+            background: {self.__data_theme["push_button_maximize"]["pressed"]["background"]}; 
+            color: {self.__data_theme["push_button_maximize"]["pressed"]["color"]}; 
         }} """)
 
         self.__push_button_close.setStyleSheet(f"""
@@ -279,223 +276,11 @@ class TitileBarWindow(QtWidgets.QWidget):
             color: {self.__data_theme["push_button_close"]["pressed"]["color"]}; 
         }} """)
 
-class ToolButtonToolbar(QtWidgets.QToolButton):
-    """Кнопка панели инструментов"""
-    tool_button_selected = None
-    tool_button_clicked = QtCore.pyqtSignal()
-
-    def __init__(self, path_image: str, text: str, data_theme: dict):
-        super().__init__()
-
-        self.__path_image = path_image
-        self.__image = QtGui.QIcon(self.__path_image)
-        self.__text = text
-        self.__data_theme = data_theme
-        self.__selected = False
-
-        self.setProperty("selected", self.__selected)
-        self.setProperty("page", PropertyPages.home_page.value)
-
-        self.setObjectName("tool_button")
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Preferred)
-        self.clicked.connect(self.press_tool_button)
-        self.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-
-        self.setIcon(self.__image)
-        self.setIconSize(QtCore.QSize(32, 32))
-        self.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
-
-        self.setText(self.__text)
-        self.setFont(QtGui.QFont("Segoe UI", 10))
-
-        self.set_style_sheet()
-
-    def press_tool_button(self):
-        if self != ToolButtonToolbar.tool_button_selected and ToolButtonToolbar.tool_button_selected != None:
-            ToolButtonToolbar.tool_button_selected.__set_selected(False)
-
-        if self != ToolButtonToolbar.tool_button_selected:
-            ToolButtonToolbar.tool_button_selected = self
-            self.__set_selected(True)
-
-            self.tool_button_clicked.emit()
-
-    def __set_selected(self, selected: bool):
-        self.__selected = selected
-
-        self.setProperty("selected", self.__selected)
-        self.style().unpolish(self)
-        self.style().polish(self)
-
-    def set_selected(self):
-        ToolButtonToolbar.tool_button_selected.__set_selected(False)
-        ToolButtonToolbar.tool_button_selected = self
-        self.__set_selected(True)
-
-    def update_style_sheet(self, property: PropertyPages):
-        self.setProperty("page", property.value)
-        self.style().unpolish(self)
-        self.style().polish(self)
-
-    def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #tool_button[page=\"{PropertyPages.home_page.value}\"][selected="true"] {{ 
-            padding: 0px;
-            outline: 0;
-            border-radius: 10px; 
-            background: {self.__data_theme["home_page"]["selected"]["background"]};
-            color: {self.__data_theme["home_page"]["selected"]["color"]};
-        }} 
-         #tool_button[page=\"{PropertyPages.home_page.value}\"][selected="false"] {{ 
-            padding: 0px;
-            outline: 0;
-            border-radius: 10px; 
-            background: {self.__data_theme["home_page"]["not_selected"]["background"]};
-            color: {self.__data_theme["home_page"]["not_selected"]["color"]};
-        }}
-
-        #tool_button[page=\"{PropertyPages.test_page.value}\"][selected="true"] {{ 
-            padding: 0px;
-            outline: 0;
-            border-radius: 10px; 
-            background: {self.__data_theme["test_page"]["selected"]["background"]};
-            color: {self.__data_theme["test_page"]["selected"]["color"]};
-        }}
-        #tool_button[page=\"{PropertyPages.test_page.value}\"][selected="false"] {{ 
-            padding: 0px;
-            outline: 0;
-            border-radius: 10px; 
-            background: {self.__data_theme["test_page"]["not_selected"]["background"]};
-            color: {self.__data_theme["test_page"]["not_selected"]["color"]};
-        }} """)
-
-class ToolBar(QtWidgets.QFrame):
-    """Панель инструментов"""
-    tool_button_home_page_cliced = QtCore.pyqtSignal()
-    tool_button_results_cliced = QtCore.pyqtSignal()
-    tool_button_test_cliced = QtCore.pyqtSignal()
-    tool_button_settings_cliced = QtCore.pyqtSignal()
-    tool_button_info_cliced = QtCore.pyqtSignal()
-
-    def __init__(self, path_images: str, data_theme: dict):
-        super().__init__()
-
-        self.__path_images = path_images
-        self.__data_theme = data_theme
-        self.__list_tool_buttons = list()
-
-        self.setObjectName("tool_bar")
-        self.setProperty("page", PropertyPages.home_page.value)
-
-        # макет панели инструментов
-        self.__vbox_layout_toolbar = QtWidgets.QVBoxLayout()
-        self.__vbox_layout_toolbar.setContentsMargins(5, 5, 5, 5)
-        self.__vbox_layout_toolbar.setSpacing(0)
-
-        self.setLayout(self.__vbox_layout_toolbar)
-
-        data_theme_tool_buttons = {
-            "home_page": self.__data_theme["home_page"]["tool_button"],
-            "test_page": self.__data_theme["test_page"]["tool_button"]
-        }
-
-        # кнопка Домашняя страница
-        self.tool_button_home_page = ToolButtonToolbar(
-            os.path.join(self.__path_images, r"home_page.png"), 
-            "Домашняя\nстраница", 
-            data_theme_tool_buttons
-        )
-        self.__list_tool_buttons.append(self.tool_button_home_page)
-        self.tool_button_home_page.tool_button_clicked.connect(self.__press_tool_button_home_page)
-
-        self.__vbox_layout_toolbar.addWidget(self.tool_button_home_page)
-        self.__vbox_layout_toolbar.addSpacing(5)
-
-        # кнопка Результаты
-        self.tool_button_results = ToolButtonToolbar(
-            os.path.join(self.__path_images, r"results.png"), 
-            "Результаты", 
-            data_theme_tool_buttons
-        )
-        self.__list_tool_buttons.append(self.tool_button_results)
-        self.tool_button_results.tool_button_clicked.connect(self.__press_tool_button_results)
-
-        self.__vbox_layout_toolbar.addWidget(self.tool_button_results)
-        self.__vbox_layout_toolbar.addSpacing(5)
-
-        # кнопка Тест
-        self.tool_button_test = ToolButtonToolbar(
-            os.path.join(self.__path_images, r"test.png"), 
-            "Тест", 
-            data_theme_tool_buttons
-        )
-        self.__list_tool_buttons.append(self.tool_button_test)
-        self.tool_button_test.tool_button_clicked.connect(self.__press_tool_button_test)
-
-        self.__vbox_layout_toolbar.addWidget(self.tool_button_test)
-        self.__vbox_layout_toolbar.addStretch(1)
-
-        # кнопка Настройка
-        self.tool_button_settings = ToolButtonToolbar(
-            os.path.join(self.__path_images, r"settings.png"),
-            "Настройка", 
-            data_theme_tool_buttons
-        )
-        self.__list_tool_buttons.append(self.tool_button_settings)
-        self.tool_button_settings.tool_button_clicked.connect(self.__press_tool_button_settings)
-        self.__vbox_layout_toolbar.addWidget(self.tool_button_settings)
-
-        self.__vbox_layout_toolbar.addSpacing(5)
-
-        # кнопка Справка
-        self.tool_button_info = ToolButtonToolbar(
-            os.path.join(self.__path_images, r"info.png"),
-            "Справка",
-            data_theme_tool_buttons
-        )
-        self.__list_tool_buttons.append(self.tool_button_info)
-        self.tool_button_info.tool_button_clicked.connect(self.__press_tool_button_info)
-        self.__vbox_layout_toolbar.addWidget(self.tool_button_info)
-
-        self.set_style_sheet()
-
-    def __press_tool_button_home_page(self):
-        self.tool_button_home_page_cliced.emit()
-
-    def __press_tool_button_results(self):
-        self.tool_button_results_cliced.emit()
-
-    def __press_tool_button_test(self):
-        self.tool_button_test_cliced.emit()
-
-    def __press_tool_button_settings(self):
-        self.tool_button_settings_cliced.emit()
-
-    def __press_tool_button_info(self):
-        self.tool_button_info_cliced.emit()
-
-    def update_style_sheet(self, property: PropertyPages):
-        self.setProperty("page", property.value)
-        self.style().unpolish(self)
-        self.style().polish(self)
-
-        for i in self.__list_tool_buttons:
-            i.update_style_sheet(property)
-
-    def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #tool_bar[page=\"{PropertyPages.home_page.value}\"] {{
-            background: {self.__data_theme["home_page"]["background"]};
-        }} 
-        #tool_bar[page=\"{PropertyPages.test_page.value}\"] {{
-            background: {self.__data_theme["test_page"]["background"]};
-        }} """ )
-
 class AbstractWindow(QtWidgets.QWidget):
     """Класс для абстрактного окна"""
     Margins = 5
     
-    def __init__(self, data_theme: dict, parent = None):
+    def __init__(self, data_theme: dict):
         super().__init__()
 
         self.__data_theme = data_theme
@@ -855,21 +640,21 @@ class AbstractWindow(QtWidgets.QWidget):
 
     def __set_style_sheet(self):
         # рамка для виджетов
-        self.__frame_widgets.setStyleSheet("""
-        #frame_widgets {
-            background: %(background)s;
-        } """ % self.__data_theme["frame_widgets"])
+        self.__frame_widgets.setStyleSheet(f"""
+        #frame_widgets {{
+            background: {self.__data_theme["frame_widgets"]["background"]};
+        }} """)
 
 class Dialog(AbstractWindow):
     """Класс для базового диалогового окна"""
     
-    def __init__(self, data_theme: dict, parent = None):
-        super().__init__(data_theme, parent)
+    def __init__(self, data_theme: dict):
+        super().__init__(data_theme = data_theme)
         super().setWindowFlags(super().windowFlags() | QtCore.Qt.WindowType.Dialog)
 
 class Window(AbstractWindow):
     """Класс для главного окна"""
    
     def __init__(self, data_theme: dict):
-        super().__init__(data_theme, None)
+        super().__init__(data_theme = data_theme)
         super().setWindowFlags(super().windowFlags() | QtCore.Qt.WindowType.Window)
