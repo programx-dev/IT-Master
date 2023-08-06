@@ -2,7 +2,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 import PageHome
 import StackLesson
 import PageTesting
-import StackResult
+import PageResultTesting
 import StackTableResults
 import Window
 import Dialogs
@@ -48,8 +48,8 @@ class PropertyPages(enum.Enum):
     home_page = 0
     test_page = 1
 
-class ToolButtonToolbar(QtWidgets.QToolButton):
-    """Кнопка панели инструментов"""
+class SwitchableToolButtonToolbar(QtWidgets.QToolButton):
+    """Переключаемая кнопка панели инструментов"""
     tool_button_selected = None
     tool_button_clicked = QtCore.pyqtSignal()
 
@@ -68,7 +68,7 @@ class ToolButtonToolbar(QtWidgets.QToolButton):
         self.setObjectName("tool_button")
         self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Preferred)
         self.clicked.connect(self.press_tool_button)
-        self.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
 
         self.setIcon(self.__image)
         self.setIconSize(QtCore.QSize(32, 32))
@@ -80,11 +80,11 @@ class ToolButtonToolbar(QtWidgets.QToolButton):
         self.set_style_sheet()
 
     def press_tool_button(self):
-        if self != ToolButtonToolbar.tool_button_selected and ToolButtonToolbar.tool_button_selected != None:
-            ToolButtonToolbar.tool_button_selected.__set_selected(False)
+        if self != SwitchableToolButtonToolbar.tool_button_selected and SwitchableToolButtonToolbar.tool_button_selected != None:
+            SwitchableToolButtonToolbar.tool_button_selected.__set_selected(False)
 
-        if self != ToolButtonToolbar.tool_button_selected:
-            ToolButtonToolbar.tool_button_selected = self
+        if self != SwitchableToolButtonToolbar.tool_button_selected:
+            SwitchableToolButtonToolbar.tool_button_selected = self
             self.__set_selected(True)
 
             self.tool_button_clicked.emit()
@@ -97,8 +97,8 @@ class ToolButtonToolbar(QtWidgets.QToolButton):
         self.style().polish(self)
 
     def set_selected(self):
-        ToolButtonToolbar.tool_button_selected.__set_selected(False)
-        ToolButtonToolbar.tool_button_selected = self
+        SwitchableToolButtonToolbar.tool_button_selected.__set_selected(False)
+        SwitchableToolButtonToolbar.tool_button_selected = self
         self.__set_selected(True)
 
     def update_style_sheet(self, property: PropertyPages):
@@ -108,32 +108,83 @@ class ToolButtonToolbar(QtWidgets.QToolButton):
 
     def set_style_sheet(self):
         self.setStyleSheet(f"""
-        #tool_button[page=\"{PropertyPages.home_page.value}\"][selected="true"] {{ 
+        #tool_button {{
             padding: 0px;
             outline: 0;
             border-radius: 10px; 
+        }}
+        #tool_button[page=\"{PropertyPages.home_page.value}\"][selected="true"] {{ 
             background: {self.__data_theme["home_page"]["selected"]["background"]};
             color: {self.__data_theme["home_page"]["selected"]["color"]};
         }} 
          #tool_button[page=\"{PropertyPages.home_page.value}\"][selected="false"] {{ 
-            padding: 0px;
-            outline: 0;
-            border-radius: 10px; 
             background: {self.__data_theme["home_page"]["not_selected"]["background"]};
             color: {self.__data_theme["home_page"]["not_selected"]["color"]};
         }}
 
         #tool_button[page=\"{PropertyPages.test_page.value}\"][selected="true"] {{ 
-            padding: 0px;
-            outline: 0;
-            border-radius: 10px; 
             background: {self.__data_theme["test_page"]["selected"]["background"]};
             color: {self.__data_theme["test_page"]["selected"]["color"]};
         }}
         #tool_button[page=\"{PropertyPages.test_page.value}\"][selected="false"] {{ 
+            background: {self.__data_theme["test_page"]["not_selected"]["background"]};
+            color: {self.__data_theme["test_page"]["not_selected"]["color"]};
+        }} """)
+
+class ToolButtonToolbar(QtWidgets.QToolButton):
+    """Кнопка панели инструментов"""
+    tool_button_clicked = QtCore.pyqtSignal()
+
+    def __init__(self, path_image: str, text: str, data_theme: dict):
+        super().__init__()
+
+        self.__path_image = path_image
+        self.__image = QtGui.QIcon(self.__path_image)
+        self.__text = text
+        self.__data_theme = data_theme
+        self.__selected = False
+
+        self.setProperty("page", PropertyPages.home_page.value)
+
+        self.setObjectName("tool_button")
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Preferred)
+        self.clicked.connect(self.press_tool_button)
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+
+        self.setIcon(self.__image)
+        self.setIconSize(QtCore.QSize(32, 32))
+        self.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
+
+        self.setText(self.__text)
+        self.setFont(QtGui.QFont("Segoe UI", 10))
+
+        self.set_style_sheet()
+
+    def press_tool_button(self):
+        self.tool_button_clicked.emit()
+
+    def set_selected(self):
+        SwitchableToolButtonToolbar.tool_button_selected.__set_selected(False)
+        SwitchableToolButtonToolbar.tool_button_selected = self
+        self.__set_selected(True)
+
+    def update_style_sheet(self, property: PropertyPages):
+        self.setProperty("page", property.value)
+        self.style().unpolish(self)
+        self.style().polish(self)
+
+    def set_style_sheet(self):
+        self.setStyleSheet(f"""
+        #tool_button {{
             padding: 0px;
             outline: 0;
             border-radius: 10px; 
+        }}
+        #tool_button[page=\"{PropertyPages.home_page.value}\"] {{ 
+            background: {self.__data_theme["home_page"]["not_selected"]["background"]};
+            color: {self.__data_theme["home_page"]["not_selected"]["color"]};
+        }} 
+        #tool_button[page=\"{PropertyPages.test_page.value}\"] {{ 
             background: {self.__data_theme["test_page"]["not_selected"]["background"]};
             color: {self.__data_theme["test_page"]["not_selected"]["color"]};
         }} """)
@@ -169,7 +220,7 @@ class ToolBar(QtWidgets.QFrame):
         }
 
         # кнопка Домашняя страница
-        self.tool_button_home_page = ToolButtonToolbar(
+        self.tool_button_home_page = SwitchableToolButtonToolbar(
             os.path.join(self.__path_images, r"home_page.png"), 
             "Домашняя\nстраница", 
             data_theme_tool_buttons
@@ -181,7 +232,7 @@ class ToolBar(QtWidgets.QFrame):
         self.__vbox_layout_toolbar.addSpacing(5)
 
         # кнопка Результаты
-        self.tool_button_results = ToolButtonToolbar(
+        self.tool_button_results = SwitchableToolButtonToolbar(
             os.path.join(self.__path_images, r"results.png"), 
             "Результаты", 
             data_theme_tool_buttons
@@ -193,7 +244,7 @@ class ToolBar(QtWidgets.QFrame):
         self.__vbox_layout_toolbar.addSpacing(5)
 
         # кнопка Тест
-        self.tool_button_test = ToolButtonToolbar(
+        self.tool_button_test = SwitchableToolButtonToolbar(
             os.path.join(self.__path_images, r"test.png"), 
             "Тест", 
             data_theme_tool_buttons
@@ -342,8 +393,8 @@ class Main(Window.Window):
             dialog.set_window_title("Покинуть тестирование")
             dialog.set_window_icon(QtGui.QIcon(self.__path_image_logo))
             dialog.set_icon(QtWidgets.QStyle.StandardPixmap.SP_MessageBoxQuestion)
-            dialog.set_text("Покинуть тестирование?")
-            dialog.set_description("Результаты не сохранятся")
+            dialog.set_text("Покинуть тестирование и выйти\nна домашнюю страницу?")
+            dialog.set_description("Результаты не сохранятся!")
             dialog.add_push_button("ОК", Dialogs.ButtonRole.accept)
             dialog.add_push_button("Отмена", Dialogs.ButtonRole.reject, True)
 
@@ -354,6 +405,7 @@ class Main(Window.Window):
         self.__test_started = False
 
         self.__toolbar.tool_button_test.hide()
+        self.__toolbar.tool_button_results.hide()
         self.__toolbar.update_style_sheet(PropertyPages.home_page)        
 
         # удаление старого окна
@@ -418,7 +470,9 @@ class Main(Window.Window):
         self.__delete_old_record()
 
     def __finish_test(self, data_result_testing: PageTesting.DataResultTesting):
+        self.__toolbar.tool_button_results.press_tool_button()
         self.__toolbar.tool_button_test.hide()
+        self.__toolbar.tool_button_results.show()
         print(*data_result_testing.list_data_result, sep = "\n")
         self.__test_started = False
 
@@ -450,7 +504,7 @@ class Main(Window.Window):
         self.__stacked_widget.removeWidget(self.__current_page)
 
         # создание и упаковка окна результата выполнения
-        self.__current_page = StackResult.PageResultTesting(
+        self.__current_page = PageResultTesting.PageResultTesting(
             data_result_testing = data_result_testing, 
             path_images = self.__path_images,
             data_theme = self.__data_theme["page_result_testing"]
@@ -555,26 +609,6 @@ class Main(Window.Window):
         # показать урок
         self.__current_page.load_lesson()
         
-    def __to_main(self):
-        # удаление старого окна
-        self.__stacked_widget.removeWidget(self.__current_page)
-
-        # создание и упаковка окна входа
-        self.__current_page = PageHome.StackLogin(
-            path_theme = self.__path_theme,
-            path_courses = self.__path_courses, 
-            path_images = self.__path_images, 
-            data_theme = self.__data_theme["stack_login"], 
-            func_start = self.__start, 
-            func_table_results = self.__open_table_result, 
-            surname = self.__data_loggin.surname, 
-            name = self.__data_loggin.name,
-            class_name = self.__data_loggin.class_name
-        )
-
-        self.__stacked_widget.addWidget(self.__current_page)
-        self.__stacked_widget.setCurrentWidget(self.__current_page)
-
     def __open_dialog_info(self):
         dialog = Dialogs.DialogInfo(
             data_theme = self.__data_theme["dialog_info"],
@@ -591,19 +625,14 @@ class Main(Window.Window):
             parent = self
         )
 
-    def __exit_test(self):
-        self.__test_started = False
-
-        self.__to_main()
-
     def close_window(self):
         if self.__test_started:
             dialog = Dialogs.Dialog(data_theme = self.__data_theme["dialog"])
-            dialog.set_window_title("Покинуть тестирование и закрыть окно")
+            dialog.set_window_title("Выход")
             dialog.set_window_icon(QtGui.QIcon(self.__path_image_logo))
             dialog.set_icon(QtWidgets.QStyle.StandardPixmap.SP_MessageBoxQuestion)
             dialog.set_text("Покинуть тестирование и закрыть окно?")
-            dialog.set_description("Результаты не сохранятся")
+            dialog.set_description("Результаты не сохранятся!")
             dialog.add_push_button("ОК", Dialogs.ButtonRole.accept)
             dialog.add_push_button("Отмена", Dialogs.ButtonRole.reject, True)
 
@@ -614,7 +643,7 @@ class Main(Window.Window):
 
 if __name__ == "__main__":
     # https://doc.qt.io/qt-5/highdpi.html
-    # os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+    os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
     # if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
     #     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     # if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):

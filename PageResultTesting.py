@@ -117,8 +117,8 @@ class PushButtonResultTesting(PageTesting.PushButtonNavigation):
             color: {self.__data_theme["not_current"]["color"]};
         }} """)
 
-class LabelLegend(QtWidgets.QLabel):
-    """Класс для метки леенды диаграммы с задавыемым цветом кружка"""
+class LabelLegend(QtWidgets.QWidget):
+    """Класс для метки легнды диаграммы с задавыемым цветом кружка"""
 
     def __init__(self, color: QtGui.QColor, data_theme: dict, text: str = ""):
         super().__init__()
@@ -127,29 +127,55 @@ class LabelLegend(QtWidgets.QLabel):
         self.__text = text
         self.__data_theme = data_theme
 
-        # метка с текстом
-        self.setObjectName("label_legend")
-        self.setFont(QtGui.QFont("Segoe UI", 16))
-        # self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
-        self.setText(self.__text)
+        # главный макет
+        self.__hbox_layout_main = QtWidgets.QHBoxLayout()
+        self.__hbox_layout_main.setSpacing(0)
+        self.__hbox_layout_main.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(self.__hbox_layout_main)
 
         # изображение с цветным кружком
-        self.__pixmap = QtGui.QPixmap(40, 40)
+        self.__pixmap = QtGui.QPixmap(24, 24)
+        self.__pixmap.fill(QtGui.QColor(0, 0, 0, 0))
         
-        # self.__painter = QtGui.QPainter(self.__pixmap)
-        # self.__painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
-        # self.__painter.setPen(QtGui.QPen(QtGui.QColor(), 0, QtCore.Qt.PenStyle.NoPen))
-        # self.__painter.setBrush(QtGui.QBrush(self.__color, QtCore.Qt.BrushStyle.SolidPattern))
-        # self.__painter.drawEllipse(0, 0, 40, 40)
-        # self.__painter.end()
+        self.__painter = QtGui.QPainter(self.__pixmap)
+        self.__painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        self.__painter.setPen(QtGui.QPen(QtGui.QColor(), 0, QtCore.Qt.PenStyle.NoPen))
+        self.__painter.setBrush(QtGui.QBrush(self.__color, QtCore.Qt.BrushStyle.SolidPattern))
+        self.__painter.drawEllipse(0, 0, 24, 24)
+        self.__painter.end()
 
-        self.setPixmap(self.__pixmap)
+        # метка с изображением
+        self.__label_pixmap = QtWidgets.QLabel()
+        self.__label_pixmap.setObjectName("label_pixmap")
+        self.__label_pixmap.setPixmap(self.__pixmap)
+
+        self.__hbox_layout_main.addWidget(self.__label_pixmap)
+        self.__hbox_layout_main.addSpacing(10)
+
+        # метка с текстом
+        self.__label_text = QtWidgets.QLabel()
+        self.__label_text.setObjectName("label_text")
+        self.__label_text.setFont(QtGui.QFont("Segoe UI", 16))
+        self.__label_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.__label_text.setText(self.__text)
+
+        self.__hbox_layout_main.addWidget(self.__label_text)
 
         self.set_style_sheet()
 
+    def set_text(self, text: str):
+        self.__text = text
+        self.__label_text.setText(self.__text)
+
     def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #label_legend {{
+        self.__label_pixmap.setStyleSheet(f"""
+        #label_pixmap {{
+            background: transparent;
+        }} """)
+
+        self.__label_text.setStyleSheet(f"""
+        #label_text {{
             background: transparent;
             color: {self.__data_theme["color"]};
         }} """)
@@ -234,7 +260,7 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         self.__label_name_test = QtWidgets.QLabel()
         self.__label_name_test.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Fixed)
         self.__label_name_test.setObjectName("label_name_test")
-        self.__label_name_test.setFont(QtGui.QFont("Segoe UI", 11))
+        self.__label_name_test.setFont(QtGui.QFont("Segoe UI", 13))
         self.__label_name_test.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.__label_name_test.setText(f"{name_test[:40] + (name_test[40:] and '…')}")
 
@@ -244,9 +270,9 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         # метка даты прохождения
         self.__label_date_passing = QtWidgets.QLabel()
         self.__label_date_passing.setObjectName("label_date_passing")
-        self.__label_date_passing.setFont(QtGui.QFont("Segoe UI", 11))
+        self.__label_date_passing.setFont(QtGui.QFont("Segoe UI", 13))
         self.__label_date_passing.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
-        self.__label_date_passing.setText(f"Дата прохождения: {self.__data_result_testing.date_start.strftime(r'%d-%m-%Y %H:%M')}")
+        self.__label_date_passing.setText(f"Дата прохождения: {self.__data_result_testing.date_start.strftime(r'%d.%m.%Y %H:%M')}")
 
         self.__hbox_layout_info.addWidget(self.__label_date_passing)
         self.__hbox_layout_info.addSpacing(10)
@@ -259,7 +285,7 @@ class PageViewerResultTesting(QtWidgets.QWidget):
 
         self.__label_time_passing = QtWidgets.QLabel()
         self.__label_time_passing.setObjectName("label_time_passing")
-        self.__label_time_passing.setFont(QtGui.QFont("Segoe UI", 11))
+        self.__label_time_passing.setFont(QtGui.QFont("Segoe UI", 13))
         self.__label_time_passing.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.__label_time_passing.setText(f"Время прохождения: {round(hours):0>2}:{round(minutes):0>2}:{round(seconds):0>2}")
 
@@ -304,13 +330,15 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         # рамка легенды
         self.__frame_legend = QtWidgets.QFrame()
         self.__frame_legend.setObjectName("frame_legend")
+        self.__frame_legend.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.__frame_legend.setObjectName("frame_legend")
         
         self.__hbox_layout_chart.addWidget(self.__frame_legend)
         self.__hbox_layout_chart.addStretch(2)
 
         # макет легенды
         self.__vbox_layout_legend = QtWidgets.QVBoxLayout()
-        self.__vbox_layout_legend.setContentsMargins(0, 0, 0, 0)
+        self.__vbox_layout_legend.setContentsMargins(30, 30, 30, 30)
         self.__vbox_layout_legend.setSpacing(0)
 
         self.__frame_legend.setLayout(self.__vbox_layout_legend)
@@ -337,7 +365,7 @@ class PageViewerResultTesting(QtWidgets.QWidget):
 
         # метка легенды правильно
         self.label_legent_right = LabelLegend(color = color_right, data_theme = self.__data_theme["frame_main"]["frame_legend"]["label_legend_right"])
-        self.label_legent_right.setText(f"Правильные: {self.__points_right} ({round(self.__points_right / self.__amount_question * 100)}%)")
+        self.label_legent_right.set_text(f"Правильные: {self.__points_right} ({round(self.__points_right / self.__amount_question * 100)}%)")
 
         self.__vbox_layout_legend.addWidget(self.label_legent_right)
         self.__vbox_layout_legend.setAlignment(self.label_legent_right, QtCore.Qt.AlignmentFlag.AlignLeft)
@@ -345,7 +373,7 @@ class PageViewerResultTesting(QtWidgets.QWidget):
 
         # метка легенды неправильно
         self.label_legent_wrong = LabelLegend(color = color_wrong, data_theme = self.__data_theme["frame_main"]["frame_legend"]["label_legend_wrong"])
-        self.label_legent_wrong.setText(f"Неправильные: {self.__points_wrong} ({round(self.__points_wrong / self.__amount_question * 100)}%)")
+        self.label_legent_wrong.set_text(f"Неправильные: {self.__points_wrong} ({round(self.__points_wrong / self.__amount_question * 100)}%)")
 
         self.__vbox_layout_legend.addWidget(self.label_legent_wrong)
         self.__vbox_layout_legend.setAlignment(self.label_legent_wrong, QtCore.Qt.AlignmentFlag.AlignLeft)
@@ -353,10 +381,56 @@ class PageViewerResultTesting(QtWidgets.QWidget):
 
         # метка легенды пропущенно
         self.label_legent_skip = LabelLegend(color = color_skip, data_theme = self.__data_theme["frame_main"]["frame_legend"]["label_legend_skip"])
-        self.label_legent_skip.setText(f"Пропущенные: {self.__points_skip} ({round(self.__points_skip / self.__amount_question * 100)}%)")
+        self.label_legent_skip.set_text(f"Пропущенные: {self.__points_skip} ({round(self.__points_skip / self.__amount_question * 100)}%)")
 
         self.__vbox_layout_legend.addWidget(self.label_legent_skip)
         self.__vbox_layout_legend.setAlignment(self.label_legent_skip, QtCore.Qt.AlignmentFlag.AlignLeft)
+
+        self.set_style_sheet()
+
+    def set_style_sheet(self):
+        self.__frame_main.setStyleSheet(f"""
+        #frame_main {{
+            background: {self.__data_theme["frame_main"]["background"]};
+        }} """)
+
+        self.__label_name_test.setStyleSheet(f"""
+        #label_name_test {{
+            background: transparent;
+            color: {self.__data_theme["frame_main"]["label_name_test"]["color"]};
+        }} """)
+
+        self.__label_date_passing.setStyleSheet(f"""
+        #label_date_passing {{
+            background: transparent;
+            color: {self.__data_theme["frame_main"]["label_date_passing"]["color"]};
+        }} """)
+
+        self.__label_time_passing.setStyleSheet(f"""
+        #label_time_passing {{
+            background: transparent;
+            color: {self.__data_theme["frame_main"]["label_time_passing"]["color"]};
+        }} """)
+
+        self.__frame_legend.setStyleSheet(f"""
+        #frame_legend {{
+            border-style: solid;
+            border-width: 1px;
+            border-color: {self.__data_theme["frame_main"]["frame_legend"]["border_color"]};
+            border-radius: 14px;
+        }} """)
+
+        self.__label_result.setStyleSheet(f"""
+        #label_result {{
+            background: transparent;
+            color: {self.__data_theme["frame_main"]["frame_legend"]["label_result"]["color"]};
+        }} """)
+
+        self.__label_header.setStyleSheet(f"""
+        #label_header {{
+            background: transparent;
+            color: {self.__data_theme["frame_main"]["frame_legend"]["label_header"]["color"]};
+        }} """)
 
 class PageResultQuestion(QtWidgets.QWidget):
     """Класс для просмотра результата выполнения отдельного вопроса"""
@@ -592,20 +666,6 @@ class PageResultQuestion(QtWidgets.QWidget):
 
                 self.__line_edit_right_answer.insert(self.__rigth_answer[0])
 
-                # self.__line_edit_right_answer.setStyleSheet(f"""
-                # #line_edit_right_answer {{
-                #     border-radius: 7px; 
-                #     border: 2px solid; 
-                #     border-color: {self.__data_theme["frame_main"]["line_edit"]["normal"]["color_border"]};
-                #     background: {self.__data_theme["frame_main"]["line_edit"]["normal"]["background"]}; 
-                #     color: {self.__data_theme["frame_main"]["line_edit"]["normal"]["color"]};
-                # }} 
-                # #line_edit_right_answer:focus {{
-                #     border-color: {self.__data_theme["frame_main"]["line_edit"]["focus"]["color_border"]};
-                #     background: {self.__data_theme["frame_main"]["line_edit"]["focus"]["background"]}; 
-                #     color: {self.__data_theme["frame_main"]["line_edit"]["focus"]["color"]};
-                # }} """)
-
                 self.__vbox_layout_internal.addWidget(self.__label_user_answer)
 
                 self.__line_edit_user_answer = PageTesting.LineEditAnswer(data_theme = self.__data_theme["frame_main"]["line_edit"])
@@ -619,9 +679,6 @@ class PageResultQuestion(QtWidgets.QWidget):
         self.__vbox_layout_internal.addStretch(1)
         
         self.set_style_sheet()
-
-    def answer(self) -> str | list | None:
-        return self.__answer
 
     def set_style_sheet(self):
         # главная рамка
@@ -649,7 +706,7 @@ class PageResultQuestion(QtWidgets.QWidget):
             color: {self.__data_theme["frame_main"]["label_status"]["right"]["color"]};   
         }} 
         #label_status[status="wrong"] {{
-           background: {self.__data_theme["frame_main"]["label_status"]["wrong"]["background"]};
+            background: {self.__data_theme["frame_main"]["label_status"]["wrong"]["background"]};
             color: {self.__data_theme["frame_main"]["label_status"]["wrong"]["color"]};
         }} 
         #label_status[status="skip"] {{
@@ -669,6 +726,7 @@ class PageResultQuestion(QtWidgets.QWidget):
         # метка типа задания
         self.__label_type_question.setStyleSheet(f"""
         #label_type_question {{ 
+            background: transparent;
             color: {self.__data_theme["frame_main"]["label_type_question"]["color"]};
         }} """)
 
@@ -935,14 +993,3 @@ class PageResultTesting(QtWidgets.QWidget):
             background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_result_questions"]["frame_push_button_result_questions"]["background"]};
             margin: 0px, 17px, 0px, 0px;
         }} """)
-
-        # # кнопка завершить тест
-        # self.__push_button_finish.setStyleSheet(f"""
-        # #push_button_finish {{
-        #     outline: 0;
-        #     padding-left: 15px;
-        #     padding-right: 15px;
-        #     border-radius: 15px;
-        #     background: {self.__data_theme["frame_main"]["frame_tools"]["push_button_finish"]["background"]}; 
-        #     color: {self.__data_theme["frame_main"]["frame_tools"]["push_button_finish"]["color"]};
-        # }} """)

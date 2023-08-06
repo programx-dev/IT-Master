@@ -309,6 +309,7 @@ class CheckboxAnswer(QtWidgets.QWidget):
         self.__push_button_flag.clicked.connect(self.__checkbox_clicked)
         self.__push_button_flag.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Preferred)
         self.__push_button_flag.setIconSize(QtCore.QSize(22, 22))
+        self.__push_button_flag.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
 
         self.__hbox_layout_main.addWidget(self.__push_button_flag)
 
@@ -448,6 +449,7 @@ class RadiobuttonAnswer(QtWidgets.QWidget):
         self.__push_button_flag.clicked.connect(self.__radio_button_clicked)
         self.__push_button_flag.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Preferred)
         self.__push_button_flag.setIconSize(QtCore.QSize(22, 22))
+        self.__push_button_flag.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
 
         self.__hbox_layout_main.addWidget(self.__push_button_flag)
 
@@ -616,11 +618,15 @@ class LineEditAnswer(QtWidgets.QLineEdit):
         #line_edit_answer {{
             border-radius: 7px; 
             border: 2px solid; 
+            selection-background-color: {self.__data_theme["normal"]["selection_background_color"]};
+            selection-color: {self.__data_theme["normal"]["selection_color"]};
             border-color: {self.__data_theme["normal"]["color_border"]};
             background: {self.__data_theme["normal"]["background"]}; 
             color: {self.__data_theme["normal"]["color"]};
         }} 
         #line_edit_answer:focus {{
+        selection-color: {self.__data_theme["focus"]["selection_color"]};
+            selection-background-color: {self.__data_theme["focus"]["selection_background_color"]};
             border-color: {self.__data_theme["focus"]["color_border"]};
             background: {self.__data_theme["focus"]["background"]}; 
             color: {self.__data_theme["focus"]["color"]};
@@ -634,6 +640,7 @@ class PushButtonImage(QtWidgets.QPushButton):
         super().__init__()
 
         self.setObjectName("push_button_image")
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
         # self.clicked.connect(self.__push_button_image_press)
         # self.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
 
@@ -693,6 +700,7 @@ class PushButtonImage(QtWidgets.QPushButton):
         self.__push_buttton_save_image.setFixedSize(40, 40)
         self.__push_buttton_save_image.setIcon(QtGui.QIcon(os.path.join(self.__path_images, r"save.png")))
         self.__push_buttton_save_image.setIconSize(QtCore.QSize(32, 32))
+        self.__push_buttton_save_image.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
 
         self.__push_buttton_save_image.hide()
         self.__grid_layout_push_button_save.addWidget(self.__push_buttton_save_image, 0, 1)
@@ -1107,6 +1115,7 @@ class PageTesting(QtWidgets.QWidget):
         self.__push_button_finish.setText("Завершить тест")
         self.__push_button_finish.setFont(QtGui.QFont("Segoe UI", 12))
         self.__push_button_finish.setFixedHeight(50)
+        self.__push_button_finish.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
 
         self.__hbox_layout_tools.addWidget(self.__push_button_finish)
         self.__hbox_layout_tools.setAlignment(self.__push_button_finish, QtCore.Qt.AlignmentFlag.AlignTop)

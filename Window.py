@@ -13,6 +13,12 @@ class Direction(enum.Enum):
     LeftBottom = 6
     RightBottom = 7
 
+class LabelMinimizeable(QtWidgets.QLabel):
+    """Метка без органичений минимального размера"""
+
+    def minimumSizeHint(self):
+        return QtCore.QSize(0, super().minimumSizeHint().height())
+
 class TitileBarWindow(QtWidgets.QWidget):
     """Рамка заголовка для окна"""
     window_close = QtCore.pyqtSignal()
@@ -61,12 +67,14 @@ class TitileBarWindow(QtWidgets.QWidget):
         self.__frame_title.setObjectName("frame_title")
 
         self.__hbox_layout_header.addWidget(self.__frame_title)
-        self.__hbox_layout_header.addStretch(1)
+        # self.__hbox_layout_header.addStretch(1)
 
         # макет рамки титла
         self.__hbox_layout_title = QtWidgets.QHBoxLayout()
         self.__hbox_layout_title.setContentsMargins(5, 0, 0, 0)
         self.__hbox_layout_title.setSpacing(0)
+
+        self.__hbox_layout_title.setSizeConstraint(QtWidgets.QLayout.SizeConstraint.SetNoConstraint)
 
         self.__frame_title.setLayout(self.__hbox_layout_title)
 
@@ -80,10 +88,13 @@ class TitileBarWindow(QtWidgets.QWidget):
         self.__hbox_layout_title.addSpacing(5)
 
         # метка титла
-        self.__label_title = QtWidgets.QLabel()
+        self.__label_title = LabelMinimizeable()
         self.__label_title.setObjectName("label_title")
         self.__label_title.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.__label_title.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.__label_title.setFont(QtGui.QFont("Segoe UI", 12))
+
+        self.__label_title.setMinimumWidth(0)
 
         self.__hbox_layout_title.addWidget(self.__label_title)
 
@@ -92,6 +103,7 @@ class TitileBarWindow(QtWidgets.QWidget):
         self.__frame_header_buttons.setObjectName("frame_header_button")
 
         self.__hbox_layout_header.addWidget(self.__frame_header_buttons)
+        self.__hbox_layout_header.setAlignment(self.__frame_header_buttons, QtCore.Qt.AlignmentFlag.AlignRight)
 
         # макет рамки кнопок заголока
         self.__hbox_header_buttons = QtWidgets.QHBoxLayout()
@@ -107,7 +119,7 @@ class TitileBarWindow(QtWidgets.QWidget):
         self.__push_button_minimize.setFont(QtGui.QFont("Webdings", 9))
         self.__push_button_minimize.setText("0")
         self.__push_button_minimize.setFixedSize(58, 36)
-        self.__push_button_minimize.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.__push_button_minimize.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
 
         self.__hbox_header_buttons.addWidget(self.__push_button_minimize)
 
@@ -118,7 +130,7 @@ class TitileBarWindow(QtWidgets.QWidget):
         self.__push_button_maximize.setFont(QtGui.QFont("Webdings", 9))
         self.__push_button_maximize.setText("1")
         self.__push_button_maximize.setFixedSize(58, 36)
-        self.__push_button_maximize.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.__push_button_maximize.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
 
         self.__hbox_header_buttons.addWidget(self.__push_button_maximize)
 
@@ -129,7 +141,7 @@ class TitileBarWindow(QtWidgets.QWidget):
         self.__push_button_close.setFont(QtGui.QFont("Webdings", 9))
         self.__push_button_close.setText("r")
         self.__push_button_close.setFixedSize(58, 36)
-        self.__push_button_close.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.__push_button_close.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
 
         self.__hbox_header_buttons.addWidget(self.__push_button_close)
 
@@ -163,8 +175,9 @@ class TitileBarWindow(QtWidgets.QWidget):
             title = self.__title
 
         width = self.__label_title.width() - self.__hbox_layout_title.getContentsMargins()[0]
-
-        self.__label_title.setText(self.fontMetrics().elidedText(title, QtCore.Qt.TextElideMode.ElideRight, width))
+        title = self.__label_title.fontMetrics().elidedText(title, QtCore.Qt.TextElideMode.ElideRight, width)
+        if self.__label_title.text() != title:
+            self.__label_title.setText(title)
 
     def window_type_changed(self, type: QtCore.Qt.WindowType):
         self.__window_type = type
@@ -213,6 +226,10 @@ class TitileBarWindow(QtWidgets.QWidget):
             pos = event.globalPosition().toPoint() - self.__mouse_pos
             self.mouse_move.emit(pos)
         event.accept()
+
+    def paintEvent(self, event):
+        self.update_title()
+        super().paintEvent(event)
 
     def set_style_sheet(self):
         # рамка заголовка
@@ -293,6 +310,7 @@ class AbstractWindow(QtWidgets.QWidget):
         self.setWindowFlag(QtCore.Qt.WindowType.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setMouseTracking(True)
+        self.setMinimumSize(0, 0)
 
         # макет окна
         self.__layout_window = QtWidgets.QVBoxLayout()

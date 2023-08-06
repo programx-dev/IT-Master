@@ -66,7 +66,7 @@ class Dialog(Window.Dialog):
         self.__label_text = QtWidgets.QLabel()
         self.__label_text.setFont(QtGui.QFont("Segoe UI", 11))
         self.__label_text.setObjectName("label_text")
-        self.__label_text.setWordWrap(True)
+        # self.__label_text.setWordWrap(True)
         self.__label_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
         self.__label_text.hide()
@@ -77,7 +77,7 @@ class Dialog(Window.Dialog):
         self.__label_description = QtWidgets.QLabel()
         self.__label_description.setFont(QtGui.QFont("Segoe UI", 11))
         self.__label_description.setObjectName("label_description")
-        self.__label_description.setWordWrap(True)
+        # self.__label_description.setWordWrap(True)
         self.__label_description.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
         self.__label_description.hide()

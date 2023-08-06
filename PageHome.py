@@ -178,132 +178,115 @@ class PageHome(QtWidgets.QWidget):
 
     def set_style_sheet(self):
         # главная рамка
-        temp_data_theme = self.__data_theme["frame_main"]
-        temp_data_theme["path_background_image"] = os.path.join(os.path.split(self.__path_theme)[0], temp_data_theme["background_image"]).replace("\\", "/")
-
-        self.__frame_main.setStyleSheet("""
-        #frame_main {
-            background: %(background)s;
-            border-image: url(%(path_background_image)s);
+        self.__frame_main.setStyleSheet(f"""
+        #frame_main {{
+            background: {self.__data_theme["frame_main"]["background"]};
+            border-image: url({os.path.join(os.path.split(self.__path_theme)[0], self.__data_theme["frame_main"]["background_image"]).replace(chr(92), "/")});
             background-repeat: no-repeat; 
             background-position: center;
-        } """ % temp_data_theme)
+        }} """)
 
         # внутренняя рамка формы
-        self.__frame_internal.setStyleSheet("""
-        #frame_internal {
+        self.__frame_internal.setStyleSheet(f"""
+        #frame_internal {{
             border-radius: 14px;
-            background: %(background)s;
-        } """ % self.__data_theme["frame_main"]["frame_internal"])
+            background: {self.__data_theme["frame_main"]["frame_internal"]["background"]};
+        }} """)
 
         # метка заголовка
-        self.__label_header.setStyleSheet("""
-        #label_header { 
-            background: none; 
-            color: %(color)s
-        } """ % self.__data_theme["frame_main"]["frame_internal"]["label_header"])
+        self.__label_header.setStyleSheet(f"""
+        #label_header {{ 
+            background: transparent; 
+            color: {self.__data_theme["frame_main"]["frame_internal"]["label_header"]["color"]}
+        }} """)
 
         # список уроков
-        temp_data_theme = self.__data_theme["frame_main"]["frame_internal"]["list_view"]
-        temp_data_theme["scrollbar_background"] = temp_data_theme["scrollbar"]["background"]
-        temp_data_theme["scrollbar_background_handle"] = temp_data_theme["scrollbar"]["handle"]["background"]
-        temp_data_theme["item_selected_background"] = temp_data_theme["item"]["selected"]["background"]
-        temp_data_theme["item_selected_color"] = temp_data_theme["item"]["selected"]["color"]
-        temp_data_theme["item_hover_background"] = temp_data_theme["item"]["hover"]["background"]
-        temp_data_theme["item_hover_color"] = temp_data_theme["item"]["hover"]["color"]
-        
-        self.__list_view.setStyleSheet("""
-        #list_view {
+        self.__list_view.setStyleSheet(f"""
+        #list_view {{
             outline: 0;
             border: 0px;
             background: transparent;
-            color: %(color)s;
-        }
-        #list_view::item {
+            color: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["color"]};
+        }}
+        #list_view::item {{
             margin: 0px 14px 0px 0px;
-        }  
-        #list_view::item:selected {
+        }}
+        #list_view::item:selected {{
             border-radius: 6px;
-            background: %(item_selected_background)s;
-            color: %(item_selected_color)s;
-        }  
-        #list_view::item:hover:!selected {
+            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["item"]["selected"]["background"]};
+            color: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["item"]["selected"]["color"]};;
+        }}  
+        #list_view::item:hover:!selected {{
             border-radius: 6px;
-            background: %(item_hover_background)s;
-            color: %(item_hover_color)s;
-        }                        
+            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["item"]["hover"]["background"]};
+            color: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["item"]["hover"]["color"]};;
+        }}                        
        
-        QScrollBar:vertical {              
+        QScrollBar:vertical {{              
             border: transparent;
-            background: %(scrollbar_background)s;
+            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["background"]};
             width: 14px;
             border-radius: 6px;
             padding: 4px;
             margin: 0px 0px 0px 0px;
-        }
-        QScrollBar::handle:vertical {
-            background: %(scrollbar_background_handle)s;
+        }}
+        QScrollBar::handle:vertical {{
+            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["handle"]["background"]};
             border-radius: 3px;
             min-height: 30px;
-        }
-        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+        }}
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
             background: transparent;
             height: 0px;
-        }
-        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+        }}
+        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
             background: transparent;
-        } 
+        }} 
 
-        QScrollBar:horizontal {              
+        QScrollBar:horizontal {{              
             border: transparent;
-            background: %(scrollbar_background)s;
+            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["background"]};
             height: 14px;
             border-radius: 6px;
             padding: 4px;
             margin: 0px 0px 0px 0px;
-        }
-        QScrollBar::handle:horizontal {
-            background: %(scrollbar_background_handle)s;
+        }}
+        QScrollBar::handle:horizontal {{
+            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["handle"]["background"]};
             border-radius: 3px;
             min-width: 30px;
-        }
-        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+        }}
+        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
             background: transparent;
             width: 0px;
-        }
-        QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+        }}
+        QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
             background: transparent;
-        } """ % temp_data_theme)
+        }} """)
         
         # кнопка Выбрать в проводнике
-        self.__push_button_select_in_explorer.setStyleSheet("""
-        #push_button_select_in_explorer {
+        self.__push_button_select_in_explorer.setStyleSheet(f"""
+        #push_button_select_in_explorer {{
             outline: 0;                                         
             text-align: left;
             border-radius: 7px; 
             background: transparent; 
-            color: %(color)s;
-        } """ % self.__data_theme["frame_main"]["frame_internal"]["push_button_select_in_explorer"])
+            color: {self.__data_theme["frame_main"]["frame_internal"]["push_button_select_in_explorer"]["color"]};
+        }} """)
 
         # кнопка входа
-        temp_data_theme = self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]
-        temp_data_theme["background_pressed"] = temp_data_theme["pressed"]["background"]
-        temp_data_theme["color_pressed"] = temp_data_theme["pressed"]["color"]
-        temp_data_theme["background_disabled"] = temp_data_theme["disabled"]["background"]
-        temp_data_theme["color_disabled"] = temp_data_theme["disabled"]["color"]
-
-        self.__push_button_start_test.setStyleSheet("""
-        #push_button_start_test {
+        self.__push_button_start_test.setStyleSheet(f"""
+        #push_button_start_test {{
             outline: 0;
             border-radius: 7px; 
-            background: %(background)s; 
-            color: %(color)s;
-        } 
-        #push_button_start_test::pressed {
-            background: %(background_pressed)s; 
-            color: %(color_pressed)s;
-        }
-        #push_button_start_test::disabled {
-            background: %(background_disabled)s;
-            color: %(color_disabled)s;
-        } """ % temp_data_theme)
+            background: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["background"]}; 
+            color: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["color"]};
+        }} 
+        #push_button_start_test::pressed {{
+            background: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["pressed"]["background"]}; 
+            color: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["pressed"]["color"]};
+        }}
+        #push_button_start_test::disabled {{
+            background: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["disabled"]["background"]};
+            color: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["disabled"]["color"]};
+        }} """)

@@ -299,12 +299,16 @@
               "normal": {
                 "color_border": "#E8E8EF",
                 "background": "#F4F3F8",
-                "color": "#000000"
+                "color": "#000000",
+                "selection_background_color": "#3087EF",
+                "selection_color": "#FFFFFF"
               },
               "focus": {
                 "color_border": "#B6D9FD",
                 "background": "#FFFFFF",
-                "color": "rgb(0, 0, 0)"
+                "color": "rgb(0, 0, 0)",
+                "selection_background_color": "#3087EF",
+                "selection_color": "#FFFFFF"
               }
             },
             "label_promt": {
@@ -452,12 +456,16 @@
               "normal": {
                 "color_border": "#E8E8EF",
                 "background": "#F4F3F8",
-                "color": "#000000"
+                "color": "#000000",
+                "selection_background_color": "#3087EF",
+                "selection_color": "#FFFFFF"
               },
               "focus": {
                 "color_border": "#B6D9FD",
                 "background": "#FFFFFF",
-                "color": "rgb(0, 0, 0)"
+                "color": "rgb(0, 0, 0)",
+                "selection_background_color": "#3087EF",
+                "selection_color": "#FFFFFF"
               }
             }
           }
@@ -486,7 +494,7 @@
               }
             },
             "frame_legend": {
-              "background": "#FFFFFF",
+              "border_color": "#888888",
               "label_header": {
                 "color": "#000000"
               },
@@ -656,7 +664,7 @@
           "background": "rgb(255, 255, 255)",
           "color": "rgb(0, 0, 0)"
         },
-        "selected_item": {
+        "frame_mainted_item": {
           "background": "rgb(3, 123, 251)",
           "color": "rgb(255, 255, 255)"
         },
