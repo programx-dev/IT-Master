@@ -315,9 +315,9 @@ class Main(Window.Window):
     """Главный класс"""
 
     def __init__(self):
-        self.__text_info = """IT Master - это школьный предметный тренажёр по информатике, позволяющий изучить материал урока и закрепить полученные знания, выполнив тест\n
-Ведущий разрабочик - Смирнов Н. А., 9 класс, ГБОУ школа №1370\n
-Приложение написано на языке программирования Python"""
+        self.__text_info = """\
+Предметный тренажер по информатике, позволяющий изучить метериал и закрепить полученные знания, выполнив тест\n
+Приложение написано на языке программирование Python, интерфейс на PyQt6"""
         self.__path_settings = r"settings.json"
         self.__test_started = False
         self.__current_page = None
@@ -380,6 +380,7 @@ class Main(Window.Window):
 
         # присоединение слотов к сигналам
         self.__toolbar.tool_button_home_page_cliced.connect(self.__open_home_page)
+        self.__toolbar.tool_button_info_cliced.connect(self.__open_dialog_about)
 
         # выбрать кнопку Домашняя страница
         self.__toolbar.tool_button_home_page.press_tool_button()
@@ -624,6 +625,14 @@ class Main(Window.Window):
             data_theme = self.__data_theme["dialog_table_results_empty"], 
             parent = self
         )
+
+    def __open_dialog_about(self):
+        dialog = Dialogs.DialogAbout(QtGui.QPixmap(self.__path_image_logo), self.__data_theme["dialog"])
+        dialog.setWindowTitle("О программе")
+        dialog.setWindowIcon(QtGui.QIcon(self.__path_image_logo))
+        dialog.set_version("версия 3.8.2 х64")
+        dialog.set_text_about(self.__text_info)
+        dialog.run_modal()
 
     def close_window(self):
         if self.__test_started:

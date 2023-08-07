@@ -100,7 +100,7 @@ class Dialog(Window.Dialog):
         if self.__event_loop:
             self.__event_loop.exit()
         
-    def run_modal(self):
+    def run_modal(self) -> ButtonRole | typing.Any:
         self.__event_loop = QtCore.QEventLoop()
         self.show()
         self.__event_loop.exec()
@@ -189,6 +189,107 @@ class Dialog(Window.Dialog):
             background: transparent;
             color: {self.__data_theme["frame_widgets"]["frame_main"]["label_description"]["color"]};
         }} """)
+
+class DialogAbout(Window.Dialog):
+    """Диалоговое окно О программе"""
+    
+    def __init__(self, pixmap: QtGui.QPixmap, data_theme: dict):
+        self.__data_theme = data_theme
+        self.__pixmap = pixmap
+
+        super().__init__(data_theme = self.__data_theme)
+        super().set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint)
+        super().setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
+        super().set_resizeable(False)
+
+        # главная рамка
+        self.__frame_main = QtWidgets.QFrame()
+        self.__frame_main.setObjectName("frame_main")
+        self.__frame_main.setFixedWidth(320)
+
+        self.add_widget(self.__frame_main)
+
+        # главный макет
+        self.__vbox_layout_main = QtWidgets.QVBoxLayout()
+        self.__vbox_layout_main.setSpacing(0)
+        self.__vbox_layout_main.setContentsMargins(14, 14, 14, 14)
+
+        self.__frame_main.setLayout(self.__vbox_layout_main)
+
+        # макет иконки и названия программы, версии
+        self.__hbox_layout_icon_info = QtWidgets.QHBoxLayout()
+        self.__hbox_layout_icon_info.setSpacing(0)
+        self.__hbox_layout_icon_info.setContentsMargins(0, 0, 0, 0)
+
+        self.__vbox_layout_main.addLayout(self.__hbox_layout_icon_info)
+
+        # метка с иконкой
+        self.__label_icon = QtWidgets.QLabel()
+        self.__label_icon.setObjectName("label_icon")
+        self.__label_icon.setFixedSize(50, 50)
+
+        self.__label_icon.setPixmap(self.__pixmap.scaled(50, 50, transformMode = QtCore.Qt.TransformationMode.SmoothTransformation))
+
+        self.__hbox_layout_icon_info.addWidget(self.__label_icon)
+
+        # макет названия программы и версии
+        self.__vbox_layout_info = QtWidgets.QVBoxLayout()
+        self.__vbox_layout_info.setSpacing(0)
+        self.__vbox_layout_info.setContentsMargins(0, 0, 0, 0)
+
+        self.__hbox_layout_icon_info.addLayout(self.__vbox_layout_info)
+
+        # метка с названием программы
+        self.__label_name = QtWidgets.QLabel()
+        self.__label_name.setObjectName("label_name")
+        self.__label_name.setText("IT Master")
+        self.__label_name.setFont(QtGui.QFont("Segoe UI", 13))
+        print(self.__label_name.alignment())
+        self.__label_name.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
+
+        self.__vbox_layout_info.addWidget(self.__label_name)
+
+        # метка версии
+        self.__label_version = QtWidgets.QLabel()
+        self.__label_version.setObjectName("label_version")
+        self.__label_version.setFont(QtGui.QFont("Segoe UI", 11))
+        self.__label_version.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
+
+        self.__vbox_layout_info.addWidget(self.__label_version)
+
+        # метка о программе
+        self.__label_about  = QtWidgets.QLabel()
+        self.__label_about.setObjectName("label_about")
+        self.__label_about.setFont(QtGui.QFont("Segoe UI", 11))
+        self.__label_about.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.__label_about.setWordWrap(True)
+
+        self.__vbox_layout_main.addWidget(self.__label_about)
+
+        # кнопка Ок
+        self.__push_button_accept = QtWidgets.QPushButton()
+        self.__push_button_accept.setObjectName("push_button_accept")
+        self.__push_button_accept.setText("ОК")
+        self.__push_button_accept.setFont(QtGui.QFont("Segoe UI", 11))
+        self.__push_button_accept.setFixedHeight(28)
+        self.__push_button_accept.setMinimumWidth(75)
+        self.__push_button_accept.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+        self.__push_button_accept.clicked.connect(self.close_window)
+
+        self.__vbox_layout_main.addWidget(self.__push_button_accept)
+        self.__vbox_layout_main.setAlignment(self.__push_button_accept, QtCore.Qt.AlignmentFlag.AlignRight)
+
+    def set_version(self, version: str):
+        self.__label_version.setText(version)
+
+    def set_text_about(self, text_about: str):
+        self.__label_about.setText(text_about)
+
+    def run_modal(self):
+        self.__event_loop = QtCore.QEventLoop()
+        self.show()
+        self.__event_loop.exec()
+        self.close()
 
 class DialogTableResultsEmpty(QtWidgets.QDialog):
     push_button_clicked_ok = QtCore.pyqtSignal()
