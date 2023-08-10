@@ -705,7 +705,7 @@ class PushButtonImage(QtWidgets.QPushButton):
         self.__push_buttton_save_image.hide()
         self.__grid_layout_push_button_save.addWidget(self.__push_buttton_save_image, 0, 1)
         
-        self.set_style_sheet()
+        # self.set_style_sheet()
 
     def __push_button_image_press(self):
         self.push_button_image_clicked.emit()
@@ -773,6 +773,7 @@ class PageQuestion(QtWidgets.QWidget):
 
     def __init__(self, number: int, path_course: str, element: str, answer: str | list | None, started_passing: bool, path_images: str, data_theme: dict):
         super().__init__()
+        self.setObjectName("page_question")
 
         self.__number = number
         self.__path_course = path_course
@@ -922,7 +923,7 @@ class PageQuestion(QtWidgets.QWidget):
 
         self.__vbox_layout_internal.addStretch(1)
         
-        self.set_style_sheet()
+        # self.set_style_sheet()
 
     def answer(self) -> str | list | None:
         return self.__answer
@@ -986,6 +987,7 @@ class PageTesting(QtWidgets.QWidget):
 
     def __init__(self, path_course: str, path_images: str, data_theme: dict):
         super().__init__()
+        self.setObjectName("page_testing")
 
         self.__data_theme = data_theme
         self.__path_images = path_images
@@ -1127,7 +1129,7 @@ class PageTesting(QtWidgets.QWidget):
             # открыть первую страницу теста
             self.__list_push_button_questions[self.__current_number_question].push_button_navigation_press()
 
-        self.set_style_sheet()
+        # self.set_style_sheet()
 
     def __open_lesson(self):
         # создание и упаковка новой страницы для просмотра урока в формате .pdf
@@ -1254,7 +1256,7 @@ class PageTesting(QtWidgets.QWidget):
             border: none;
         }}
         
-        QScrollBar:vertical {{              
+        #scroll_area_page_test QScrollBar:vertical {{              
             border: transparent;
             background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["background"]};
             width: 14px;
@@ -1262,20 +1264,20 @@ class PageTesting(QtWidgets.QWidget):
             padding: 4px;
             margin: 0px 0px 0px 0px;
         }}
-        QScrollBar::handle:vertical {{
+        #scroll_area_page_test QScrollBar::handle:vertical {{
             background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["handle"]["background"]};
             border-radius: 3px;
             min-height: 30px;
         }}
-        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+        #scroll_area_page_test QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
             background: transparent;
             height: 0px;
         }}
-        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
+        #scroll_area_page_test QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
             background: transparent;
         }} 
 
-        QScrollBar:horizontal {{              
+        #scroll_area_page_test QScrollBar:horizontal {{              
             border: transparent;
             background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["background"]};
             height: 14px;
@@ -1283,16 +1285,16 @@ class PageTesting(QtWidgets.QWidget):
             padding: 4px;
             margin: 0px 0px 0px 0px;
         }}
-        QScrollBar::handle:horizontal {{
+        #scroll_area_page_test QScrollBar::handle:horizontal {{
             background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["handle"]["background"]};
             border-radius: 3px;
             min-width: 30px;
         }}
-        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
+        #scroll_area_page_test QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
             background: transparent;
             width: 0px;
         }}
-        QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
+        #scroll_area_page_test QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
             background: transparent;
         }} """)
 
@@ -1304,11 +1306,11 @@ class PageTesting(QtWidgets.QWidget):
             margin: 0px, 0px, 0px, 0px;
         }} 
 
-        QScrollBar:vertical {{
+        #scroll_area_push_button_questions QScrollBar:vertical {{
             width: 0px;
         }}
         
-        QScrollBar:horizontal {{              
+        #scroll_area_push_button_questions QScrollBar:horizontal {{              
             border: transparent;
             background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["scrollbar"]["background"]};
             height: 14px;
@@ -1316,19 +1318,20 @@ class PageTesting(QtWidgets.QWidget):
             padding: 4px;
             margin: 0px 0px 0px 0px;
         }}
-        QScrollBar::handle:horizontal {{
+        #scroll_area_push_button_questions QScrollBar::handle:horizontal {{
             background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["scrollbar"]["handle"]["background"]};
             border-radius: 3px;
             min-width: 30px;
         }}
-        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
+        #scroll_area_push_button_questions QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
             background: transparent;
             width: 0px;
         }}
-        QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
+        #scroll_area_push_button_questions QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
             background: transparent;
         }} """)
 
+        # рамка кнопок навигации по вопросам
         self.__frame_push_button_questions.setStyleSheet(f"""
         #frame_push_button_questions {{
             background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["frame_push_button_questions"]["background"]};

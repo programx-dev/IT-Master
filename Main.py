@@ -385,6 +385,8 @@ class Main(Window.Window):
         # выбрать кнопку Домашняя страница
         self.__toolbar.tool_button_home_page.press_tool_button()
 
+        self.set_style_sheet()
+
     def __open_home_page(self):
         if type(self.__current_page) == PageHome.PageHome:
             return
@@ -649,6 +651,267 @@ class Main(Window.Window):
                 self.__toolbar.tool_button_test.set_selected()
                 return  
         super().close_window()
+
+    def set_style_sheet(self):
+        self.setStyleSheet(f"""
+        /* PageHome */
+            /* главная рамка */
+            #page_home #frame_main {{
+                background: {self.__data_theme["stack_home_page"]["frame_main"]["background"]};
+                border-image: url({os.path.join(os.path.split(self.__path_theme)[0], self.__data_theme["stack_home_page"]["frame_main"]["background_image"]).replace(chr(92), "/")});
+                background-repeat: no-repeat; 
+                background-position: center;
+            }}
+
+            /* внутренняя рамка формы */
+            #page_home #frame_internal {{
+                border-radius: 14px;
+                background: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["background"]};
+            }}
+
+            /* метка заголовка */
+            #page_home #label_header {{ 
+                background: transparent; 
+                color: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["label_header"]["color"]}
+            }} 
+
+            /* список уроков */
+            #page_home #list_view {{
+                outline: 0;
+                border: 0px;
+                background: transparent;
+                color: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["list_view"]["color"]};
+            }}
+            #page_home #list_view::item {{
+                margin: 0px 14px 0px 0px;
+            }}
+            #page_home #list_view::item:selected {{
+                border-radius: 6px;
+                background: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["list_view"]["item"]["selected"]["background"]};
+                color: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["list_view"]["item"]["selected"]["color"]};;
+            }}  
+            #page_home #list_view::item:hover:!selected {{
+                border-radius: 6px;
+                background: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["list_view"]["item"]["hover"]["background"]};
+                color: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["list_view"]["item"]["hover"]["color"]};;
+            }}                        
+        
+            #page_home #list_view QScrollBar:vertical {{              
+                border: transparent;
+                background: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["background"]};
+                width: 14px;
+                border-radius: 6px;
+                padding: 4px;
+                margin: 0px 0px 0px 0px;
+            }}
+            #page_home #list_view QScrollBar::handle:vertical {{
+                background: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["handle"]["background"]};
+                border-radius: 3px;
+                min-height: 30px;
+            }}
+            #page_home #list_view QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+                background: transparent;
+                height: 0px;
+            }}
+            #page_home #list_view QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
+                background: transparent;
+            }} 
+
+            #page_home #list_view QScrollBar:horizontal {{              
+                border: transparent;
+                background: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["background"]};
+                height: 14px;
+                border-radius: 6px;
+                padding: 4px;
+                margin: 0px 0px 0px 0px;
+            }}
+            #page_home #list_view QScrollBar::handle:horizontal {{
+                background: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["handle"]["background"]};
+                border-radius: 3px;
+                min-width: 30px;
+            }}
+            #page_home #list_view QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
+                background: transparent;
+                width: 0px;
+            }}
+            #page_home #list_view QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
+                background: transparent;
+            }}
+
+            /* кнопка Выбрать в проводнике */
+            #page_home #push_button_select_in_explorer {{
+                outline: 0;                                         
+                text-align: left;
+                border-radius: 7px; 
+                background: transparent; 
+                color: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["push_button_select_in_explorer"]["color"]};
+            }} 
+
+            /* кнопка входа */
+            #page_home #push_button_start_test {{
+            outline: 0;
+                border-radius: 7px; 
+                background: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["push_button_start_test"]["background"]}; 
+                color: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["push_button_start_test"]["color"]};
+            }} 
+            #page_home #push_button_start_test::pressed {{
+                background: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["push_button_start_test"]["pressed"]["background"]}; 
+                color: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["push_button_start_test"]["pressed"]["color"]};
+            }}
+            #page_home #push_button_start_test::disabled {{
+                background: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["push_button_start_test"]["disabled"]["background"]};
+                color: {self.__data_theme["stack_home_page"]["frame_main"]["frame_internal"]["push_button_start_test"]["disabled"]["color"]};
+            }}
+
+        /* PageTesting */
+            /* главная рамка */
+            #page_testing #frame_main {{
+                background: {self.__data_theme["page_testing"]["frame_main"]["background"]};
+            }} 
+
+            /* панель инструментов и навигации */
+            #page_testing #frame_tools {{               
+                border-top-left-radius: 0px;
+                border-top-right-radius: 0px;
+                background: {self.__data_theme["page_testing"]["frame_main"]["frame_tools"]["background"]};
+            }} 
+
+            /* прокручиваемая область для станица теста */
+            #page_testing #scroll_area_page_test {{
+                background: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["background"]};
+                border: none;
+            }}
+            
+            #page_testing #scroll_area_page_test QScrollBar:vertical {{              
+                border: transparent;
+                background: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["scrollbar"]["background"]};
+                width: 14px;
+                border-radius: 6px;
+                padding: 4px;
+                margin: 0px 0px 0px 0px;
+            }}
+            #page_testing #scroll_area_page_test QScrollBar::handle:vertical {{
+                background: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["scrollbar"]["handle"]["background"]};
+                border-radius: 3px;
+                min-height: 30px;
+            }}
+            #page_testing #scroll_area_page_test QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+                background: transparent;
+                height: 0px;
+            }}
+            #page_testing #scroll_area_page_test QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
+                background: transparent;
+            }} 
+
+            #page_testing #scroll_area_page_test QScrollBar:horizontal {{              
+                border: transparent;
+                background: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["scrollbar"]["background"]};
+                height: 14px;
+                border-radius: 6px;
+                padding: 4px;
+                margin: 0px 0px 0px 0px;
+            }}
+            #page_testing #scroll_area_page_test QScrollBar::handle:horizontal {{
+                background: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["scrollbar"]["handle"]["background"]};
+                border-radius: 3px;
+                min-width: 30px;
+            }}
+            #page_testing #scroll_area_page_test QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
+                background: transparent;
+                width: 0px;
+            }}
+            #page_testing #scroll_area_page_test QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
+                background: transparent;
+            }} 
+
+            /* прокручиваемая область для кнопок навигации по вопросам */
+            #page_testing #scroll_area_push_button_questions {{
+                background: {self.__data_theme["page_testing"]["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["background"]};
+                border: none;
+                margin: 0px, 0px, 0px, 0px;
+            }} 
+
+            #page_testing #scroll_area_push_button_questions QScrollBar:vertical {{
+                width: 0px;
+            }}
+            
+            #page_testing #scroll_area_push_button_questions QScrollBar:horizontal {{              
+                border: transparent;
+                background: {self.__data_theme["page_testing"]["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["scrollbar"]["background"]};
+                height: 14px;
+                border-radius: 6px;
+                padding: 4px;
+                margin: 0px 0px 0px 0px;
+            }}
+            #page_testing #scroll_area_push_button_questions QScrollBar::handle:horizontal {{
+                background: {self.__data_theme["page_testing"]["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["scrollbar"]["handle"]["background"]};
+                border-radius: 3px;
+                min-width: 30px;
+            }}
+            #page_testing #scroll_area_push_button_questions QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
+                background: transparent;
+                width: 0px;
+            }}
+            #page_testing #scroll_area_push_button_questions QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
+                background: transparent;
+            }} 
+
+            /* рамка кнопок навигации по вопросам */
+            #page_testing #frame_push_button_questions {{
+                background: {self.__data_theme["page_testing"]["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["frame_push_button_questions"]["background"]};
+                margin: 0px, 17px, 0px, 0px;
+            }}
+
+            /* кнопка завершить тест */
+            #page_testing #push_button_finish {{
+                outline: 0;
+                padding-left: 15px;
+                padding-right: 15px;
+                border-radius: 15px;
+                background: {self.__data_theme["page_testing"]["frame_main"]["frame_tools"]["push_button_finish"]["background"]}; 
+                color: {self.__data_theme["page_testing"]["frame_main"]["frame_tools"]["push_button_finish"]["color"]};
+            }} 
+
+        /* PageTesting PageQuestion */
+            /* главная рамка */
+            #page_testing #page_question #frame_main {{
+                background: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["page_question"]["frame_main"]["background"]};
+            }} 
+
+            /* метка номера вопроса */
+            #page_testing #page_question #label_numder_question {{
+                color: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["page_question"]["frame_main"]["label_numder_question"]["color"]};   
+            }} 
+
+            /* метка вопроса */
+            #page_testing #page_question #label_question {{
+                color: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["page_question"]["frame_main"]["label_question"]["color"]};
+                background: transparent;
+                selection-color: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["page_question"]["frame_main"]["label_question"]["selection_color"]};
+                selection-background-color: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["page_question"]["frame_main"]["label_question"]["selection_background_color"]};
+            }} 
+
+            /* метка типа задания */
+            #page_testing #page_question #label_type_question {{ 
+                color: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["page_question"]["frame_main"]["label_type_question"]["color"]};
+            }}
+
+        /* PageTesting PageQuestion PushButtonImage */
+            #page_testing #page_question #push_button_image {{ 
+                outline: 0;
+                border-radius: 14px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: {self.__data_theme["page_testing"]["frame_main"]["scroll_area_page_test"]["page_question"]["frame_main"]["push_button_image"]["border_color"]};
+                background: transparent; 
+            }} 
+
+            #page_testing #page_question #push_button_image #push_buttton_save_image {{ 
+                outline: 0;
+                border-radius: 14px; 
+                background: transparent; 
+            }} 
+        """)
 
 if __name__ == "__main__":
     # https://doc.qt.io/qt-5/highdpi.html

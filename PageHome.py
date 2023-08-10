@@ -19,6 +19,7 @@ class PageHome(QtWidgets.QWidget):
 
     def __init__(self, path_courses: str, path_images: str, path_theme: str, data_theme: dict):
         super().__init__()
+        self.setObjectName("page_home")
 
         self.__path_courses = path_courses
         self.__path_images = path_images
@@ -127,7 +128,7 @@ class PageHome(QtWidgets.QWidget):
 
         self.__vbox_layout_internal.addWidget(self.__push_button_start_test)
 
-        self.set_style_sheet()
+        # self.set_style_sheet()
 
     def __list_view_row_changed(self, current: QtCore.QModelIndex, previous: QtCore.QModelIndex):
         if current.isValid():
@@ -222,7 +223,7 @@ class PageHome(QtWidgets.QWidget):
             color: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["item"]["hover"]["color"]};;
         }}                        
        
-        QScrollBar:vertical {{              
+        #list_view QScrollBar:vertical {{              
             border: transparent;
             background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["background"]};
             width: 14px;
@@ -230,20 +231,20 @@ class PageHome(QtWidgets.QWidget):
             padding: 4px;
             margin: 0px 0px 0px 0px;
         }}
-        QScrollBar::handle:vertical {{
+        #list_view QScrollBar::handle:vertical {{
             background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["handle"]["background"]};
             border-radius: 3px;
             min-height: 30px;
         }}
-        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+        #list_view QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
             background: transparent;
             height: 0px;
         }}
-        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
+        #list_view QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
             background: transparent;
         }} 
 
-        QScrollBar:horizontal {{              
+        #list_view QScrollBar:horizontal {{              
             border: transparent;
             background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["background"]};
             height: 14px;
@@ -251,16 +252,16 @@ class PageHome(QtWidgets.QWidget):
             padding: 4px;
             margin: 0px 0px 0px 0px;
         }}
-        QScrollBar::handle:horizontal {{
+        #list_view QScrollBar::handle:horizontal {{
             background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["handle"]["background"]};
             border-radius: 3px;
             min-width: 30px;
         }}
-        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
+        #list_view QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
             background: transparent;
             width: 0px;
         }}
-        QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
+        #list_view QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
             background: transparent;
         }} """)
         
