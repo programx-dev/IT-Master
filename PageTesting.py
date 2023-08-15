@@ -74,11 +74,10 @@ class PushButtonQuestion(PushButtonNavigation):
     """Класс для кнопок навигации по вопросам на панели инструменов"""
     push_button_question_clicked = QtCore.pyqtSignal(int)
     
-    def __init__(self, number: int, data_theme: dict):
+    def __init__(self, number: int):
         super().__init__()
 
         self.__number = number
-        self.__data_theme = data_theme
         self.__answered = False
 
         self.setObjectName("push_button_question")
@@ -86,8 +85,6 @@ class PushButtonQuestion(PushButtonNavigation):
         self.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_navigation_clicked.connect(self.__push_button_question_press)
         self.setProperty("answered", self.answered())
-
-        self.set_style_sheet()
 
     def __push_button_question_press(self):
         self.push_button_question_clicked.emit(self.__number)
@@ -102,79 +99,22 @@ class PushButtonQuestion(PushButtonNavigation):
     def answered(self) -> bool:
         return self.__answered
 
-    def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #push_button_question[current="true"][answered="true"] {{
-            outline: 0;
-            border: 3px solid;
-            border-radius: 25px;
-            background: {self.__data_theme["current"]["answered"]["background"]};
-            border-color: {self.__data_theme["current"]["answered"]["color_border"]};
-            color: {self.__data_theme["current"]["answered"]["color"]};
-        }} 
-        #push_button_question[current="true"][answered="false"] {{
-            outline: 0;
-            border: 3px solid;
-            border-radius: 25px;
-            background: {self.__data_theme["current"]["not_answered"]["background"]};
-            border-color: {self.__data_theme["current"]["not_answered"]["color_border"]};
-            color: {self.__data_theme["current"]["not_answered"]["color"]};
-        }} 
-        #push_button_question[current="false"][answered="true"] {{
-            outline: 0;
-            border: 3px solid;
-            border-radius: 25px;
-            background: {self.__data_theme["not_current"]["answered"]["background"]};
-            border-color: {self.__data_theme["not_current"]["answered"]["color_border"]};
-            color: {self.__data_theme["not_current"]["answered"]["color"]};
-        }} 
-        #push_button_question[current="false"][answered="false"] {{
-            outline: 0;
-            border: 3px solid;
-            border-radius: 25px;
-            background: {self.__data_theme["not_current"]["not_answered"]["background"]};
-            border-color: {self.__data_theme["not_current"]["not_answered"]["color_border"]};
-            color: {self.__data_theme["not_current"]["not_answered"]["color"]};
-        }} """)
-
 class PushButtonLesson(PushButtonNavigation):
     """Класс для кнопки теоретической части на панели инструменов"""
     push_button_lesson_clicked = QtCore.pyqtSignal()
     
-    def __init__(self, path_images: str, data_theme: dict):
+    def __init__(self, path_images: str):
         super().__init__()
 
         self.__path_images = path_images
-        self.__data_theme = data_theme
 
         self.setObjectName("push_button_lesson")
         self.setIcon(QtGui.QIcon(os.path.join(self.__path_images, r"lesson.png")))
         self.setIconSize(QtCore.QSize(35, 35))
         self.push_button_navigation_clicked.connect(self.__push_button_lesson_press)
 
-        self.set_style_sheet()
-
     def __push_button_lesson_press(self):
         self.push_button_lesson_clicked.emit()
-
-    def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #push_button_lesson[current="true"] {{
-            outline: 0;
-            border: 3px solid;
-            border-radius: 10px;
-            background: {self.__data_theme["current"]["background"]};
-            border-color: {self.__data_theme["current"]["color_border"]};
-            color: {self.__data_theme["current"]["color"]};
-        }} 
-        #push_button_lesson[current="false"] {{
-            outline: 0;
-            border: 3px solid;
-            border-radius: 10px;
-            background: {self.__data_theme["not_current"]["background"]};
-            border-color: {self.__data_theme["not_current"]["color_border"]};
-            color: {self.__data_theme["not_current"]["color"]};
-        }} """)
 
 class LessonViewer(QtWebEngineWidgets.QWebEngineView):
     """Класс просмотра уроков в формате .pdf"""
@@ -192,14 +132,13 @@ class LessonViewer(QtWebEngineWidgets.QWebEngineView):
 class LabelPromt(QtWidgets.QFrame):
     """Метка с подсказкой"""
     
-    def __init__(self, promt: str, path_image: str, data_theme: dict):
+    def __init__(self, promt: str, path_image: str):
         super().__init__()
 
         self.setObjectName("label_promt")
 
         self.__promt = promt
         self.__path_image = path_image
-        self.__data_theme = data_theme
 
         self.__pixmap = QtGui.QPixmap(self.__path_image).scaled(18, 18, transformMode = QtCore.Qt.TransformationMode.SmoothTransformation)
 
@@ -238,36 +177,6 @@ class LabelPromt(QtWidgets.QFrame):
 
         self.__hbox_layout_main.addWidget(self.__label_text)
 
-        self.set_style_sheet()
-
-    def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #label_promt {{
-            background: {self.__data_theme["background"]};
-            border-radius: 3px;
-        }} """)
-
-        # метка с полоской
-        self.__label_line.setStyleSheet(f"""
-        #label_line {{
-            background:{self.__data_theme["line"]["background"]};
-            border-top-left-radius: 3px;
-            border-bottom-left-radius: 3px;
-        }} """)
-
-        # метка с иконкой
-        self.__label_icon.setStyleSheet(f"""
-        #label_icon {{
-            background: transparent;
-        }} """)
-
-        # метка с текстом
-        self.__label_text.setStyleSheet(f"""
-        #label_text {{
-            background: transparent;
-            color: {self.__data_theme["color"]};
-        }} """)
-
 class LabelClickable(QtWidgets.QLabel):
     """Класс для кликабельной метки"""
     clicked = QtCore.pyqtSignal(QtGui.QMouseEvent)
@@ -282,12 +191,12 @@ class CheckboxAnswer(QtWidgets.QWidget):
     """Класс для чекбоксов для ответов с возможностью переноса слов"""
     checkbox_answer_state_changed = QtCore.pyqtSignal(bool)
 
-    def __init__(self, text: str, path_images: str, data_theme: dict):
+    def __init__(self, text: str, path_images: str):
         super().__init__()
+        self.setObjectName("checkbox_answer")
         self.setFixedHeight(32)
 
         self.__text = text
-        self.__data_theme = data_theme
         self.__path_images = path_images
         self.__checked = False
 
@@ -325,8 +234,6 @@ class CheckboxAnswer(QtWidgets.QWidget):
         # self.__label_text.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
 
         self.__hbox_layout_main.addWidget(self.__label_text)
-
-        self.set_style_sheet()
 
         self.set_checked(checked = False)
 
@@ -389,45 +296,16 @@ class CheckboxAnswer(QtWidgets.QWidget):
 
         self.checkbox_answer_state_changed.emit(checked)
 
-    def set_style_sheet(self):
-        # кнопка с флажком
-        self.__push_button_flag.setStyleSheet(f"""
-        #push_button_flag {{
-            padding-left: 2px;
-            border-top-left-radius: 6px;
-            border-bottom-left-radius: 6px;
-            outline: 0;
-            border: none;
-            background: transparent;
-        }}
-        #push_button_flag[hover="true"] {{
-            background: {self.__data_theme["hover"]["background"]};
-        }} """)
-
-        # кликабельная метка c текстом
-        self.__label_text.setStyleSheet(f"""
-        #label_text {{
-            padding-left: 5px;
-            border-top-right-radius: 6px;
-            border-bottom-right-radius: 6px;
-            background: transparent;
-            color: #000000;
-        }}
-        #label_text[hover="true"] {{
-            color: {self.__data_theme["hover"]["color"]};
-            background: {self.__data_theme["hover"]["background"]};
-        }} """)
-
-class RadiobuttonAnswer(QtWidgets.QWidget):
+class RadioButtonAnswer(QtWidgets.QWidget):
     """Класс для радиокнопок для ответов с возможностью переноса слов"""
     radio_button_answer_toggled = QtCore.pyqtSignal(bool)
 
-    def __init__(self, text: str, path_images: str, data_theme: dict):
+    def __init__(self, text: str, path_images: str):
         super().__init__()
+        self.setObjectName("radio_button_answer")
         self.setFixedHeight(32)
 
         self.__text = text
-        self.__data_theme = data_theme
         self.__path_images = path_images
         self.__checked = False
 
@@ -465,8 +343,6 @@ class RadiobuttonAnswer(QtWidgets.QWidget):
         # self.__label_text.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
 
         self.__hbox_layout_main.addWidget(self.__label_text)
-
-        self.set_style_sheet()
 
         self.set_checked(checked = False)
 
@@ -526,38 +402,9 @@ class RadiobuttonAnswer(QtWidgets.QWidget):
 
         self.radio_button_answer_toggled.emit(checked)
 
-    def set_style_sheet(self):
-        # кнопка с флажком
-        self.__push_button_flag.setStyleSheet(f"""
-        #push_button_flag {{
-            padding-left: 2px;
-            border-top-left-radius: 6px;
-            border-bottom-left-radius: 6px;
-            outline: 0;
-            border: none;
-            background: transparent;
-        }}
-        #push_button_flag[hover="true"] {{
-            background: {self.__data_theme["hover"]["background"]};
-        }} """)
-
-        # кликабельная метка c текстом
-        self.__label_text.setStyleSheet(f"""
-        #label_text {{
-            padding-left: 5px;
-            border-top-right-radius: 6px;
-            border-bottom-right-radius: 6px;
-            background: transparent;
-            color: {self.__data_theme["normal"]["color"]};
-        }}
-        #label_text[hover="true"] {{
-            color: {self.__data_theme["hover"]["color"]};
-            background: {self.__data_theme["hover"]["background"]};
-        }} """)
-
 class GroupRadiobuttonsAnswer(QtCore.QObject):
     """Класс для группирования RadiobuttonAnswer"""
-    radio_button_checked = QtCore.pyqtSignal(RadiobuttonAnswer)
+    radio_button_checked = QtCore.pyqtSignal(RadioButtonAnswer)
     
     def __init__(self):
         super().__init__()
@@ -575,7 +422,7 @@ class GroupRadiobuttonsAnswer(QtCore.QObject):
 
             self.radio_button_checked.emit(self.__checked_radio_button)
 
-    def add_radio_button_answer(self, radio_button: RadiobuttonAnswer):
+    def add_radio_button_answer(self, radio_button: RadioButtonAnswer):
         radio_button.radio_button_answer_toggled.connect(self.__toggle_radio_button_answer)
         self.__list_radio_buttons.append(radio_button)
 
@@ -583,10 +430,8 @@ class LineEditAnswer(QtWidgets.QLineEdit):
     """Класс для строки ввода ответов"""
     line_edit_answer_text_changed = QtCore.pyqtSignal()
 
-    def __init__(self, data_theme: dict):
+    def __init__(self):
         super().__init__()
-
-        self.__data_theme = data_theme
 
         # self.__enabled = True
 
@@ -595,8 +440,6 @@ class LineEditAnswer(QtWidgets.QLineEdit):
         self.textChanged.connect(self.__line_edit_text_changed)
         self.setFont(QtGui.QFont("Segoe UI", 14))
         self.setFixedHeight(42)
-
-        self.set_style_sheet()
 
     def is_enabled(self) -> bool:
         # return self.__enabled
@@ -613,30 +456,11 @@ class LineEditAnswer(QtWidgets.QLineEdit):
     def __line_edit_text_changed(self):
         self.line_edit_answer_text_changed.emit()
 
-    def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #line_edit_answer {{
-            border-radius: 7px; 
-            border: 2px solid; 
-            selection-background-color: {self.__data_theme["normal"]["selection_background_color"]};
-            selection-color: {self.__data_theme["normal"]["selection_color"]};
-            border-color: {self.__data_theme["normal"]["color_border"]};
-            background: {self.__data_theme["normal"]["background"]}; 
-            color: {self.__data_theme["normal"]["color"]};
-        }} 
-        #line_edit_answer:focus {{
-        selection-color: {self.__data_theme["focus"]["selection_color"]};
-            selection-background-color: {self.__data_theme["focus"]["selection_background_color"]};
-            border-color: {self.__data_theme["focus"]["color_border"]};
-            background: {self.__data_theme["focus"]["background"]}; 
-            color: {self.__data_theme["focus"]["color"]};
-        }} """)
-
 class PushButtonImage(QtWidgets.QPushButton):
     """Класс для кнопки с изображением"""
     push_button_image_clicked = QtCore.pyqtSignal()
     
-    def __init__(self, path_pixmap: str, path_images: str, data_theme: dict):
+    def __init__(self, path_pixmap: str, path_images: str):
         super().__init__()
 
         self.setObjectName("push_button_image")
@@ -646,7 +470,6 @@ class PushButtonImage(QtWidgets.QPushButton):
 
         self.__path_pixmap = path_pixmap
         self.__path_images = path_images
-        self.__data_theme = data_theme
 
         self.__min_size = QtCore.QSize(93, 93)
         self.__max_size = QtCore.QSize(393, 393)
@@ -705,8 +528,6 @@ class PushButtonImage(QtWidgets.QPushButton):
         self.__push_buttton_save_image.hide()
         self.__grid_layout_push_button_save.addWidget(self.__push_buttton_save_image, 0, 1)
         
-        # self.set_style_sheet()
-
     def __push_button_image_press(self):
         self.push_button_image_clicked.emit()
 
@@ -749,29 +570,11 @@ class PushButtonImage(QtWidgets.QPushButton):
                 msg.setInformativeText(str(error))
                 msg.exec()
        
-    def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #push_button_image {{
-            outline: 0;
-            border-radius: 14px;
-            border-style: solid;
-            border-width: 1px;
-            border-color: {self.__data_theme["border_color"]};
-            background: transparent; 
-        }} """)
-
-        self.__push_buttton_save_image.setStyleSheet(f"""
-        #push_buttton_save_image {{
-            outline: 0;
-            border-radius: 14px; 
-            background: transparent; 
-        }} """)
-
 class PageQuestion(QtWidgets.QWidget):
     """Класс для страницы с вопросом"""
     answer_changed = QtCore.pyqtSignal(int, bool)
 
-    def __init__(self, number: int, path_course: str, element: str, answer: str | list | None, started_passing: bool, path_images: str, data_theme: dict):
+    def __init__(self, number: int, path_course: str, element: str, answer: str | list | None, started_passing: bool, path_images: str):
         super().__init__()
         self.setObjectName("page_question")
 
@@ -782,7 +585,6 @@ class PageQuestion(QtWidgets.QWidget):
         self.__started_passing = started_passing
         self.__path_images = path_images
         self.__path_pixmap = None
-        self.__data_theme = data_theme
         
         # главный макет
         self.__vbox_layout_main = QtWidgets.QGridLayout()
@@ -834,7 +636,7 @@ class PageQuestion(QtWidgets.QWidget):
         if (path_pixmap := self.__question.find("questions").find("image")) != None:
             self.__path_pixmap = os.path.join(os.path.split(self.__path_course)[0], path_pixmap.text) # .replace("\\", "/")
 
-            self.__push_button_image = PushButtonImage(path_pixmap = self.__path_pixmap, path_images = self.__path_images, data_theme = self.__data_theme["frame_main"]["push_button_image"])
+            self.__push_button_image = PushButtonImage(path_pixmap = self.__path_pixmap, path_images = self.__path_images)
 
             self.__vbox_layout_internal.addWidget(self.__push_button_image)
             self.__vbox_layout_internal.addSpacing(5)
@@ -854,10 +656,9 @@ class PageQuestion(QtWidgets.QWidget):
 
                 # создание и упаковка радиокнопок
                 for i, element in enumerate(list_questions):
-                    radio_button = RadiobuttonAnswer(
+                    radio_button = RadioButtonAnswer(
                         text = element.text,
-                        path_images = self.__path_images,
-                        data_theme = self.__data_theme["frame_main"]["radio_button"]
+                        path_images = self.__path_images
                     )
 
                     self.__list_radio_buttons.append(radio_button)
@@ -884,8 +685,7 @@ class PageQuestion(QtWidgets.QWidget):
                 for i, element in enumerate(list_questions):
                     checkbox = CheckboxAnswer(
                         text = element.text, 
-                        path_images = self.__path_images, 
-                        data_theme = self.__data_theme["frame_main"]["checkbox"]
+                        path_images = self.__path_images
                     )
 
                     self.__list_checkboxes.append(checkbox)
@@ -902,7 +702,7 @@ class PageQuestion(QtWidgets.QWidget):
             case "input_answer":
                 self.__label_type_question.setText("Введите правильный ответ:")
                 
-                self.__line_edit_answer = LineEditAnswer(data_theme = self.__data_theme["frame_main"]["line_edit"])
+                self.__line_edit_answer = LineEditAnswer()
                 self.__line_edit_answer.line_edit_answer_text_changed.connect(self.__line_edit_answer_text_changed)
 
                 self.__vbox_layout_internal.addWidget(self.__line_edit_answer)
@@ -911,8 +711,7 @@ class PageQuestion(QtWidgets.QWidget):
                 # метка с подсказкой
                 self.__label_promt = LabelPromt(
                     "Для записи десятичных дробей используется запятая, а не точка.",
-                    os.path.join(self.__path_images, "warning.png"),
-                    self.__data_theme["frame_main"]["label_promt"]["warning"]
+                    os.path.join(self.__path_images, "warning.png")
                 )
                 self.__label_promt.hide()
 
@@ -923,12 +722,10 @@ class PageQuestion(QtWidgets.QWidget):
 
         self.__vbox_layout_internal.addStretch(1)
         
-        # self.set_style_sheet()
-
     def answer(self) -> str | list | None:
         return self.__answer
 
-    def __radio_button_checked(self, radio_button: RadiobuttonAnswer):
+    def __radio_button_checked(self, radio_button: RadioButtonAnswer):
         self.__answer = radio_button.text()
 
         self.answer_changed.emit(self.__number, True)
@@ -953,43 +750,14 @@ class PageQuestion(QtWidgets.QWidget):
 
         self.answer_changed.emit(self.__number, True if self.__answer != "" else False)
 
-    def set_style_sheet(self):
-        # главная рамка
-        self.__frame_main.setStyleSheet(f"""
-        #frame_main {{
-            background: {self.__data_theme["frame_main"]["background"]};
-        }} """)
-
-        # метка номера вопроса
-        self.__label_numder_question.setStyleSheet(f"""
-        #label_numder_question {{
-            color: {self.__data_theme["frame_main"]["label_numder_question"]["color"]};   
-        }} """)
-
-        # метка вопроса
-        self.__label_question.setStyleSheet(f"""
-        #label_question {{
-            color: {self.__data_theme["frame_main"]["label_question"]["color"]};
-            background: transparent;
-            selection-color: {self.__data_theme["frame_main"]["label_question"]["selection_color"]};
-            selection-background-color: {self.__data_theme["frame_main"]["label_question"]["selection_background_color"]};
-        }} """)
-
-        # метка типа задания
-        self.__label_type_question.setStyleSheet(f"""
-        #label_type_question {{ 
-            color: {self.__data_theme["frame_main"]["label_type_question"]["color"]};
-        }} """)
-
 class PageTesting(QtWidgets.QWidget):
     """Главный класс тестирования"""
     push_button_finish_cliced = QtCore.pyqtSignal(DataResultTesting)
 
-    def __init__(self, path_course: str, path_images: str, data_theme: dict):
+    def __init__(self, path_course: str, path_images: str):
         super().__init__()
         self.setObjectName("page_testing")
 
-        self.__data_theme = data_theme
         self.__path_images = path_images
         self.__path_course = path_course
         self.__path_lesson = None
@@ -1066,7 +834,7 @@ class PageTesting(QtWidgets.QWidget):
 
         if self.__path_lesson:
             # кнопка для открытия урока в формате .pdf
-            self.__push_button_lesson = PushButtonLesson(self.__path_images, self.__data_theme["frame_main"]["frame_tools"]["push_button_lesson"])
+            self.__push_button_lesson = PushButtonLesson(self.__path_images)
             self.__push_button_lesson.push_button_lesson_clicked.connect(self.__open_lesson)
 
             self.__hbox_layout_tools.addWidget(self.__push_button_lesson)
@@ -1100,7 +868,7 @@ class PageTesting(QtWidgets.QWidget):
         self.__hbox_layout_button_questions.addStretch(1)
 
         for i in range(self.__len_course):
-            push_button_question = PushButtonQuestion(number = i, data_theme = self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["frame_push_button_questions"]["push_button_qestion"])
+            push_button_question = PushButtonQuestion(number = i)
             push_button_question.push_button_question_clicked.connect(self.__switch_question)
             self.__list_push_button_questions.append(push_button_question)
 
@@ -1128,8 +896,6 @@ class PageTesting(QtWidgets.QWidget):
         else:
             # открыть первую страницу теста
             self.__list_push_button_questions[self.__current_number_question].push_button_navigation_press()
-
-        # self.set_style_sheet()
 
     def __open_lesson(self):
         # создание и упаковка новой страницы для просмотра урока в формате .pdf
@@ -1220,8 +986,7 @@ class PageTesting(QtWidgets.QWidget):
             element = current_question,
             answer = self.__list_data_page_test[number].answer, 
             started_passing = self.__dict_questions_started_passing[number],
-            path_images = self.__path_images, 
-            data_theme = self.__data_theme["frame_main"]["scroll_area_page_test"]["page_question"]            
+            path_images = self.__path_images     
         )
         self.__page_question.answer_changed.connect(self.__on_change_answer)
 
@@ -1233,118 +998,3 @@ class PageTesting(QtWidgets.QWidget):
     def __on_change_answer(self, number: int, answered: bool):
         self.__list_push_button_questions[number].set_answered(answered)
         self.__dict_questions_started_passing[number] = answered
-
-    def set_style_sheet(self):
-        # главная рамка
-        self.__frame_main.setStyleSheet(f"""
-        #frame_main {{
-            background: {self.__data_theme["frame_main"]["background"]};
-        }} """)
-
-        # панель инструментов и навигации
-        self.__frame_tools.setStyleSheet(f"""
-        #frame_tools {{               
-            border-top-left-radius: 0px;
-            border-top-right-radius: 0px;
-            background: {self.__data_theme["frame_main"]["frame_tools"]["background"]};
-        }} """)
-        
-        # прокручиваемая область для станица теста
-        self.__scroll_area_page_test.setStyleSheet(f"""
-        #scroll_area_page_test {{
-            background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["background"]};
-            border: none;
-        }}
-        
-        #scroll_area_page_test QScrollBar:vertical {{              
-            border: transparent;
-            background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["background"]};
-            width: 14px;
-            border-radius: 6px;
-            padding: 4px;
-            margin: 0px 0px 0px 0px;
-        }}
-        #scroll_area_page_test QScrollBar::handle:vertical {{
-            background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["handle"]["background"]};
-            border-radius: 3px;
-            min-height: 30px;
-        }}
-        #scroll_area_page_test QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
-            background: transparent;
-            height: 0px;
-        }}
-        #scroll_area_page_test QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
-            background: transparent;
-        }} 
-
-        #scroll_area_page_test QScrollBar:horizontal {{              
-            border: transparent;
-            background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["background"]};
-            height: 14px;
-            border-radius: 6px;
-            padding: 4px;
-            margin: 0px 0px 0px 0px;
-        }}
-        #scroll_area_page_test QScrollBar::handle:horizontal {{
-            background: {self.__data_theme["frame_main"]["scroll_area_page_test"]["scrollbar"]["handle"]["background"]};
-            border-radius: 3px;
-            min-width: 30px;
-        }}
-        #scroll_area_page_test QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
-            background: transparent;
-            width: 0px;
-        }}
-        #scroll_area_page_test QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
-            background: transparent;
-        }} """)
-
-        # прокручиваемая область для кнопок навигации по вопросам
-        self.__scroll_area_push_button_questions.setStyleSheet(f"""
-        #scroll_area_push_button_questions {{
-            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["background"]};
-            border: none;
-            margin: 0px, 0px, 0px, 0px;
-        }} 
-
-        #scroll_area_push_button_questions QScrollBar:vertical {{
-            width: 0px;
-        }}
-        
-        #scroll_area_push_button_questions QScrollBar:horizontal {{              
-            border: transparent;
-            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["scrollbar"]["background"]};
-            height: 14px;
-            border-radius: 6px;
-            padding: 4px;
-            margin: 0px 0px 0px 0px;
-        }}
-        #scroll_area_push_button_questions QScrollBar::handle:horizontal {{
-            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["scrollbar"]["handle"]["background"]};
-            border-radius: 3px;
-            min-width: 30px;
-        }}
-        #scroll_area_push_button_questions QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
-            background: transparent;
-            width: 0px;
-        }}
-        #scroll_area_push_button_questions QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
-            background: transparent;
-        }} """)
-
-        # рамка кнопок навигации по вопросам
-        self.__frame_push_button_questions.setStyleSheet(f"""
-        #frame_push_button_questions {{
-            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_questions"]["frame_push_button_questions"]["background"]};
-            margin: 0px, 17px, 0px, 0px;
-        }} """)
-
-        # кнопка завершить тест
-        self.__push_button_finish.setStyleSheet(f"""
-        #push_button_finish {{
-            outline: 0;
-            padding-left: 15px;
-            padding-right: 15px;
-            border-radius: 15px;
-            background: {self.__data_theme["frame_main"]["frame_tools"]["push_button_finish"]["background"]}; 
-            color: {self.__data_theme["frame_main"]["frame_tools"]["push_button_finish"]["color"]};
-        }} """)

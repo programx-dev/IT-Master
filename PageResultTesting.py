@@ -9,29 +9,33 @@ from dataclasses import dataclass
 import Dialogs
 from PyQt6.QtCharts import QChart, QChartView, QPieSeries
 import PageTesting
+import GlobalSenderEvents
 
 @dataclass
 class DataPageResultTest:
     horizontal_scrollbar_value: int = 0
     vertical__scrollbar_value: int = 0
 
+@dataclass
+class DataPageViewerResultTesting:
+    color_right: QtGui.QColor
+    color_wrong: QtGui.QColor
+    color_skip: QtGui.QColor
+
 class PushButtonResultQuestion(PageTesting.PushButtonNavigation):
     """Класс для кнопок навигации по вопросам на панели инструменов"""
     push_button_question_clicked = QtCore.pyqtSignal(int)
     
-    def __init__(self, number: int, data_theme: dict):
+    def __init__(self, number: int):
         super().__init__()
 
         self.__number = number
-        self.__data_theme = data_theme
         self.__answered = False
 
         self.setObjectName("push_button_result_question")
         self.setText(f"{self.__number + 1}")
         self.setFont(QtGui.QFont("Segoe UI", 12))
         self.push_button_navigation_clicked.connect(self.__push_button_question_press)
-
-        self.set_style_sheet()
 
     def set_status(self, status: PageTesting.AnswerStatus):
         self.setProperty("status", status.value)
@@ -41,91 +45,32 @@ class PushButtonResultQuestion(PageTesting.PushButtonNavigation):
     def __push_button_question_press(self):
         self.push_button_question_clicked.emit(self.__number)
 
-    def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #push_button_result_question {{
-            outline: 0;
-            border: 3px solid;
-            border-radius: 25px;
-        }}
-        #push_button_result_question[current="true"][status=\"{PageTesting.AnswerStatus.right.value}\"] {{
-            background: {self.__data_theme["current"]["right"]["background"]};
-            border-color: {self.__data_theme["current"]["right"]["color_border"]};
-            color: {self.__data_theme["current"]["right"]["color"]};
-        }} 
-        #push_button_result_question[current="true"][status=\"{PageTesting.AnswerStatus.wrong.value}\"] {{
-            background: {self.__data_theme["current"]["wrong"]["background"]};
-            border-color: {self.__data_theme["current"]["wrong"]["color_border"]};
-            color: {self.__data_theme["current"]["wrong"]["color"]};
-        }} 
-        #push_button_result_question[current="true"][status=\"{PageTesting.AnswerStatus.skip.value}\"] {{
-            background: {self.__data_theme["current"]["skip"]["background"]};
-            border-color: {self.__data_theme["current"]["skip"]["color_border"]};
-            color: {self.__data_theme["current"]["skip"]["color"]};
-        }} 
-        #push_button_result_question[current="false"][status=\"{PageTesting.AnswerStatus.right.value}\"] {{
-            background: {self.__data_theme["not_current"]["right"]["background"]};
-            border-color: {self.__data_theme["not_current"]["right"]["color_border"]};
-            color: {self.__data_theme["not_current"]["right"]["color"]};
-        }} 
-        #push_button_result_question[current="false"][status=\"{PageTesting.AnswerStatus.wrong.value}\"] {{
-            background: {self.__data_theme["not_current"]["wrong"]["background"]};
-            border-color: {self.__data_theme["not_current"]["wrong"]["color_border"]};
-            color: {self.__data_theme["not_current"]["wrong"]["color"]};
-        }} 
-        #push_button_result_question[current="false"][status=\"{PageTesting.AnswerStatus.skip.value}\"] {{
-            background: {self.__data_theme["not_current"]["skip"]["background"]};
-            border-color: {self.__data_theme["not_current"]["skip"]["color_border"]};
-            color: {self.__data_theme["not_current"]["skip"]["color"]};
-        }} """)
-
 class PushButtonResultTesting(PageTesting.PushButtonNavigation):
     """Класс для кнопки для открытия результатов  тестирования"""
     push_button_result_testing_clicked = QtCore.pyqtSignal()
     
-    def __init__(self, path_images: str, data_theme: dict):
+    def __init__(self, path_images: str):
         super().__init__()
 
         self.__path_images = path_images
-        self.__data_theme = data_theme
 
         self.setObjectName("push_button_result_testing")
         self.setIcon(QtGui.QIcon(os.path.join(self.__path_images, r"results.png")))
         self.setIconSize(QtCore.QSize(35, 35))
         self.push_button_navigation_clicked.connect(self.__push_button_result_testing_press)
 
-        self.set_style_sheet()
-
     def __push_button_result_testing_press(self):
         self.push_button_result_testing_clicked.emit()
-
-    def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #push_button_result_testing {{
-            outline: 0;
-            border: 3px solid;
-            border-radius: 10px;
-        }}
-        #push_button_result_testing[current="true"] {{
-            background: {self.__data_theme["current"]["background"]};
-            border-color: {self.__data_theme["current"]["color_border"]};
-            color: {self.__data_theme["current"]["color"]};
-        }} 
-        #push_button_result_testing[current="false"] {{
-            background: {self.__data_theme["not_current"]["background"]};
-            border-color: {self.__data_theme["not_current"]["color_border"]};
-            color: {self.__data_theme["not_current"]["color"]};
-        }} """)
 
 class LabelLegend(QtWidgets.QWidget):
     """Класс для метки легнды диаграммы с задавыемым цветом кружка"""
 
-    def __init__(self, color: QtGui.QColor, data_theme: dict, text: str = ""):
+    def __init__(self, color: QtGui.QColor, text: str = ""):
         super().__init__()
+        self.setObjectName("label_legend")
         
         self.__color = color
         self.__text = text
-        self.__data_theme = data_theme
 
         # главный макет
         self.__hbox_layout_main = QtWidgets.QHBoxLayout()
@@ -138,7 +83,8 @@ class LabelLegend(QtWidgets.QWidget):
         self.__pixmap = QtGui.QPixmap(24, 24)
         self.__pixmap.fill(QtGui.QColor(0, 0, 0, 0))
         
-        self.__painter = QtGui.QPainter(self.__pixmap)
+        self.__painter = QtGui.QPainter()
+        self.__painter.begin(self.__pixmap)
         self.__painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         self.__painter.setPen(QtGui.QPen(QtGui.QColor(), 0, QtCore.Qt.PenStyle.NoPen))
         self.__painter.setBrush(QtGui.QBrush(self.__color, QtCore.Qt.BrushStyle.SolidPattern))
@@ -162,34 +108,38 @@ class LabelLegend(QtWidgets.QWidget):
 
         self.__hbox_layout_main.addWidget(self.__label_text)
 
-        self.set_style_sheet()
+    def change_color(self, color: QtGui.QColor):
+        self.__color = color
+
+       # изображение с цветным кружком
+        self.__pixmap = QtGui.QPixmap(24, 24)
+        self.__pixmap.fill(QtGui.QColor(0, 0, 0, 0))
+        
+        self.__painter = QtGui.QPainter()
+        self.__painter.begin(self.__pixmap)
+        self.__painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        self.__painter.setPen(QtGui.QPen(QtGui.QColor(), 0, QtCore.Qt.PenStyle.NoPen))
+        self.__painter.setBrush(QtGui.QBrush(self.__color, QtCore.Qt.BrushStyle.SolidPattern))
+        self.__painter.drawEllipse(0, 0, 24, 24)
+        self.__painter.end()
+
+        self.__label_pixmap.setPixmap(self.__pixmap)
 
     def set_text(self, text: str):
         self.__text = text
         self.__label_text.setText(self.__text)
 
-    def set_style_sheet(self):
-        self.__label_pixmap.setStyleSheet(f"""
-        #label_pixmap {{
-            background: transparent;
-        }} """)
-
-        self.__label_text.setStyleSheet(f"""
-        #label_text {{
-            background: transparent;
-            color: {self.__data_theme["color"]};
-        }} """)
-
 class PageViewerResultTesting(QtWidgets.QWidget):
     """Класс просмотра результатов тестирования"""
 
-    def __init__(self, data_result_testing: PageTesting.DataResultTesting, data_theme: dict):
+    def __init__(self, data_result_testing: PageTesting.DataResultTesting, data_page_viewer_result_testing: DataPageViewerResultTesting):
         super().__init__()
+        self.setObjectName("page_viewer_result_testing")
 
         self.__data_result_testing = data_result_testing
-        self.__data_theme = data_theme
+        self.__data_page_viewer_result_testing = data_page_viewer_result_testing
 
-        self.__parser_rgb = re.compile("rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)")
+        # self.__parser_rgb = re.compile("rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)")
 
         self.__points_right = 0
         self.__points_wrong = 0
@@ -205,23 +155,23 @@ class PageViewerResultTesting(QtWidgets.QWidget):
                 case _:
                     self.__points_skip += 1
 
-        parsing_result = self.__parser_rgb.search(self.__data_theme["frame_main"]["chart"]["pie_slice_right"]["color"])
-        if parsing_result != None:
-            color_right = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
-        else:
-            color_right = QtGui.QColor(self.__data_theme["frame_main"]["chart"]["pie_slice_right"]["color"])
+        # parsing_result = self.__parser_rgb.search(self.__data_theme["frame_main"]["chart"]["pie_slice_right"]["color"])
+        # if parsing_result != None:
+        #     color_right = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
+        # else:
+        #     color_right = QtGui.QColor(self.__data_theme["frame_main"]["chart"]["pie_slice_right"]["color"])
 
-        parsing_result = self.__parser_rgb.search(self.__data_theme["frame_main"]["chart"]["pie_slice_wrong"]["color"])
-        if parsing_result != None:
-            color_wrong = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
-        else:
-            color_wrong = QtGui.QColor(self.__data_theme["frame_main"]["chart"]["pie_slice_wrong"]["color"])
+        # parsing_result = self.__parser_rgb.search(self.__data_theme["frame_main"]["chart"]["pie_slice_wrong"]["color"])
+        # if parsing_result != None:
+        #     color_wrong = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
+        # else:
+        #     color_wrong = QtGui.QColor(self.__data_theme["frame_main"]["chart"]["pie_slice_wrong"]["color"])
 
-        parsing_result = self.__parser_rgb.search(self.__data_theme["frame_main"]["chart"]["pie_slice_skip"]["color"])
-        if parsing_result != None:
-            color_skip = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
-        else:
-            color_skip = QtGui.QColor(self.__data_theme["frame_main"]["chart"]["pie_slice_skip"]["color"])
+        # parsing_result = self.__parser_rgb.search(self.__data_theme["frame_main"]["chart"]["pie_slice_skip"]["color"])
+        # if parsing_result != None:
+        #     color_skip = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
+        # else:
+        #     color_skip = QtGui.QColor(self.__data_theme["frame_main"]["chart"]["pie_slice_skip"]["color"])
 
         self.__tree = ET.parse(self.__data_result_testing.path_course)
         self.__root = self.__tree.getroot()
@@ -305,13 +255,13 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         self.__pie_series.setHoleSize(0.4)
 
         self.__pie_slice_right = self.__pie_series.append("Правильные", round(self.__points_right / self.__amount_question * 100))
-        self.__pie_slice_right.setBrush(color_right)
+        self.__pie_slice_right.setBrush(self.__data_page_viewer_result_testing.color_right)
 
         self.__pie_slice_wrong = self.__pie_series.append("Неправильные", round(self.__points_wrong / self.__amount_question * 100))
-        self.__pie_slice_wrong.setBrush(color_wrong)
+        self.__pie_slice_wrong.setBrush(self.__data_page_viewer_result_testing.color_wrong)
         
         self.__pie_slice_skip = self.__pie_series.append("Пропущенные", round(self.__points_skip / self.__amount_question * 100))
-        self.__pie_slice_skip.setBrush(color_skip)
+        self.__pie_slice_skip.setBrush(self.__data_page_viewer_result_testing.color_skip)
 
         self.__chart = QChart()
         self.__chart.legend().hide()
@@ -319,6 +269,7 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         self.__chart.setBackgroundRoundness(0)
         self.__chart.setContentsMargins(-82,-82,-82, -82)
         self.__chart.addSeries(self.__pie_series)
+        self.__chart.setBackgroundBrush(QtGui.QBrush(QtCore.Qt.GlobalColor.transparent))
 
         self.__chart__view = QChartView(self.__chart)
         self.__chart__view.setFixedSize(QtCore.QSize(293, 293))
@@ -364,7 +315,8 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         self.__vbox_layout_legend.addSpacing(10)
 
         # метка легенды правильно
-        self.label_legent_right = LabelLegend(color = color_right, data_theme = self.__data_theme["frame_main"]["frame_legend"]["label_legend_right"])
+        self.label_legent_right = LabelLegend(color = self.__data_page_viewer_result_testing.color_right)
+        self.label_legent_right.setProperty("status", PageTesting.AnswerStatus.right.value)
         self.label_legent_right.set_text(f"Правильные: {self.__points_right} ({round(self.__points_right / self.__amount_question * 100)}%)")
 
         self.__vbox_layout_legend.addWidget(self.label_legent_right)
@@ -372,7 +324,8 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         self.__vbox_layout_legend.addSpacing(10)
 
         # метка легенды неправильно
-        self.label_legent_wrong = LabelLegend(color = color_wrong, data_theme = self.__data_theme["frame_main"]["frame_legend"]["label_legend_wrong"])
+        self.label_legent_wrong = LabelLegend(color = self.__data_page_viewer_result_testing.color_wrong)
+        self.label_legent_wrong.setProperty("status", PageTesting.AnswerStatus.wrong.value)
         self.label_legent_wrong.set_text(f"Неправильные: {self.__points_wrong} ({round(self.__points_wrong / self.__amount_question * 100)}%)")
 
         self.__vbox_layout_legend.addWidget(self.label_legent_wrong)
@@ -380,63 +333,30 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         self.__vbox_layout_legend.addSpacing(10)
 
         # метка легенды пропущенно
-        self.label_legent_skip = LabelLegend(color = color_skip, data_theme = self.__data_theme["frame_main"]["frame_legend"]["label_legend_skip"])
+        self.label_legent_skip = LabelLegend(color = self.__data_page_viewer_result_testing.color_skip)
+        self.label_legent_skip.setProperty("status", PageTesting.AnswerStatus.wrong.skip.value)
         self.label_legent_skip.set_text(f"Пропущенные: {self.__points_skip} ({round(self.__points_skip / self.__amount_question * 100)}%)")
 
         self.__vbox_layout_legend.addWidget(self.label_legent_skip)
         self.__vbox_layout_legend.setAlignment(self.label_legent_skip, QtCore.Qt.AlignmentFlag.AlignLeft)
 
-        self.set_style_sheet()
+    def change_data_page_viewer_result_testing(self, data_page_viewer_result_testing: DataPageViewerResultTesting):
+        self.__data_page_viewer_result_testing = data_page_viewer_result_testing
 
-    def set_style_sheet(self):
-        self.__frame_main.setStyleSheet(f"""
-        #frame_main {{
-            background: {self.__data_theme["frame_main"]["background"]};
-        }} """)
+        self.__pie_slice_right.setBrush(self.__data_page_viewer_result_testing.color_right)
+        self.__pie_slice_wrong.setBrush(self.__data_page_viewer_result_testing.color_wrong)
+        self.__pie_slice_skip.setBrush(self.__data_page_viewer_result_testing.color_skip)
 
-        self.__label_name_test.setStyleSheet(f"""
-        #label_name_test {{
-            background: transparent;
-            color: {self.__data_theme["frame_main"]["label_name_test"]["color"]};
-        }} """)
-
-        self.__label_date_passing.setStyleSheet(f"""
-        #label_date_passing {{
-            background: transparent;
-            color: {self.__data_theme["frame_main"]["label_date_passing"]["color"]};
-        }} """)
-
-        self.__label_time_passing.setStyleSheet(f"""
-        #label_time_passing {{
-            background: transparent;
-            color: {self.__data_theme["frame_main"]["label_time_passing"]["color"]};
-        }} """)
-
-        self.__frame_legend.setStyleSheet(f"""
-        #frame_legend {{
-            border-style: solid;
-            border-width: 1px;
-            border-color: {self.__data_theme["frame_main"]["frame_legend"]["border_color"]};
-            border-radius: 14px;
-        }} """)
-
-        self.__label_result.setStyleSheet(f"""
-        #label_result {{
-            background: transparent;
-            color: {self.__data_theme["frame_main"]["frame_legend"]["label_result"]["color"]};
-        }} """)
-
-        self.__label_header.setStyleSheet(f"""
-        #label_header {{
-            background: transparent;
-            color: {self.__data_theme["frame_main"]["frame_legend"]["label_header"]["color"]};
-        }} """)
+        self.label_legent_right.change_color(self.__data_page_viewer_result_testing.color_right)
+        self.label_legent_wrong.change_color(self.__data_page_viewer_result_testing.color_wrong)
+        self.label_legent_skip.change_color(self.__data_page_viewer_result_testing.color_skip)
 
 class PageResultQuestion(QtWidgets.QWidget):
     """Класс для просмотра результата выполнения отдельного вопроса"""
 
-    def __init__(self, number: int, path_course: str, question: str, answer: str | list | None, status: PageTesting.AnswerStatus, path_images: str, data_theme: dict):
+    def __init__(self, number: int, path_course: str, question: str, answer: str | list | None, status: PageTesting.AnswerStatus, path_images: str):
         super().__init__()
+        self.setObjectName("page_result_question")
 
         self.__number = number
         self.__path_course = path_course
@@ -445,7 +365,6 @@ class PageResultQuestion(QtWidgets.QWidget):
         self.__status = status
         self.__path_images = path_images
         self.__path_pixmap = None
-        self.__data_theme = data_theme
 
         self.__rigth_answer = list(i.text for i in self.__question.find("answers").findall("answer"))
         
@@ -528,7 +447,7 @@ class PageResultQuestion(QtWidgets.QWidget):
         if (path_pixmap := self.__question.find("questions").find("image")) != None:
             self.__path_pixmap = os.path.join(os.path.split(self.__path_course)[0], path_pixmap.text) # .replace("\\", "/")
 
-            self.__push_button_image = PageTesting.PushButtonImage(path_pixmap = self.__path_pixmap, path_images = self.__path_images, data_theme = self.__data_theme["frame_main"]["push_button_image"])
+            self.__push_button_image = PageTesting.PushButtonImage(path_pixmap = self.__path_pixmap, path_images = self.__path_images)
 
             self.__vbox_layout_internal.addWidget(self.__push_button_image)
             self.__vbox_layout_internal.addSpacing(5)
@@ -562,10 +481,9 @@ class PageResultQuestion(QtWidgets.QWidget):
 
                 # создание и упаковка радиокнопок верных ответов
                 for i, question in enumerate(list_questions):
-                    radio_button_right = PageTesting.RadiobuttonAnswer(
+                    radio_button_right = PageTesting.RadioButtonAnswer(
                         text = question.text,
-                        path_images = self.__path_images,
-                        data_theme = self.__data_theme["frame_main"]["radio_button"]
+                        path_images = self.__path_images
                     )
                     radio_button_right.set_enabled(False)
 
@@ -589,10 +507,9 @@ class PageResultQuestion(QtWidgets.QWidget):
 
                  # создание и упаковка радиокнопок пользовательских ответов
                 for i, question in enumerate(list_questions):
-                    radio_button_user = PageTesting.RadiobuttonAnswer(
+                    radio_button_user = PageTesting.RadioButtonAnswer(
                         text = question.text,
-                        path_images = self.__path_images,
-                        data_theme = self.__data_theme["frame_main"]["radio_button"]
+                        path_images = self.__path_images
                     )
                     radio_button_user.set_enabled(False)
 
@@ -619,8 +536,7 @@ class PageResultQuestion(QtWidgets.QWidget):
                 for i, element in enumerate(list_questions):
                     checkbox_right = PageTesting.CheckboxAnswer(
                         text = element.text, 
-                        path_images = self.__path_images, 
-                        data_theme = self.__data_theme["frame_main"]["checkbox"]
+                        path_images = self.__path_images
                     )
                     checkbox_right.set_enabled(False)
 
@@ -641,8 +557,7 @@ class PageResultQuestion(QtWidgets.QWidget):
                 for i, element in enumerate(list_questions):
                     checkbox_user = PageTesting.CheckboxAnswer(
                         text = element.text, 
-                        path_images = self.__path_images, 
-                        data_theme = self.__data_theme["frame_main"]["checkbox"]
+                        path_images = self.__path_images
                     )
                     checkbox_user.set_enabled(False)
 
@@ -658,7 +573,7 @@ class PageResultQuestion(QtWidgets.QWidget):
             case "input_answer":
                 self.__label_type_question.setText("Введите правильный ответ:")
                 
-                self.__line_edit_right_answer = PageTesting.LineEditAnswer(data_theme = self.__data_theme["frame_main"]["line_edit"])
+                self.__line_edit_right_answer = PageTesting.LineEditAnswer()
                 self.__line_edit_right_answer.set_enabled(False)
 
                 self.__vbox_layout_internal.addWidget(self.__line_edit_right_answer)
@@ -668,7 +583,7 @@ class PageResultQuestion(QtWidgets.QWidget):
 
                 self.__vbox_layout_internal.addWidget(self.__label_user_answer)
 
-                self.__line_edit_user_answer = PageTesting.LineEditAnswer(data_theme = self.__data_theme["frame_main"]["line_edit"])
+                self.__line_edit_user_answer = PageTesting.LineEditAnswer()
                 self.__line_edit_user_answer.set_enabled(False)
 
                 self.__vbox_layout_internal.addWidget(self.__line_edit_user_answer)
@@ -678,67 +593,16 @@ class PageResultQuestion(QtWidgets.QWidget):
 
         self.__vbox_layout_internal.addStretch(1)
         
-        self.set_style_sheet()
-
-    def set_style_sheet(self):
-        # главная рамка
-        self.__frame_main.setStyleSheet(f"""
-        #frame_main {{
-            background: {self.__data_theme["frame_main"]["background"]};
-        }} """)
-
-        # метка номера вопроса
-        self.__label_numder_question.setStyleSheet(f"""
-        #label_numder_question {{
-            background: transparent;
-            color: {self.__data_theme["frame_main"]["label_numder_question"]["color"]};   
-        }} """)
-
-        # метка статуса выполнения
-        self.__label_status.setStyleSheet(f"""
-        #label_status {{
-            border-radius: 7px;
-            padding-left: 7px;
-            padding-right: 7px; 
-        }}
-        #label_status[status="right"] {{
-            background: {self.__data_theme["frame_main"]["label_status"]["right"]["background"]};
-            color: {self.__data_theme["frame_main"]["label_status"]["right"]["color"]};   
-        }} 
-        #label_status[status="wrong"] {{
-            background: {self.__data_theme["frame_main"]["label_status"]["wrong"]["background"]};
-            color: {self.__data_theme["frame_main"]["label_status"]["wrong"]["color"]};
-        }} 
-        #label_status[status="skip"] {{
-            background: {self.__data_theme["frame_main"]["label_status"]["skip"]["background"]};
-            color: {self.__data_theme["frame_main"]["label_status"]["skip"]["color"]}; 
-        }} """)
-
-        # метка вопроса
-        self.__label_question.setStyleSheet(f"""
-        #label_question {{
-            color: {self.__data_theme["frame_main"]["label_question"]["color"]};
-            background: transparent;
-            selection-color: {self.__data_theme["frame_main"]["label_question"]["selection_color"]};
-            selection-background-color: {self.__data_theme["frame_main"]["label_question"]["selection_background_color"]};
-        }} """)
-
-        # метка типа задания
-        self.__label_type_question.setStyleSheet(f"""
-        #label_type_question {{ 
-            background: transparent;
-            color: {self.__data_theme["frame_main"]["label_type_question"]["color"]};
-        }} """)
-
 class PageResultTesting(QtWidgets.QWidget):
     """Главный класс для просмотра результатов тестирования"""
 
-    def __init__(self, data_result_testing: PageTesting.DataResultTesting, path_images: str, data_theme: dict):
+    def __init__(self, data_result_testing: PageTesting.DataResultTesting, path_images: str, data_page_viewer_result_testing: DataPageViewerResultTesting):
         super().__init__()
+        self.setObjectName("page_result_testing")
 
-        self.__data_theme = data_theme
         self.__path_images = path_images
         self.__data_result_testing = data_result_testing
+        self.__data_page_viewer_result_testing = data_page_viewer_result_testing
 
         self.__path_course = self.__data_result_testing.path_course
         self.__list_data_result = self.__data_result_testing.list_data_result
@@ -804,7 +668,7 @@ class PageResultTesting(QtWidgets.QWidget):
         self.__frame_tools.setLayout(self.__hbox_layout_tools)
 
         # кнопка для открытия результатов тестирования
-        self.__push_button_result_testing = PushButtonResultTesting(self.__path_images, self.__data_theme["frame_main"]["frame_tools"]["push_button_resul_testing"])
+        self.__push_button_result_testing = PushButtonResultTesting(self.__path_images)
         self.__push_button_result_testing.push_button_result_testing_clicked.connect(self.__open_result_testing)
 
         self.__hbox_layout_tools.addWidget(self.__push_button_result_testing)
@@ -838,7 +702,7 @@ class PageResultTesting(QtWidgets.QWidget):
         self.__hbox_layout_button_result_questions.addStretch(1)
 
         for i in range(self.__len_course):
-            push_button_result_question = PushButtonResultQuestion(number = i, data_theme = self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_result_questions"]["frame_push_button_result_questions"]["push_button_resul_question"])
+            push_button_result_question = PushButtonResultQuestion(number = i)
             push_button_result_question.set_status(self.__list_data_result[i].status)
             push_button_result_question.push_button_question_clicked.connect(self.__switch_result_question)
             self.__list_push_button_questions.append(push_button_result_question)
@@ -851,13 +715,16 @@ class PageResultTesting(QtWidgets.QWidget):
 
         self.__push_button_result_testing.push_button_navigation_press()
 
-        self.set_style_sheet()
+        # прослушивание изменений цветовой темы
+        GlobalSenderEvents.GlobalSenderEvents().addEventListener("change_data_page_viewer_result_testing", self.__change_data_page_viewer_result_testing)
+
+    def __change_data_page_viewer_result_testing(self, data_page_viewer_result_testing: DataPageViewerResultTesting):
+        self.__data_page_viewer_result_testing = data_page_viewer_result_testing
+        self.__page_result_testing.change_data_page_viewer_result_testing(self.__data_page_viewer_result_testing)
 
     def __open_result_testing(self):
-        print(self.__page_result_testing)
         if self.__page_result_testing == None:
-            self.__page_result_testing = PageViewerResultTesting(self.__data_result_testing, self.__data_theme["frame_main"]["scroll_area_page_result_test"]["page_result_testing"])
-            print(self.__page_result_testing)
+            self.__page_result_testing = PageViewerResultTesting(self.__data_result_testing, self.__data_page_viewer_result_testing)
             self.__stacked_widget.addWidget(self.__page_result_testing)
 
         self.__stacked_widget.setCurrentWidget(self.__page_result_testing)
@@ -882,114 +749,10 @@ class PageResultTesting(QtWidgets.QWidget):
             question = current_question,
             answer = self.__list_data_result[self.__current_number_page_result_question].user_answer, 
             status = self.__list_data_result[self.__current_number_page_result_question].status,
-            path_images = self.__path_images, 
-            data_theme = self.__data_theme["frame_main"]["scroll_area_page_result_test"]["page_result_question"]          
+            path_images = self.__path_images         
         )
 
         self.__scroll_area_page_result_test.setWidget(self.__page_result_question)
         self.__scroll_area_page_result_test.horizontalScrollBar().setValue(self.__list_data_page_result_test[self.__current_number_page_result_question].horizontal_scrollbar_value)
         self.__scroll_area_page_result_test.verticalScrollBar().setValue(self.__list_data_page_result_test[self.__current_number_page_result_question].vertical__scrollbar_value)
         self.__stacked_widget.setCurrentWidget(self.__scroll_area_page_result_test)
-
-    def set_style_sheet(self):
-        # главная рамка
-        self.__frame_main.setStyleSheet(f"""
-        #frame_main {{
-            background: {self.__data_theme["frame_main"]["background"]};
-        }} """)
-
-        # панель инструментов и навигации
-        self.__frame_tools.setStyleSheet(f"""
-        #frame_tools {{               
-            border-top-left-radius: 0px;
-            border-top-right-radius: 0px;
-            background: {self.__data_theme["frame_main"]["frame_tools"]["background"]};
-        }} """)
-        
-        # прокручиваемая область для станица теста
-        self.__scroll_area_page_result_test.setStyleSheet(f"""
-        #scroll_area_page_result_test {{
-            background: {self.__data_theme["frame_main"]["scroll_area_page_result_test"]["background"]};
-            border: none;
-        }}
-        
-        QScrollBar:vertical {{              
-            border: transparent;
-            background: {self.__data_theme["frame_main"]["scroll_area_page_result_test"]["scrollbar"]["background"]};
-            width: 14px;
-            border-radius: 6px;
-            padding: 4px;
-            margin: 0px 0px 0px 0px;
-        }}
-        QScrollBar::handle:vertical {{
-            background: {self.__data_theme["frame_main"]["scroll_area_page_result_test"]["scrollbar"]["handle"]["background"]};
-            border-radius: 3px;
-            min-height: 30px;
-        }}
-        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
-            background: transparent;
-            height: 0px;
-        }}
-        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
-            background: transparent;
-        }} 
-
-        QScrollBar:horizontal {{              
-            border: transparent;
-            background: {self.__data_theme["frame_main"]["scroll_area_page_result_test"]["scrollbar"]["background"]};
-            height: 14px;
-            border-radius: 6px;
-            padding: 4px;
-            margin: 0px 0px 0px 0px;
-        }}
-        QScrollBar::handle:horizontal {{
-            background: {self.__data_theme["frame_main"]["scroll_area_page_result_test"]["scrollbar"]["handle"]["background"]};
-            border-radius: 3px;
-            min-width: 30px;
-        }}
-        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
-            background: transparent;
-            width: 0px;
-        }}
-        QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
-            background: transparent;
-        }} """)
-
-        # прокручиваемая область для кнопок навигации по вопросам
-        self.__scroll_area_push_button_result_questions.setStyleSheet(f"""
-        #scroll_area_push_button_result_questions {{
-            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_result_questions"]["background"]};
-            border: none;
-            margin: 0px, 0px, 0px, 0px;
-        }} 
-
-        QScrollBar:vertical {{
-            width: 0px;
-        }}
-        
-        QScrollBar:horizontal {{              
-            border: transparent;
-            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_result_questions"]["scrollbar"]["background"]};
-            height: 14px;
-            border-radius: 6px;
-            padding: 4px;
-            margin: 0px 0px 0px 0px;
-        }}
-        QScrollBar::handle:horizontal {{
-            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_result_questions"]["scrollbar"]["handle"]["background"]};
-            border-radius: 3px;
-            min-width: 30px;
-        }}
-        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
-            background: transparent;
-            width: 0px;
-        }}
-        QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
-            background: transparent;
-        }} """)
-
-        self.__frame_push_button_result_questions.setStyleSheet(f"""
-        #frame_push_button_result_questions {{
-            background: {self.__data_theme["frame_main"]["frame_tools"]["scroll_area_push_button_result_questions"]["frame_push_button_result_questions"]["background"]};
-            margin: 0px, 17px, 0px, 0px;
-        }} """)

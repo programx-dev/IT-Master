@@ -1,6 +1,7 @@
 {
-    "path_theme": ".\\resources\\themes\\default\\default.json",
-    "path_images": ".\\resources\\images",
+    "dir_theme": ".\\src\\themes",
+    "path_theme": ".\\src\\themes\\default\\default.json",
+    "path_images": ".\\src\\images",
     "path_courses": ".\\courses",
-    "path_database": ".\\resources\\table_tesult.db"
+    "path_database": ".\\src\\table_tesult.db"
 }

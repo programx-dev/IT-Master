@@ -30,16 +30,15 @@ class TitileBarWindow(QtWidgets.QWidget):
     mouse_press = QtCore.pyqtSignal()
     mouse_move = QtCore.pyqtSignal(QtCore.QPoint)
 
-    def __init__(self, data_theme):
+    def __init__(self):
         super().__init__()
+        self.setObjectName("titile_bar_window")
 
         self.__title = None
         self.__icon = None
         self.__window_type = QtCore.Qt.WindowType.WindowMinMaxButtonsHint
         self.__window_state = QtCore.Qt.WindowState.WindowNoState
         self.__mouse_pos = None
-
-        self.__data_theme = data_theme
 
         # главный макет
         self.__vbox_layout_main = QtWidgets.QVBoxLayout()
@@ -145,7 +144,7 @@ class TitileBarWindow(QtWidgets.QWidget):
 
         self.__hbox_header_buttons.addWidget(self.__push_button_close)
 
-        self.set_style_sheet()
+        # self.set_style_sheet()
 
     def __press_push_button_minimize(self):
         self.window_show_minimized.emit()
@@ -297,10 +296,8 @@ class AbstractWindow(QtWidgets.QWidget):
     """Класс для абстрактного окна"""
     Margins = 5
     
-    def __init__(self, data_theme: dict):
+    def __init__(self):
         super().__init__()
-
-        self.__data_theme = data_theme
         
         self.__pressed  = False
         self.__mouse_pos = None
@@ -340,7 +337,7 @@ class AbstractWindow(QtWidgets.QWidget):
         self.__frame_main.setLayout(self.__vbox_layout_main)
 
         # рамка с заголовком
-        self.title_bar_window = TitileBarWindow(data_theme = self.__data_theme["frame_title_bar"])
+        self.title_bar_window = TitileBarWindow()
         self.__vbox_layout_main.addWidget(self.title_bar_window)
 
         # рамка для виджетов
@@ -371,7 +368,7 @@ class AbstractWindow(QtWidgets.QWidget):
         self.windowTitleChanged.connect(self.__title_chaged)
         self.windowIconChanged.connect(self.__icon_changed)
 
-        self.__set_style_sheet()
+        # self.__set_style_sheet()
 
     def __title_chaged(self, title: str):
         self.title_bar_window.set_window_title(title)
@@ -613,6 +610,7 @@ class AbstractWindow(QtWidgets.QWidget):
 
     def eventFilter(self, obj, event):
         if isinstance(event, QtGui.QEnterEvent):
+            self.__direction = None
             self.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
         return super().eventFilter(obj, event)
 
@@ -666,13 +664,13 @@ class AbstractWindow(QtWidgets.QWidget):
 class Dialog(AbstractWindow):
     """Класс для базового диалогового окна"""
     
-    def __init__(self, data_theme: dict):
-        super().__init__(data_theme = data_theme)
+    def __init__(self):
+        super().__init__()
         super().setWindowFlags(super().windowFlags() | QtCore.Qt.WindowType.Dialog)
 
 class Window(AbstractWindow):
     """Класс для главного окна"""
    
-    def __init__(self, data_theme: dict):
-        super().__init__(data_theme = data_theme)
+    def __init__(self):
+        super().__init__()
         super().setWindowFlags(super().windowFlags() | QtCore.Qt.WindowType.Window)

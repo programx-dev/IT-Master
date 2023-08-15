@@ -17,13 +17,12 @@ class PageHome(QtWidgets.QWidget):
     """Домашняя страница"""
     push_button_clicked_start_test = QtCore.pyqtSignal(DataPageHome)
 
-    def __init__(self, path_courses: str, path_images: str, path_theme: str, data_theme: dict):
+    def __init__(self, path_courses: str, path_images: str, path_theme: str):
         super().__init__()
         self.setObjectName("page_home")
 
         self.__path_courses = path_courses
         self.__path_images = path_images
-        self.__data_theme = data_theme
         self.__path_theme = path_theme
 
         self.__path_selected_course = None
@@ -128,8 +127,6 @@ class PageHome(QtWidgets.QWidget):
 
         self.__vbox_layout_internal.addWidget(self.__push_button_start_test)
 
-        # self.set_style_sheet()
-
     def __list_view_row_changed(self, current: QtCore.QModelIndex, previous: QtCore.QModelIndex):
         if current.isValid():
             self.__path_selected_course = self.__list_view_model.item(current.row())._path
@@ -176,118 +173,3 @@ class PageHome(QtWidgets.QWidget):
             self.__push_button_start_test.setEnabled(True)
             self.__list_view.clearSelection()
             self.__push_button_select_in_explorer.setText(formated_name_course)
-
-    def set_style_sheet(self):
-        # главная рамка
-        self.__frame_main.setStyleSheet(f"""
-        #frame_main {{
-            background: {self.__data_theme["frame_main"]["background"]};
-            border-image: url({os.path.join(os.path.split(self.__path_theme)[0], self.__data_theme["frame_main"]["background_image"]).replace(chr(92), "/")});
-            background-repeat: no-repeat; 
-            background-position: center;
-        }} """)
-
-        # внутренняя рамка формы
-        self.__frame_internal.setStyleSheet(f"""
-        #frame_internal {{
-            border-radius: 14px;
-            background: {self.__data_theme["frame_main"]["frame_internal"]["background"]};
-        }} """)
-
-        # метка заголовка
-        self.__label_header.setStyleSheet(f"""
-        #label_header {{ 
-            background: transparent; 
-            color: {self.__data_theme["frame_main"]["frame_internal"]["label_header"]["color"]}
-        }} """)
-
-        # список уроков
-        self.__list_view.setStyleSheet(f"""
-        #list_view {{
-            outline: 0;
-            border: 0px;
-            background: transparent;
-            color: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["color"]};
-        }}
-        #list_view::item {{
-            margin: 0px 14px 0px 0px;
-        }}
-        #list_view::item:selected {{
-            border-radius: 6px;
-            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["item"]["selected"]["background"]};
-            color: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["item"]["selected"]["color"]};;
-        }}  
-        #list_view::item:hover:!selected {{
-            border-radius: 6px;
-            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["item"]["hover"]["background"]};
-            color: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["item"]["hover"]["color"]};;
-        }}                        
-       
-        #list_view QScrollBar:vertical {{              
-            border: transparent;
-            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["background"]};
-            width: 14px;
-            border-radius: 6px;
-            padding: 4px;
-            margin: 0px 0px 0px 0px;
-        }}
-        #list_view QScrollBar::handle:vertical {{
-            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["handle"]["background"]};
-            border-radius: 3px;
-            min-height: 30px;
-        }}
-        #list_view QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
-            background: transparent;
-            height: 0px;
-        }}
-        #list_view QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
-            background: transparent;
-        }} 
-
-        #list_view QScrollBar:horizontal {{              
-            border: transparent;
-            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["background"]};
-            height: 14px;
-            border-radius: 6px;
-            padding: 4px;
-            margin: 0px 0px 0px 0px;
-        }}
-        #list_view QScrollBar::handle:horizontal {{
-            background: {self.__data_theme["frame_main"]["frame_internal"]["list_view"]["scrollbar"]["handle"]["background"]};
-            border-radius: 3px;
-            min-width: 30px;
-        }}
-        #list_view QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
-            background: transparent;
-            width: 0px;
-        }}
-        #list_view QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
-            background: transparent;
-        }} """)
-        
-        # кнопка Выбрать в проводнике
-        self.__push_button_select_in_explorer.setStyleSheet(f"""
-        #push_button_select_in_explorer {{
-            outline: 0;                                         
-            text-align: left;
-            border-radius: 7px; 
-            background: transparent; 
-            color: {self.__data_theme["frame_main"]["frame_internal"]["push_button_select_in_explorer"]["color"]};
-        }} """)
-
-        # кнопка входа
-        self.__push_button_start_test.setStyleSheet(f"""
-        #push_button_start_test {{
-            outline: 0;
-            border-radius: 7px; 
-            background: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["background"]}; 
-            color: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["color"]};
-        }} 
-        #push_button_start_test::pressed {{
-            background: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["pressed"]["background"]}; 
-            color: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["pressed"]["color"]};
-        }}
-        #push_button_start_test::disabled {{
-            background: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["disabled"]["background"]};
-            color: {self.__data_theme["frame_main"]["frame_internal"]["push_button_start_test"]["disabled"]["color"]};
-        }} """)
