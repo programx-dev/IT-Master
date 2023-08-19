@@ -693,13 +693,13 @@ class PageResultTesting(QtWidgets.QWidget):
         self.__scroll_area_push_button_result_questions.setWidget(self.__frame_push_button_result_questions)
 
         # макет для кнопок навигации по вопросам
-        self.__hbox_layout_button_result_questions = QtWidgets.QHBoxLayout()
-        self.__hbox_layout_button_result_questions.setSpacing(0)
-        self.__hbox_layout_button_result_questions.setContentsMargins(0, 0, 0, 0)
+        self.__hbox_layout_push_button_result_questions = QtWidgets.QHBoxLayout()
+        self.__hbox_layout_push_button_result_questions.setSpacing(0)
+        self.__hbox_layout_push_button_result_questions.setContentsMargins(0, 0, 0, 0)
 
-        self.__frame_push_button_result_questions.setLayout(self.__hbox_layout_button_result_questions)
+        self.__frame_push_button_result_questions.setLayout(self.__hbox_layout_push_button_result_questions)
 
-        self.__hbox_layout_button_result_questions.addStretch(1)
+        self.__hbox_layout_push_button_result_questions.addStretch(1)
 
         for i in range(self.__len_course):
             push_button_result_question = PushButtonResultQuestion(number = i)
@@ -707,11 +707,11 @@ class PageResultTesting(QtWidgets.QWidget):
             push_button_result_question.push_button_question_clicked.connect(self.__switch_result_question)
             self.__list_push_button_questions.append(push_button_result_question)
 
-            self.__hbox_layout_button_result_questions.addWidget(push_button_result_question)
+            self.__hbox_layout_push_button_result_questions.addWidget(push_button_result_question)
             if i < self.__len_course:
-                self.__hbox_layout_button_result_questions.addSpacing(10)
+                self.__hbox_layout_push_button_result_questions.addSpacing(10)
 
-        self.__hbox_layout_button_result_questions.addStretch(1)
+        self.__hbox_layout_push_button_result_questions.addStretch(1)
 
         self.__push_button_result_testing.push_button_navigation_press()
 

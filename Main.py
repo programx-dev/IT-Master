@@ -3,6 +3,7 @@ import PageHome
 import PageTesting
 import PageResultTesting
 import StackTableResults
+import PageHistory
 import Window
 import Dialogs
 import version
@@ -17,6 +18,7 @@ from glob import glob
 from dataclasses import dataclass
 import xml.etree.ElementTree as ET
 import GlobalSenderEvents
+import pickle
 
 @dataclass
 class DataResult:
@@ -191,6 +193,7 @@ class ToolBar(QtWidgets.QFrame):
     tool_button_home_page_cliced = QtCore.pyqtSignal()
     tool_button_results_cliced = QtCore.pyqtSignal()
     tool_button_test_cliced = QtCore.pyqtSignal()
+    tool_button_history_cliced = QtCore.pyqtSignal()
     tool_button_settings_cliced = QtCore.pyqtSignal()
     tool_button_info_cliced = QtCore.pyqtSignal()
 
@@ -250,6 +253,18 @@ class ToolBar(QtWidgets.QFrame):
         self.tool_button_test.tool_button_clicked.connect(self.__press_tool_button_test)
 
         self.__vbox_layout_toolbar.addWidget(self.tool_button_test)
+        self.__vbox_layout_toolbar.addSpacing(5)
+
+        # кнопка История
+        self.tool_button_history = SwitchableToolButtonToolbar(
+            os.path.join(self.__path_images, r"history.png"), 
+            "История", 
+            data_theme_tool_buttons
+        )
+        self.__list_tool_buttons.append(self.tool_button_history)
+        self.tool_button_history.tool_button_clicked.connect(self.__press_tool_button_history)
+
+        self.__vbox_layout_toolbar.addWidget(self.tool_button_history)
         self.__vbox_layout_toolbar.addStretch(1)
 
         # кнопка Настройка
@@ -284,6 +299,9 @@ class ToolBar(QtWidgets.QFrame):
 
     def __press_tool_button_test(self):
         self.tool_button_test_cliced.emit()
+
+    def __press_tool_button_history(self):
+        self.tool_button_history_cliced.emit()
 
     def __press_tool_button_settings(self):
         self.tool_button_settings_cliced.emit()
@@ -339,24 +357,19 @@ class Main(Window.Window):
         self.__path_database = self.__data["path_database"]
         self.__path_image_logo = os.path.join(self.__path_images, r"logo.png")
 
-        # создание БД если её нет
-        # with sqlite3.connect(self.__path_database) as db:
-        #     cursor = db.cursor()
+        # SQLite - это библиотека на основе языка C, предоставляющая переносимый и бессерверный движок базы данных SQL. Он имеет файловую архитектуру; следовательно, он выполняет чтение и запись на диск. Поскольку SQLite является базой данных с нулевой конфигурацией, перед ее использованием не требуется установка или конфигурирование. Начиная с Python 2.5.x, SQLite3 по умолчанию поставляется с python.
 
-        #     cursor.execute("""
-        #     CREATE TABLE IF NOT EXISTS users(
-        #         date_start VARCHAR,
-        #         date_end VARCHAR,
-        #         name VARCHAR,
-        #         surname VARCHAR,
-        #         class_name VARCHAR,
-        #         course VARCHAR,
-        #         points_max INTEGER,
-        #         points_right INTEGER,
-        #         points_wrong INTEGER,
-        #         points_skip INTEGER,
-        #         result INTEGER
-        #     ) """)
+        # # создание БД если её нет
+        with sqlite3.connect(self.__path_database) as db:
+            cursor = db.cursor()
+
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS history(
+                date_start TEXT,
+                date_end TEXT,
+                path_course TEXT,
+                list_data_result  BLOB
+            ) """)
 
         # панель инструментов
         self.__toolbar = ToolBar(self.__path_images, self.__data_theme["tool_bar"])
@@ -375,6 +388,7 @@ class Main(Window.Window):
         self.__toolbar.tool_button_home_page_cliced.connect(self.__open_home_page)
         self.__toolbar.tool_button_settings_cliced.connect(self.__open_dialog_settings)
         self.__toolbar.tool_button_info_cliced.connect(self.__open_dialog_about)
+        self.__toolbar.tool_button_history_cliced.connect(self.__open_page_history)
 
         # выбрать кнопку Домашняя страница
         self.__toolbar.tool_button_home_page.press_tool_button()
@@ -403,6 +417,7 @@ class Main(Window.Window):
 
         self.__toolbar.tool_button_test.hide()
         self.__toolbar.tool_button_results.hide()
+        self.__toolbar.tool_button_history.show()
         self.__toolbar.update_style_sheet(PropertyPages.page_home)        
 
         # удаление старого окна
@@ -420,98 +435,46 @@ class Main(Window.Window):
         self.__stacked_widget.addWidget(self.__current_page)
         self.__stacked_widget.setCurrentWidget(self.__current_page)
 
-    def __delete_old_record(self):
+    def __delete_result_records(self):
         # оставить в БД до 100 записей
         with sqlite3.connect(self.__path_database) as db:
             cursor = db.cursor()
 
             cursor.execute("""SELECT date_end FROM users""")
-            amount_rows = i if (i := len(cursor.fetchall()) - 100) > 0 else 0
+            amount_rows = i if (i := len(cursor.rowcount) - 100) > 0 else 0
 
             cursor.execute("""DELETE FROM users WHERE date_end IN (SELECT date_end FROM users ORDER BY date_end ASC LIMIT ?)""", (amount_rows, ))
 
-    def __create_record(self, data: DataSave):
+    def __save_result(self, data_result_testing: PageTesting.DataResultTesting):
         # запись данных о прохождении в БД
         with sqlite3.connect(self.__path_database) as db:
             cursor = db.cursor()
 
             values = (
-                data.date_start.strftime(r"%Y.%m.%d %H:%M"),
-                data.date_end.strftime(r"%Y.%m.%d %H:%M"),
-                data.name,
-                data.surname,
-                data.class_name,
-                data.course,
-                data.points_max,
-                data.points_right,
-                data.points_wrong,
-                data.points_skip,
-                round(data.points_right / data.points_max * 100),
+                data_result_testing.date_start.strftime(r'%d.%m.%Y %H:%M'),
+                data_result_testing.date_end.strftime(r'%d.%m.%Y %H:%M'),
+                data_result_testing.path_course,
+                pickle.dumps(data_result_testing.list_data_result)
             )
 
-            cursor.execute("""
-            INSERT INTO users(
-                date_start,
-                date_end,
-                name,
-                surname,
-                class_name,
-                course,
-                points_max,
-                points_right,
-                points_wrong,
-                points_skip,
-                result) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """, values)
+            cursor.execute("""INSERT INTO history(date_start, date_end, path_course, list_data_result) VALUES(?, ?, ?, ?)""", values)
 
-        self.__delete_old_record()
+        # self.__delete_result_records()
 
     def __finish_test(self, data_result_testing: PageTesting.DataResultTesting):
-        self.__toolbar.tool_button_results.press_tool_button()
         self.__toolbar.tool_button_test.hide()
-        self.__toolbar.tool_button_results.show()
+        self.__toolbar.tool_button_history.show()
         self.__test_started = False
+        
+        self.__save_result(data_result_testing)
 
-        # # получение данных о прохождении
-        # data_save = DataSave(
-        #     name = self.__data_loggin.name,
-        #     surname = self.__data_loggin.surname,
-        #     class_name = self.__data_loggin.class_name,
-        #     course = os.path.splitext(os.path.basename(self.__data_loggin.path_course))[0],
-        #     date_start = data.date_start,
-        #     date_end = data.date_end,
-        #     points_max = len(list_status),
-        #     points_right = list_status.count(StackTesting.AnswerStatus.right),
-        #     points_wrong = list_status.count(StackTesting.AnswerStatus.wrong),
-        #     points_skip = list_status.count(StackTesting.AnswerStatus.skip)
-        # )
-
-        # data_result = DataResult(
-        #     points_max = data_save.points_max,
-        #     points_right = data_save.points_right,
-        #     points_wrong = data_save.points_wrong,
-        #     points_skip = data_save.points_skip,
-        #     dict_result = data.list_data_result
-        # )
-
-        # self.__create_record(data_save)
-
-        # удаление старого окна
-        self.__stacked_widget.removeWidget(self.__current_page)
-
-        # создание и упаковка окна результата выполнения
-        self.__current_page = PageResultTesting.PageResultTesting(
-            data_result_testing = data_result_testing, 
-            path_images = self.__path_images,
-            data_page_viewer_result_testing = self.__get_data_page_viewer_result_testing()
-        )
-
-        self.__stacked_widget.addWidget(self.__current_page)
-        self.__stacked_widget.setCurrentWidget(self.__current_page)
+        self.__open_result_testing(data_result_testing)
 
     def __start_test(self, data_page_test: PageTesting.DataPageTest):
         self.__toolbar.update_style_sheet(PropertyPages.page_testing)
         self.__toolbar.tool_button_test.press_tool_button()
         self.__toolbar.tool_button_test.show()
+        self.__toolbar.tool_button_history.hide()
 
         self.__test_started = True
 
@@ -527,6 +490,56 @@ class Main(Window.Window):
 
         self.__stacked_widget.addWidget(self.__current_page)
         self.__stacked_widget.setCurrentWidget(self.__current_page)
+
+    def __open_result_testing(self, data_result_testing: PageTesting.DataResultTesting):
+        self.__toolbar.tool_button_results.press_tool_button()
+        self.__toolbar.tool_button_results.show()
+
+        # удаление старого окна
+        self.__stacked_widget.removeWidget(self.__current_page)
+
+        # создание и упаковка окна результата выполнения
+        self.__current_page = PageResultTesting.PageResultTesting(
+            data_result_testing = data_result_testing, 
+            path_images = self.__path_images,
+            data_page_viewer_result_testing = self.__get_data_page_viewer_result_testing()
+        )
+
+        self.__stacked_widget.addWidget(self.__current_page)
+        self.__stacked_widget.setCurrentWidget(self.__current_page)
+
+    def __open_page_history(self):
+        with sqlite3.connect(self.__path_database) as db:
+            cursor = db.cursor()
+
+            cursor.execute("""SELECT * FROM history""")
+
+            list_data_result_testing = list(map(list, cursor.fetchall()))
+            for i in range(len(list_data_result_testing)):
+                list_data_result_testing[i][3] = pickle.loads(list_data_result_testing[i][3])
+                list_data_result_testing[i] = PageTesting.DataResultTesting(
+                    date_start = datetime.datetime.strptime(list_data_result_testing[i][0], r'%d.%m.%Y %H:%M'),
+                    date_end = datetime.datetime.strptime(list_data_result_testing[i][1], r'%d.%m.%Y %H:%M'),
+                    path_course = list_data_result_testing[i][2],
+                    list_data_result = list_data_result_testing[i][3]
+                )
+
+        self.__toolbar.tool_button_results.hide()
+
+        # удаление старого окна
+        if self.__current_page!= None:
+            self.__stacked_widget.removeWidget(self.__current_page)
+
+        # создание и упаковка окна входа
+        self.__current_page = PageHistory.PageHistory(
+            list_data_result_testing = list_data_result_testing, 
+            path_images = self.__path_images, 
+            data_push_button_result_testing = self.__get_data_push_button_result_testing(), 
+        )
+        self.__current_page.push_button_result_testing_clicked.connect(self.__open_result_testing)
+
+        self.__stacked_widget.addWidget(self.__current_page)
+        self.__stacked_widget.setCurrentWidget(self.__current_page)    
 
     def __open_table_result(self, data: PageHome.DataPageHome):
         # проверить пустая ли таблица
@@ -642,8 +655,38 @@ class Main(Window.Window):
 
         return data_page_viewer_result_testing
 
+    def __get_data_push_button_result_testing(self) -> PageHistory.DataPushButtonResultTesting:
+        __parser_rgb = re.compile("rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)")
+
+        parsing_result = __parser_rgb.search(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_right"]["color"])
+        if parsing_result != None:
+            color_right = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
+        else:
+            color_right = QtGui.QColor(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_right"]["color"])
+
+        parsing_result = __parser_rgb.search(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_wrong"]["color"])
+        if parsing_result != None:
+            color_wrong = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
+        else:
+            color_wrong = QtGui.QColor(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_wrong"]["color"])
+
+        parsing_result = __parser_rgb.search(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_skip"]["color"])
+        if parsing_result != None:
+            color_skip = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
+        else:
+            color_skip = QtGui.QColor(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_skip"]["color"])
+        
+        data_push_button_result_testing = PageHistory.DataPushButtonResultTesting(
+            color_right = color_right,
+            color_wrong = color_wrong,
+            color_skip = color_skip
+        )
+
+        return data_push_button_result_testing
+
     def set_style_sheet(self):
         GlobalSenderEvents.GlobalSenderEvents().dispatchEvent("change_data_page_viewer_result_testing", self.__get_data_page_viewer_result_testing())
+        GlobalSenderEvents.GlobalSenderEvents().dispatchEvent("change_data_push_button_result_testing", self.__get_data_push_button_result_testing())
 
         QtWidgets.QApplication.instance().setStyleSheet(f"""
         /* PageHome */
@@ -1924,6 +1967,16 @@ class Main(Window.Window):
                 background: {self.__data_theme["dialog_settings"]["frame_title_bar"]["push_button_close"]["pressed"]["background"]}; 
                 color: {self.__data_theme["dialog_settings"]["frame_title_bar"]["push_button_close"]["pressed"]["color"]}; 
             }} 
+
+
+        /* PageHistory */
+            #page_history #frame_main {{
+                background: #FFFFFF;
+            }}
+
+            #page_history #scroll_area_push_button_result_testing {{
+                background: red;
+            }}
         """)
 
 # ["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"] {self.__data_theme["color"]}

@@ -17,7 +17,7 @@
 		</answers>
 	</exercise>
 
-	<exercise>
+	<!-- <exercise>
 		<title>Чему будет равен результат вычитания двух чисел 110001₂ и 1011₂? Ответ запишите в восьмеричной системе счисления.</title>
 		<questions>
 			<type>input</type>
@@ -133,5 +133,5 @@
 			<answer>501₈</answer>
 			<answer>141₁₆</answer>
 		</answers>
-	</exercise>
+	</exercise> -->
 </main>
