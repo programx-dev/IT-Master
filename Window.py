@@ -326,7 +326,7 @@ class AbstractWindow(QtWidgets.QWidget):
         self.__shadow = QtWidgets.QGraphicsDropShadowEffect()
         self.__shadow.setBlurRadius(17)
         self.__shadow.setOffset(0, 0)
-        self.__shadow.setColor(QtGui.QColor(0, 0, 0, 100))
+        self.__shadow.setColor(QtGui.QColor(0, 0, 0, 180))
         self.__frame_main.setGraphicsEffect(self.__shadow)
 
         # главный макет

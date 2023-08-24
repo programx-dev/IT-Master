@@ -9,7 +9,6 @@ from dataclasses import dataclass
 import Dialogs
 from PyQt6.QtCharts import QChart, QChartView, QPieSeries
 import PageTesting
-import GlobalSenderEvents
 
 @dataclass
 class DataPageResultTest:
@@ -211,7 +210,7 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         self.__label_name_test.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Fixed)
         self.__label_name_test.setObjectName("label_name_test")
         self.__label_name_test.setFont(QtGui.QFont("Segoe UI", 13))
-        self.__label_name_test.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.__label_name_test.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.__label_name_test.setText(f"{name_test[:40] + (name_test[40:] and '…')}")
 
         self.__hbox_layout_info.addWidget(self.__label_name_test)
@@ -221,7 +220,7 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         self.__label_date_passing = QtWidgets.QLabel()
         self.__label_date_passing.setObjectName("label_date_passing")
         self.__label_date_passing.setFont(QtGui.QFont("Segoe UI", 13))
-        self.__label_date_passing.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.__label_date_passing.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.__label_date_passing.setText(f"Дата прохождения: {self.__data_result_testing.date_start.strftime(r'%d.%m.%Y %H:%M')}")
 
         self.__hbox_layout_info.addWidget(self.__label_date_passing)
@@ -236,7 +235,7 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         self.__label_time_passing = QtWidgets.QLabel()
         self.__label_time_passing.setObjectName("label_time_passing")
         self.__label_time_passing.setFont(QtGui.QFont("Segoe UI", 13))
-        self.__label_time_passing.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.__label_time_passing.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.__label_time_passing.setText(f"Время прохождения: {round(hours):0>2}:{round(minutes):0>2}:{round(seconds):0>2}")
 
         self.__hbox_layout_info.addWidget(self.__label_time_passing)
@@ -299,7 +298,7 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         self.__label_result.setObjectName("label_result")
         self.__label_result.setText(f"{round(self.__points_right / self.__amount_question * 100)} / 100")
         self.__label_result.setFont(QtGui.QFont("Segoe UI", 20))
-        self.__label_result.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.__label_result.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.__vbox_layout_legend.addWidget(self.__label_result)
         self.__vbox_layout_legend.addSpacing(10)
@@ -309,7 +308,7 @@ class PageViewerResultTesting(QtWidgets.QWidget):
         self.__label_header.setObjectName("label_header")
         self.__label_header.setText("Результат теста в баллах")
         self.__label_header.setFont(QtGui.QFont("Segoe UI", 16))
-        self.__label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.__label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.__vbox_layout_legend.addWidget(self.__label_header)
         self.__vbox_layout_legend.addSpacing(10)
@@ -715,10 +714,7 @@ class PageResultTesting(QtWidgets.QWidget):
 
         self.__push_button_result_testing.push_button_navigation_press()
 
-        # прослушивание изменений цветовой темы
-        GlobalSenderEvents.GlobalSenderEvents().addEventListener("change_data_page_viewer_result_testing", self.__change_data_page_viewer_result_testing)
-
-    def __change_data_page_viewer_result_testing(self, data_page_viewer_result_testing: DataPageViewerResultTesting):
+    def change_data_page_viewer_result_testing(self, data_page_viewer_result_testing: DataPageViewerResultTesting):
         self.__data_page_viewer_result_testing = data_page_viewer_result_testing
         self.__page_result_testing.change_data_page_viewer_result_testing(self.__data_page_viewer_result_testing)
 

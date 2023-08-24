@@ -17,8 +17,8 @@ import datetime
 from glob import glob
 from dataclasses import dataclass
 import xml.etree.ElementTree as ET
-import GlobalSenderEvents
 import pickle
+import logging
 
 @dataclass
 class DataResult:
@@ -51,6 +51,8 @@ class DataLoggin:
 class PropertyPages(enum.Enum):
     page_home = 0
     page_testing = 1
+    page_result_testing = 2
+    page_history = 3
 
 class SwitchableToolButtonToolbar(QtWidgets.QToolButton):
     """Переключаемая кнопка панели инструментов"""
@@ -162,8 +164,6 @@ class ToolButtonToolbar(QtWidgets.QToolButton):
         self.setText(self.__text)
         self.setFont(QtGui.QFont("Segoe UI", 10))
 
-        # self.set_style_sheet()
-
     def press_tool_button(self):
         self.tool_button_clicked.emit()
 
@@ -171,22 +171,6 @@ class ToolButtonToolbar(QtWidgets.QToolButton):
         SwitchableToolButtonToolbar.tool_button_selected.__set_selected(False)
         SwitchableToolButtonToolbar.tool_button_selected = self
         self.__set_selected(True)
-
-    def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #tool_button {{
-            padding: 0px;
-            outline: 0;
-            border-radius: 10px; 
-        }}
-        #tool_button[page=\"{PropertyPages.page_home.value}\"] {{ 
-            background: {self.__data_theme["home_page"]["not_selected"]["background"]};
-            color: {self.__data_theme["home_page"]["not_selected"]["color"]};
-        }} 
-        #tool_button[page=\"{PropertyPages.page_testing.value}\"] {{ 
-            background: {self.__data_theme["test_page"]["not_selected"]["background"]};
-            color: {self.__data_theme["test_page"]["not_selected"]["color"]};
-        }} """)
 
 class ToolBar(QtWidgets.QFrame):
     """Панель инструментов"""
@@ -289,8 +273,6 @@ class ToolBar(QtWidgets.QFrame):
         self.tool_button_info.tool_button_clicked.connect(self.__press_tool_button_info)
         self.__vbox_layout_toolbar.addWidget(self.tool_button_info)
 
-        # self.set_style_sheet()
-
     def __press_tool_button_home_page(self):
         self.tool_button_home_page_cliced.emit()
 
@@ -318,15 +300,6 @@ class ToolBar(QtWidgets.QFrame):
             i.style().unpolish(i)
             i.style().polish(i)
 
-    def set_style_sheet(self):
-        self.setStyleSheet(f"""
-        #tool_bar[page=\"{PropertyPages.page_home.value}\"] {{
-            background: {self.__data_theme["home_page"]["background"]};
-        }} 
-        #tool_bar[page=\"{PropertyPages.page_testing.value}\"] {{
-            background: {self.__data_theme["test_page"]["background"]};
-        }} """ )
-
 class Main(Window.Window):
     """Главный класс"""
 
@@ -352,6 +325,7 @@ class Main(Window.Window):
             self.__data_theme = json.load(file)
 
         self.__dir_theme = self.__data["dir_theme"]
+        self.__amount_records = self.__data["amount_records"]
         self.__path_courses = self.__data["path_courses"]
         self.__path_images = self.__data["path_images"]
         self.__path_database = self.__data["path_database"]
@@ -409,7 +383,7 @@ class Main(Window.Window):
             dialog.add_push_button("ОК", Dialogs.ButtonRole.accept)
             dialog.add_push_button("Отмена", Dialogs.ButtonRole.reject, True)
 
-            if dialog.run_modal() != Dialogs.ButtonRole.accept:
+            if dialog.run_modal() == Dialogs.ButtonRole.reject:
                 self.__toolbar.tool_button_test.set_selected()
                 return  
 
@@ -435,16 +409,6 @@ class Main(Window.Window):
         self.__stacked_widget.addWidget(self.__current_page)
         self.__stacked_widget.setCurrentWidget(self.__current_page)
 
-    def __delete_result_records(self):
-        # оставить в БД до 100 записей
-        with sqlite3.connect(self.__path_database) as db:
-            cursor = db.cursor()
-
-            cursor.execute("""SELECT date_end FROM users""")
-            amount_rows = i if (i := len(cursor.rowcount) - 100) > 0 else 0
-
-            cursor.execute("""DELETE FROM users WHERE date_end IN (SELECT date_end FROM users ORDER BY date_end ASC LIMIT ?)""", (amount_rows, ))
-
     def __save_result(self, data_result_testing: PageTesting.DataResultTesting):
         # запись данных о прохождении в БД
         with sqlite3.connect(self.__path_database) as db:
@@ -459,7 +423,46 @@ class Main(Window.Window):
 
             cursor.execute("""INSERT INTO history(date_start, date_end, path_course, list_data_result) VALUES(?, ?, ?, ?)""", values)
 
-        # self.__delete_result_records()
+        self.__delete_old_records()
+
+    def __delete_old_records(self):
+        with sqlite3.connect(self.__path_database) as db:
+            cursor = db.cursor()
+
+            cursor.execute("""SELECT COUNT (*) FROM history""")
+            result = cursor.fetchone()[0]
+            amount_rows = i if (i := result - self.__amount_records) > 0 else 0
+
+            cursor.execute("""DELETE FROM history WHERE rowid IN (SELECT rowid FROM history ORDER BY rowid ASC LIMIT ?)""", (amount_rows, ))
+
+        if isinstance(self.__current_page, PageHistory.PageHistory):
+            with sqlite3.connect(self.__path_database) as db:
+                cursor = db.cursor()
+
+                cursor.execute("""SELECT * FROM history""")
+
+                list_data_result_testing = list(map(list, cursor.fetchall()))
+                for i in range(len(list_data_result_testing)):
+                    list_data_result_testing[i][3] = pickle.loads(list_data_result_testing[i][3])
+                    list_data_result_testing[i] = PageTesting.DataResultTesting(
+                        date_start = datetime.datetime.strptime(list_data_result_testing[i][0], r'%d.%m.%Y %H:%M'),
+                        date_end = datetime.datetime.strptime(list_data_result_testing[i][1], r'%d.%m.%Y %H:%M'),
+                        path_course = list_data_result_testing[i][2],
+                        list_data_result = list_data_result_testing[i][3]
+                    )
+                self.__current_page.update_list_data_result_testing(list_data_result_testing)
+
+    def __clear_database(self):
+        with sqlite3.connect(self.__path_database) as db:
+            cursor = db.cursor()
+
+            cursor.execute("""SELECT COUNT (*) FROM history""")
+            amount_rows = cursor.fetchone()[0]
+
+            cursor.execute("""DELETE FROM history WHERE rowid IN (SELECT rowid FROM history ORDER BY rowid ASC LIMIT ?)""", (amount_rows, ))
+
+        if isinstance(self.__current_page, PageHistory.PageHistory):
+            self.__current_page.update_list_data_result_testing(list())
 
     def __finish_test(self, data_result_testing: PageTesting.DataResultTesting):
         self.__toolbar.tool_button_test.hide()
@@ -492,6 +495,7 @@ class Main(Window.Window):
         self.__stacked_widget.setCurrentWidget(self.__current_page)
 
     def __open_result_testing(self, data_result_testing: PageTesting.DataResultTesting):
+        self.__toolbar.update_style_sheet(PropertyPages.page_result_testing)  
         self.__toolbar.tool_button_results.press_tool_button()
         self.__toolbar.tool_button_results.show()
 
@@ -523,7 +527,8 @@ class Main(Window.Window):
                     path_course = list_data_result_testing[i][2],
                     list_data_result = list_data_result_testing[i][3]
                 )
-
+        
+        self.__toolbar.update_style_sheet(PropertyPages.page_history)      
         self.__toolbar.tool_button_results.hide()
 
         # удаление старого окна
@@ -587,25 +592,49 @@ class Main(Window.Window):
         dialog.set_text_about(self.__text_info)
         dialog.run_modal()
 
+    def __open_dialog_clear_database(self):
+        dialog = Dialogs.Dialog()
+        dialog.set_window_title("Очистить историю")
+        dialog.set_window_icon(QtGui.QIcon(self.__path_image_logo))
+        dialog.set_icon(QtWidgets.QStyle.StandardPixmap.SP_MessageBoxQuestion)
+        dialog.set_text("Очистить историю?")
+        dialog.set_description("Все записи удалятся безвозвратно!")
+        dialog.add_push_button("ОК", Dialogs.ButtonRole.accept)
+        dialog.add_push_button("Отмена", Dialogs.ButtonRole.reject, True)
+
+        if dialog.run_modal() == Dialogs.ButtonRole.accept:
+            self.__clear_database()
+
     def __open_dialog_settings(self):
         dialog = Dialogs.DialogSettings(
             dir_theme = self.__dir_theme, 
-            path_current_theme = self.__path_theme, 
+            data_settings = Dialogs.DataSettings(self.__path_theme, self.__amount_records), 
             path_images = self.__path_images
         )
         dialog.setWindowTitle("Настройки")
         dialog.setWindowIcon(QtGui.QIcon(os.path.join(self.__path_images, r"settings.png")))
+        dialog.push_button_clear_clicked.connect(self.__open_dialog_clear_database)
         result = dialog.run_modal()
 
-        if result != None and result != self.__path_theme:
-            self.__path_theme = result
+        if result.amount_records != None and result.amount_records != self.__amount_records:
+            self.__amount_records = result.amount_records
+
+            self.__data["amount_records"] = self.__amount_records
+
+            with open(self.__path_settings, "w", encoding = "utf-8") as file:
+                json.dump(self.__data, file, indent = 4)
+
+            self.__delete_old_records()
+
+        if result.path_theme != None and result.path_theme != self.__path_theme:
+            self.__path_theme = result.path_theme
 
             self.__data["path_theme"] = self.__path_theme
 
             with open(self.__path_settings, "w", encoding = "utf-8") as file:
                 json.dump(self.__data, file, indent = 4)
 
-            with open(result, "r", encoding = "utf-8") as file:
+            with open(self.__path_theme, "r", encoding = "utf-8") as file:
                 self.__data_theme = json.load(file)            
 
             self.set_style_sheet()
@@ -621,7 +650,7 @@ class Main(Window.Window):
             dialog.add_push_button("ОК", Dialogs.ButtonRole.accept)
             dialog.add_push_button("Отмена", Dialogs.ButtonRole.reject, True)
 
-            if dialog.run_modal() != Dialogs.ButtonRole.accept:
+            if dialog.run_modal() == Dialogs.ButtonRole.reject:
                 self.__toolbar.tool_button_test.set_selected()
                 return  
         super().close_window()
@@ -658,23 +687,23 @@ class Main(Window.Window):
     def __get_data_push_button_result_testing(self) -> PageHistory.DataPushButtonResultTesting:
         __parser_rgb = re.compile("rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)")
 
-        parsing_result = __parser_rgb.search(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_right"]["color"])
+        parsing_result = __parser_rgb.search(self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["push_button_result_testing"]["chart"]["pie_slice_right"]["color"])
         if parsing_result != None:
             color_right = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
         else:
-            color_right = QtGui.QColor(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_right"]["color"])
+            color_right = QtGui.QColor(self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["push_button_result_testing"]["chart"]["pie_slice_right"]["color"])
 
-        parsing_result = __parser_rgb.search(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_wrong"]["color"])
+        parsing_result = __parser_rgb.search(self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["push_button_result_testing"]["chart"]["pie_slice_wrong"]["color"])
         if parsing_result != None:
             color_wrong = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
         else:
-            color_wrong = QtGui.QColor(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_wrong"]["color"])
+            color_wrong = QtGui.QColor(self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["push_button_result_testing"]["chart"]["pie_slice_wrong"]["color"])
 
-        parsing_result = __parser_rgb.search(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_skip"]["color"])
+        parsing_result = __parser_rgb.search(self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["push_button_result_testing"]["chart"]["pie_slice_skip"]["color"])
         if parsing_result != None:
             color_skip = QtGui.QColor("#{0:02X}{1:02X}{2:02X}".format(*map(int, parsing_result.groups())))
         else:
-            color_skip = QtGui.QColor(self.__data_theme["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"]["frame_main"]["chart"]["pie_slice_skip"]["color"])
+            color_skip = QtGui.QColor(self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["push_button_result_testing"]["chart"]["pie_slice_skip"]["color"])
         
         data_push_button_result_testing = PageHistory.DataPushButtonResultTesting(
             color_right = color_right,
@@ -685,9 +714,11 @@ class Main(Window.Window):
         return data_push_button_result_testing
 
     def set_style_sheet(self):
-        GlobalSenderEvents.GlobalSenderEvents().dispatchEvent("change_data_page_viewer_result_testing", self.__get_data_page_viewer_result_testing())
-        GlobalSenderEvents.GlobalSenderEvents().dispatchEvent("change_data_push_button_result_testing", self.__get_data_push_button_result_testing())
-
+        if isinstance(self.__current_page, PageResultTesting.PageResultTesting):
+            self.__current_page.change_data_page_viewer_result_testing(self.__get_data_page_viewer_result_testing())
+        elif isinstance(self.__current_page, PageHistory.PageHistory):
+            self.__current_page.change_data_push_button_result_testing(self.__get_data_push_button_result_testing())
+        
         QtWidgets.QApplication.instance().setStyleSheet(f"""
         /* PageHome */
             /* главная рамка */
@@ -1177,8 +1208,6 @@ class Main(Window.Window):
 
             /* панель инструментов и навигации */
             #page_result_testing #frame_tools {{               
-                border-top-left-radius: 0px;
-                border-top-right-radius: 0px;
                 background: {self.__data_theme["page_result_testing"]["frame_main"]["frame_tools"]["background"]};
             }} 
 
@@ -1656,6 +1685,12 @@ class Main(Window.Window):
             #tool_bar[page=\"{PropertyPages.page_testing.value}\"] {{
                 background: {self.__data_theme["tool_bar"]["page_testing"]["background"]};
             }} 
+            #tool_bar[page=\"{PropertyPages.page_result_testing.value}\"] {{
+                background: {self.__data_theme["tool_bar"]["page_result_testing"]["background"]};
+            }} 
+            #tool_bar[page=\"{PropertyPages.page_history.value}\"] {{
+                background: {self.__data_theme["tool_bar"]["page_history"]["background"]};
+            }} 
 
         /* ToolBar SwitchableToolButtonToolbar */
             #tool_bar #switchable_tool_button {{
@@ -1681,6 +1716,24 @@ class Main(Window.Window):
                 color: {self.__data_theme["tool_bar"]["page_testing"]["tool_button"]["not_selected"]["color"]};
             }} 
 
+            #tool_bar[page=\"{PropertyPages.page_result_testing.value}\"] #switchable_tool_button[selected="true"] {{ 
+                background: {self.__data_theme["tool_bar"]["page_result_testing"]["tool_button"]["selected"]["background"]};
+                color: {self.__data_theme["tool_bar"]["page_result_testing"]["tool_button"]["selected"]["color"]};
+            }}
+            #tool_bar[page=\"{PropertyPages.page_result_testing.value}\"] #switchable_tool_button[selected="false"] {{ 
+                background: {self.__data_theme["tool_bar"]["page_result_testing"]["tool_button"]["not_selected"]["background"]};
+                color: {self.__data_theme["tool_bar"]["page_result_testing"]["tool_button"]["not_selected"]["color"]};
+            }} 
+
+            #tool_bar[page=\"{PropertyPages.page_history.value}\"] #switchable_tool_button[selected="true"] {{ 
+                background: {self.__data_theme["tool_bar"]["page_history"]["tool_button"]["selected"]["background"]};
+                color: {self.__data_theme["tool_bar"]["page_history"]["tool_button"]["selected"]["color"]};
+            }}
+            #tool_bar[page=\"{PropertyPages.page_history.value}\"] #switchable_tool_button[selected="false"] {{ 
+                background: {self.__data_theme["tool_bar"]["page_history"]["tool_button"]["not_selected"]["background"]};
+                color: {self.__data_theme["tool_bar"]["page_history"]["tool_button"]["not_selected"]["color"]};
+            }} 
+
         /* ToolBar ToolButtonToolbar */
             #tool_bar #tool_button {{
                 padding: 0px;
@@ -1694,6 +1747,15 @@ class Main(Window.Window):
             #tool_bar[page=\"{PropertyPages.page_testing.value}\"] #tool_button {{ 
                 background: {self.__data_theme["tool_bar"]["page_testing"]["tool_button"]["not_selected"]["background"]};
                 color: {self.__data_theme["tool_bar"]["page_testing"]["tool_button"]["not_selected"]["color"]};
+            }} 
+
+            #tool_bar[page=\"{PropertyPages.page_result_testing.value}\"] #tool_button {{ 
+                background: {self.__data_theme["tool_bar"]["page_result_testing"]["tool_button"]["not_selected"]["background"]};
+                color: {self.__data_theme["tool_bar"]["page_result_testing"]["tool_button"]["not_selected"]["color"]};
+            }} 
+            #tool_bar[page=\"{PropertyPages.page_history.value}\"] #tool_button {{ 
+                background: {self.__data_theme["tool_bar"]["page_history"]["tool_button"]["not_selected"]["background"]};
+                color: {self.__data_theme["tool_bar"]["page_history"]["tool_button"]["not_selected"]["color"]};
             }} 
 
         /* DialogAbout */ 
@@ -1821,43 +1883,191 @@ class Main(Window.Window):
                 background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["background"]};
             }}
 
-            /* метка заголовка */
-            #dialog_settings #label_header {{
-                background: transparent; 
-                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["label_header"]["color"]}
+            /* виджет с вкладками */
+            #dialog_settings #tab_widget_settings::pane {{ 
+                border-width: 1px;
+                border-style: solid;
+                border-color:  {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["pane"]["border_color"]};
+                margin-top: -1px;
+                border-radius: 5px;
+                border-top-left-radius: 0px;
             }}
+
+            #dialog_settings #tab_widget_settings QTabBar::tab {{
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["tab"]["normal"]["background"]};
+                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["tab"]["normal"]["color"]};
+                border-width: 1px;
+                border-style: solid;
+                border-color:  {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["tab"]["normal"]["border_color"]};
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+                min-width: 8px;
+                padding: 2px;
+                padding-left: 5px;
+                padding-right: 5px;
+            }}
+
+            #dialog_settings #tab_widget_settings QTabBar::tab:hover {{
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["tab"]["hover"]["background"]};
+                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["tab"]["hover"]["color"]};
+                border-color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["tab"]["hover"]["border_color"]};
+            }}
+
+            #dialog_settings #tab_widget_settings QTabBar::tab:selected {{
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["tab"]["selected"]["background"]};
+                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["tab"]["selected"]["color"]};
+                border-color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["tab"]["selected"]["border_color"]};
+                border-bottom-color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["tab"]["selected"]["background"]}; 
+            }}
+
+            #dialog_settings #tab_widget_settings QTabBar::tab:!selected {{
+                margin-top: 2px; 
+            }}
+
+            #dialog_settings #tab_widget_settings QTabBar::tab:selected {{
+                margin-left: -4px;
+                margin-right: -4px;
+            }}
+
+            #dialog_settings #tab_widget_settings QTabBar::tab:first:selected {{
+                margin-left: 0;
+            }}
+
+            #dialog_settings #tab_widget_settings QTabBar::tab:last:selected {{
+                margin-right: 0;
+            }}
+
+            #dialog_settings #tab_widget_settings QTabBar::tab:only-one {{
+                margin: 0; 
+            }}
+
+            /* метка заголовка истории */
+            #dialog_settings #label_header_history {{
+                background: transparent;
+                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["label_header_history"]["color"]};
+            }}
+
+            /* виджет ввода целых чисел */
+            #dialog_settings #spin_box_amount_records {{
+                padding-right: 15px;
+                border-width: 1;
+                border-style: solid;
+                border-color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["normal"]["color_border"]};
+                border-radius: 5px;
+
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["normal"]["background"]};
+                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["normal"]["color"]};
+                selection-color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["normal"]["selection_color"]};
+                selection-background-color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["normal"]["selection_background_color"]};
+            }}
+
+            #dialog_settings #spin_box_amount_records:focus {{
+                border-color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["focus"]["color_border"]};
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["focus"]["background"]};
+                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["focus"]["color"]};
+                selection-color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["focus"]["selection_color"]};
+                selection-background-color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["focus"]["selection_background_color"]};
+            }}
+
+            #dialog_settings #spin_box_amount_records::up-button {{
+                subcontrol-origin: border;
+                subcontrol-position: top right;
+
+                background: transparent;
+
+                margin-top: 1px;
+                margin-right: 1px;
+
+                width: 20px;
+                border-top-right-radius: 5px;
+            }}
+
+            #dialog_settings #spin_box_amount_records::up-button:hover {{
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["push_button"]["hover"]["background"]};
+            }}
+            
+            #dialog_settings #spin_box_amount_records::up-button:pressed {{
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["push_button"]["pressed"]["background"]};
+            }}
+
+            #dialog_settings #spin_box_amount_records::up-arrow {{
+                image: url({os.path.join(self.__path_images, "arrow_up.png").replace(chr(92), "/")});
+                width: 9px;
+                height: 9px;
+            }}
+
+            #dialog_settings #spin_box_amount_records::down-button {{
+                subcontrol-origin: border;
+                subcontrol-position: bottom right;
+
+                background: transparent;
+
+                margin-bottom: 1px;
+                margin-right: 1px;
+
+                width: 20px;
+                border-bottom-right-radius: 5px;
+            }}
+
+            #dialog_settings #spin_box_amount_records::down-button:hover {{
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["push_button"]["hover"]["background"]};
+            }}
+
+            #dialog_settings #spin_box_amount_records::down-button:pressed {{
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["spin_box_amount_records"]["push_button"]["pressed"]["background"]};
+            }}
+
+            #dialog_settings #spin_box_amount_records::down-arrow {{
+                image: url({os.path.join(self.__path_images, "arrow_down.png").replace(chr(92), "/")});
+                width: 9px;
+                height: 9px;
+            }}
+
+            /* кнопка Очистить историю */
+            #dialog_settings #push_button_clear {{
+                border-width: 1px;
+                border-style: solid;
+                border-color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["push_button_clear"]["color_border"]};
+                outline: 0;
+                padding-left: 15px;
+                padding-right: 15px;
+                border-radius: 5px; 
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["push_button_clear"]["background"]}; 
+                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_history"]["push_button_clear"]["color"]};
+            }} 
+
 
             /* список цветовых тем */
             #dialog_settings #list_view {{
                 outline: 0;
                 border: 0px;
                 background: transparent;
-                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["list_view"]["color"]};
+                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_theme"]["list_view"]["color"]};
             }}
             #dialog_settings #list_view::item {{
                 margin: 0px 14px 0px 0px;
             }}
             #dialog_settings #list_view::item:selected {{
                 border-radius: 6px;
-                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["list_view"]["item"]["selected"]["background"]};
-                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["list_view"]["item"]["selected"]["color"]};;
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_theme"]["list_view"]["item"]["selected"]["background"]};
+                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_theme"]["list_view"]["item"]["selected"]["color"]};;
             }}  
             #dialog_settings #list_view::item:hover:!selected {{
                 border-radius: 6px;
-                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["list_view"]["item"]["hover"]["background"]};
-                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["list_view"]["item"]["hover"]["color"]};;
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_theme"]["list_view"]["item"]["hover"]["background"]};
+                color: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_theme"]["list_view"]["item"]["hover"]["color"]};;
             }}                        
         
             #dialog_settings #list_view QScrollBar:vertical {{              
                 border: transparent;
-                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["list_view"]["scrollbar"]["background"]};
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_theme"]["list_view"]["scrollbar"]["background"]};
                 width: 14px;
                 border-radius: 6px;
                 padding: 4px;
                 margin: 0px 0px 0px 0px;
             }}
             #dialog_settings #list_view QScrollBar::handle:vertical {{
-                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["list_view"]["scrollbar"]["handle"]["background"]};
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_theme"]["list_view"]["scrollbar"]["handle"]["background"]};
                 border-radius: 3px;
                 min-height: 30px;
             }}
@@ -1871,14 +2081,14 @@ class Main(Window.Window):
 
             #dialog_settings #list_view QScrollBar:horizontal {{              
                 border: transparent;
-                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["list_view"]["scrollbar"]["background"]};
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_theme"]["list_view"]["scrollbar"]["background"]};
                 height: 14px;
                 border-radius: 6px;
                 padding: 4px;
                 margin: 0px 0px 0px 0px;
             }}
             #dialog_settings #list_view QScrollBar::handle:horizontal {{
-                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["list_view"]["scrollbar"]["handle"]["background"]};
+                background: {self.__data_theme["dialog_settings"]["frame_widgets"]["frame_main"]["tab_widget_settings"]["page_settings_theme"]["list_view"]["scrollbar"]["handle"]["background"]};
                 border-radius: 3px;
                 min-width: 30px;
             }}
@@ -1968,19 +2178,104 @@ class Main(Window.Window):
                 color: {self.__data_theme["dialog_settings"]["frame_title_bar"]["push_button_close"]["pressed"]["color"]}; 
             }} 
 
-
         /* PageHistory */
+            /* главная рамка */
             #page_history #frame_main {{
-                background: #FFFFFF;
+                background: {self.__data_theme["page_history"]["frame_main"]["background"]};
             }}
 
+            #page_history #widget_stub #label_icon {{
+                background: transparent;
+            }}
+
+            #page_history #widget_stub #label_text {{
+                background: transparent;
+                color: {self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["widget_stub"]["color"]};
+            }}
+
+            /* прокручиваемая область для кнопок просмотра и открытия результатов тестирования */
             #page_history #scroll_area_push_button_result_testing {{
-                background: red;
+                background: {self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["background"]};
+                border: none;
+            }}
+            
+            #page_history #scroll_area_push_button_result_testing QScrollBar:vertical {{              
+                border: transparent;
+                background: {self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["scrollbar"]["background"]};
+                width: 14px;
+                border-radius: 6px;
+                padding: 4px;
+            }}
+            #page_history #scroll_area_push_button_result_testing QScrollBar::handle:vertical {{
+                background: {self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["scrollbar"]["handle"]["background"]};
+                border-radius: 3px;
+                min-height: 30px;
+            }}
+            #page_history #scroll_area_push_button_result_testing QScrollBar::add-line:vertical, #page_history #scroll_area_push_button_result_testing QScrollBar::sub-line:vertical {{
+                background: transparent;
+                height: 0px;
+            }}
+            #page_history #scroll_area_push_button_result_testing QScrollBar::add-page:vertical, #page_history #scroll_area_push_button_result_testing QScrollBar::sub-page:vertical {{
+                background: transparent;
+            }} 
+
+            #page_history #scroll_area_push_button_result_testing QScrollBar:horizontal {{              
+                height: 0px;
+            }}
+
+            /* рамка для кнопок просмотра и открытия результатов тестирования */
+            #page_history #frame_push_button_result_testing {{
+                background: {self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["background"]};
+            }}
+
+            /* кнопка просмотра и открытия результатов тестирования */
+            #page_history #push_button_result_testing {{
+                background: {self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["push_button_result_testing"]["background"]};
+                border-radius: 12px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: gray;
+            }}
+
+            /* метка результата теста */
+            #page_history #push_button_result_testing #label_result {{
+                background: transparent;
+                color: {self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["push_button_result_testing"]["label_result"]["color"]};
+            }}
+
+            /* метка названия теста */
+            #page_history #push_button_result_testing #label_name_test {{
+                background: transparent;
+                color: {self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["push_button_result_testing"]["label_name_test"]["color"]};
+            }}
+            
+            /* метка даты прохождения */
+            #page_history #push_button_result_testing #label_date_passing {{
+                background: transparent;
+                color: {self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["push_button_result_testing"]["label_date_passing"]["color"]};
+            }}
+            
+            /* метка подробнее */
+            #page_history #push_button_result_testing #label_detail {{
+                background: transparent;
+                color: {self.__data_theme["page_history"]["frame_main"]["scroll_area_push_button_result_testing"]["frame_push_button_result_testing"]["push_button_result_testing"]["label_detail"]["color"]};
             }}
         """)
 
-# ["page_result_testing"]["frame_main"]["scroll_area_page_result_test"]["page_result_testing"] {self.__data_theme["color"]}
 if __name__ == "__main__": 
+    # получение пользовательского логгера и установка уровня логирования
+    py_logger = logging.getLogger(__name__)
+    py_logger.setLevel(logging.INFO)
+
+    # настройка обработчика и форматировщика в соответствии с нашими нуждами
+    py_handler = logging.FileHandler("LOG.log", mode = "w")
+    py_formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+
+    # добавление форматировщика к обработчику 
+    py_handler.setFormatter(py_formatter)
+    # добавление обработчика к логгеру
+    py_logger.addHandler(py_handler)
+
     # https://doc.qt.io/qt-5/highdpi.html
     os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
     # if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
@@ -1997,9 +2292,12 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     # app.setAttribute(QtCore.Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
 
-    window_main = Main()
-    # window_main.set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.WindowMinimizeButtonHint)
-    window_main.show_maximized()
-    # window_main.show_normal()
+    try:
+        window_main = Main()
+        # window_main.set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.WindowMinimizeButtonHint)
+        window_main.show_maximized()
+        # window_main.show_normal()
 
-    sys.exit(app.exec())
+        sys.exit(app.exec())
+    except Exception as error:
+        py_logger.exception(error)

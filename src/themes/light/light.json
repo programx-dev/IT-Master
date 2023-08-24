@@ -252,25 +252,80 @@
       "background":"#F0F0F0",
       "frame_main": {
         "background": "#FFFFFF",
-        "label_header": {
-          "color": "#000000"
-        },
-        "list_view": {
-          "color": "#000000",
-          "item": {
-            "selected": {
-              "background": "#CCE8FF",
+        "tab_widget_settings": {
+          "pane": {
+            "border_color": "#C3C3C3"
+          },
+          "tab": {
+            "normal": {
+              "background": "#E1E1E1",
+              "border_color": "#C3C3C3",
               "color": "#000000"
             },
             "hover": {
-              "background": "#E5F3FF",
+              "background": "#FFFFFF",
+              "border_color": "#C3C3C3",
+              "color": "#000000"
+            },
+            "selected": {
+              "background": "#FFFFFF",
+              "border_color": "#C3C3C3",
               "color": "#000000"
             }
           },
-          "scrollbar": {
-            "background": "#F2F2F2",
-            "handle": {
-              "background": "#888888"
+          "page_settings_theme": {
+            "list_view": {
+              "color": "#000000",
+              "item": {
+                "selected": {
+                  "background": "#CCE8FF",
+                  "color": "#000000"
+                },
+                "hover": {
+                  "background": "#E5F3FF",
+                  "color": "#000000"
+                }
+              },
+              "scrollbar": {
+                "background": "#F2F2F2",
+                "handle": {
+                  "background": "#888888"
+                }
+              }
+            }
+          },
+          "page_settings_history": {
+            "label_header_history": {
+              "color": "#000000"
+            },
+            "spin_box_amount_records": {
+              "normal": {
+                "color_border": "#C3C3C3",
+                "background": "#FFFFFF",
+                "color": "#000000",
+                "selection_background_color": "#3087EF",
+                "selection_color": "#FFFFFF"
+              },
+              "focus": {
+                "color_border": "#000000",
+                "background": "#FFFFFF",
+                "color": "#000000",
+                "selection_background_color": "#3087EF",
+                "selection_color": "#FFFFFF"
+              },
+              "push_button": {
+                "hover": {
+                  "background": "#ECEDED"
+                },
+                "pressed": {
+                  "background": "#ECEDED"
+                }
+              }
+            },
+            "push_button_clear": {
+              "color_border": "#C3C3C3",
+              "background": "#FFFFFF",
+              "color": "#000000"
             }
           }
         },
@@ -370,6 +425,19 @@
       }
     },
     "page_result_testing": {
+      "background": "#FFFFFF",
+      "tool_button": {
+        "selected": {
+          "background": "#DCDCDC",
+          "color": "#000000"
+        },
+        "not_selected": {
+          "background": "#FFFFFF",
+          "color": "#000000"
+        }
+      }
+    },
+    "page_history": {
       "background": "#FFFFFF",
       "tool_button": {
         "selected": {
@@ -719,6 +787,53 @@
             "background": "#888888"
           }
         }
+      }
+    }
+  },
+  "page_history": {
+    "frame_main": {
+      "background": "#FFFFFF",
+      "scroll_area_push_button_result_testing": {
+        "background": "#FFFFFF",
+          "frame_push_button_result_testing": {
+            "background": "#FFFFFF",
+            "widget_stub": {
+              "color": "#000000"
+            },
+            "push_button_result_testing": {
+              "background": "#FFFFFF",
+              "border_color": "#C3C3C3",
+              "chart": {
+                "pie_slice_right": {
+                  "color": "#68D145"
+                },
+                "pie_slice_wrong": {
+                  "color": "#FF7F27"
+                },
+                "pie_slice_skip": {
+                  "color": "#C3C3C3"
+                }
+              },
+              "label_result": {
+                "color": "#000000"
+              },
+              "label_name_test": {
+                "color": "#000000"
+              },
+              "label_date_passing": {
+                "color": "#000000"
+              },
+              "label_detail": {
+                "color": "#000000"
+              }
+            }
+          },
+          "scrollbar": {
+            "background": "#F2F2F2",
+            "handle": {
+              "background": "#888888"
+            }
+          }
       }
     }
   },

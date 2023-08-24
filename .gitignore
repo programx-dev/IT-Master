@@ -4,7 +4,7 @@ __pycache__/
 build/
 IT Master Installer/
 Main.spec
-resources/table_tesult.db
-run.bat
+resources/history_result.db
+LOG.jog
 
 deleted_code.py

@@ -24,7 +24,7 @@
           "scrollbar": {
             "background": "#2A3039",
             "handle": {
-              "background": "#484F5C"
+              "background": "#888888"
             }
           }
         },
@@ -252,25 +252,80 @@
       "background":"#23272E",
       "frame_main": {
         "background": "#23272E",
-        "label_header": {
-          "color": "#FFFFFF"
-        },
-        "list_view": {
-          "color": "#ABB2BF",
-          "item": {
-            "selected": {
-              "background": "#40454E",
+        "tab_widget_settings": {
+          "pane": {
+            "border_color": "#C3C3C3"
+          },
+          "tab": {
+            "normal": {
+              "background": "#1E2227",
+              "border_color": "#C3C3C3",
               "color": "#FFFFFF"
             },
             "hover": {
-              "background": "#2C313A",
-              "color": "#ABB2BF"
+              "background": "#23272E",
+              "border_color": "#C3C3C3",
+              "color": "#FFFFFF"
+            },
+            "selected": {
+              "background": "#23272E",
+              "border_color": "#C3C3C3",
+              "color": "#FFFFFF"
             }
           },
-          "scrollbar": {
-            "background": "#2A3039",
-            "handle": {
-              "background": "#484F5C"
+          "page_settings_theme": {
+            "list_view": {
+              "color": "#ABB2BF",
+              "item": {
+                "selected": {
+                  "background": "#40454E",
+                  "color": "#FFFFFF"
+                },
+                "hover": {
+                  "background": "#2C313A",
+                  "color": "#ABB2BF"
+                }
+              },
+              "scrollbar": {
+                "background": "#2A3039",
+                "handle": {
+                  "background": "#888888"
+                }
+              }
+            }
+          },
+          "page_settings_history": {
+            "label_header_history": {
+              "color": "#FFFFFF"
+            },
+            "spin_box_amount_records": {
+              "normal": {
+                "color_border": "#C3C3C3",
+                "background": "#23272E",
+                "color": "#FFFFFF",
+                "selection_background_color": "#39404F",
+                "selection_color": "#FFFFFF"
+              },
+              "focus": {
+                "color_border": "#FFFFFF",
+                "background": "#23272E",
+                "color": "#FFFFFF",
+                "selection_background_color": "#39404F",
+                "selection_color": "#FFFFFF"
+              },
+              "push_button": {
+                "hover": {
+                  "background": "#323842"
+                },
+                "pressed": {
+                  "background": "#323842"
+                }
+              }
+            },
+            "push_button_clear": {
+              "color_border": "#C3C3C3",
+              "background": "#23272E",
+              "color": "#FFFFFF"
             }
           }
         },
@@ -370,15 +425,28 @@
       }
     },
     "page_result_testing": {
-      "background": "#FFFFFF",
+      "background": "#23272E",
       "tool_button": {
         "selected": {
-          "background": "#DCDCDC",
-          "color": "#000000"
+          "background": "#323945",
+          "color": "#FFFFFF"
         },
         "not_selected": {
-          "background": "#FFFFFF",
-          "color": "#000000"
+          "background": "#23272E",
+          "color": "#FFFFFF"
+        }
+      }
+    },
+    "page_history": {
+      "background": "#23272E",
+      "tool_button": {
+        "selected": {
+          "background": "#323945",
+          "color": "#FFFFFF"
+        },
+        "not_selected": {
+          "background": "#23272E",
+          "color": "#FFFFFF"
         }
       }
     }
@@ -422,7 +490,7 @@
           "scrollbar": {
             "background": "#2A3039",
             "handle": {
-              "background": "#484F5C"
+              "background": "#888888"
             }
           }
         },
@@ -510,7 +578,7 @@
         "scrollbar": {
           "background": "#2A3039",
           "handle": {
-            "background": "#484F5C"
+            "background": "#888888"
           }
         }
       }
@@ -565,7 +633,7 @@
           "scrollbar": {
             "background": "#2A3039",
             "handle": {
-              "background": "#484F5C"
+              "background": "#888888"
             }
           },
           "push_button_finish": {
@@ -717,9 +785,57 @@
         "scrollbar": {
           "background": "#2A3039",
           "handle": {
-            "background": "#484F5C"
+            "background": "#888888"
           }
         }
+      }
+    }
+  },
+  "page_history": {
+    "frame_main": {
+      "background": "#23272E",
+      "scroll_area_push_button_result_testing": {
+        "background": "#23272E",
+          "frame_push_button_result_testing": {
+            "background": "#23272E",
+            "widget_stub": {
+              "color": "#FFFFFF"
+            },
+            "push_button_result_testing": {
+              "background": "#23272E",
+              "border_color": "#C3C3C3",
+              "chart": {
+                "background": "#23272E",
+                "pie_slice_right": {
+                  "color": "#68D145"
+                },
+                "pie_slice_wrong": {
+                  "color": "#FF7F27"
+                },
+                "pie_slice_skip": {
+                  "color": "#C3C3C3"
+                }
+              },
+              "label_result": {
+                "color": "#FFFFFF"
+              },
+              "label_name_test": {
+                "color": "#FFFFFF"
+              },
+              "label_date_passing": {
+                "color": "#FFFFFF"
+              },
+              "label_detail": {
+                "color": "#FFFFFF"
+              }
+            }
+          },
+          "scrollbar": {
+            "background": "#2A3039",
+            "handle": {
+              "background": "#888888"
+            }
+          }
       }
     }
   },

@@ -11,7 +11,6 @@ from PyQt6.QtCore import QEvent, QObject
 import Dialogs
 from PyQt6.QtCharts import QChart, QChartView, QPieSeries
 import PageTesting
-import GlobalSenderEvents
 
 @dataclass
 class DataPushButtonResultTesting:
@@ -28,13 +27,13 @@ class ChartViewClicable(QChartView):
 
         return super().mouseReleaseEvent(event)
 
-class PushButtonResultTesting(QtWidgets.QWidget):
+class PushButtonResultTesting(QtWidgets.QFrame):
     """Класс для кнопок просмотра и открытия результатов тестирования"""
     push_button_result_testing_clicked = QtCore.pyqtSignal(PageTesting.DataResultTesting)
     
     def __init__(self, data_result_testing: PageTesting.DataResultTesting, data_push_button_result_testing: DataPushButtonResultTesting):
         super().__init__()
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.MinimumExpanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.installEventFilter(self)
         self.setObjectName("push_button_result_testing")
 
@@ -82,7 +81,7 @@ class PushButtonResultTesting(QtWidgets.QWidget):
         self.__chart.legend().hide()
         self.__chart.layout().setContentsMargins(0, 0, 0, 0)
         self.__chart.setBackgroundRoundness(0)
-        self.__chart.setContentsMargins(-39, -39, -39, -39)
+        self.__chart.setContentsMargins(-38, -38, -38, -38)
         self.__chart.addSeries(self.__pie_series)
         self.__chart.setBackgroundBrush(QtGui.QBrush(QtCore.Qt.GlobalColor.transparent))
 
@@ -138,6 +137,7 @@ class PushButtonResultTesting(QtWidgets.QWidget):
         self.__label_detail.setFont(QtGui.QFont("Segoe UI", 13))
         self.__label_detail.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.__label_detail.setText("Подробнее")
+        self.__label_detail.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
 
         self.__hbox_layout_main.addWidget(self.__label_detail)
         self.__hbox_layout_main.setAlignment(self.__label_detail, QtCore.Qt.AlignmentFlag.AlignRight)
@@ -158,6 +158,51 @@ class PushButtonResultTesting(QtWidgets.QWidget):
 
         return super().eventFilter(obj, event)
 
+class WidgetStub(QtWidgets.QFrame):
+    """Виджет-заглушка"""
+
+    def __init__(self):
+        super().__init__()
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.MinimumExpanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.setObjectName("widget_stub")
+
+        self.__pixmap = None
+        self.__text = ""
+
+        # главный макет
+        self.__vbox_layout_main = QtWidgets.QVBoxLayout()
+        self.__vbox_layout_main.setSpacing(0)
+        self.__vbox_layout_main.setContentsMargins(0, 0, 0, 0)
+        self.__vbox_layout_main.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+
+        self.setLayout(self.__vbox_layout_main)
+
+        # метка иконки
+        self.__label_icon = QtWidgets.QLabel()
+        self.__label_icon.setObjectName("label_icon")
+        self.__label_icon.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+
+        self.__vbox_layout_main.addWidget(self.__label_icon)
+        self.__vbox_layout_main.addSpacing(10)
+
+        # метка с текстом
+        self.__label_text = QtWidgets.QLabel()
+        self.__label_text.setObjectName("label_text")
+        self.__label_text.setFont(QtGui.QFont("Segoe UI", 16))
+        self.__label_text.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+
+        self.__vbox_layout_main.addWidget(self.__label_text)
+
+    def set_pixmap(self, pixmap: QtGui.QPixmap):
+        self.__pixmap = pixmap.scaled(QtCore.QSize(150, 150), aspectRatioMode = QtCore.Qt.AspectRatioMode.KeepAspectRatio, transformMode = QtCore.Qt.TransformationMode.SmoothTransformation)
+
+        self.__label_icon.setPixmap(self.__pixmap)
+
+    def set_text(self, text: str):
+        self.__text = text
+
+        self.__label_text.setText(self.__text)
+        
 class PageHistory(QtWidgets.QWidget):
     """Главный класс для просмотра истории результатов тестирования"""
     push_button_result_testing_clicked = QtCore.pyqtSignal(PageTesting.DataResultTesting)
@@ -170,7 +215,9 @@ class PageHistory(QtWidgets.QWidget):
         self.__list_data_result_testing = list_data_result_testing
         self.__data_push_button_result_testing = data_push_button_result_testing
 
-        self.__list_push_button_result_testing = list()
+        self.__widget_stub = None
+
+        self.__list_push_button_result_testing: list[PushButtonResultTesting] = list()
 
         # главный макет
         self.__vbox_layout_main = QtWidgets.QGridLayout()
@@ -211,28 +258,65 @@ class PageHistory(QtWidgets.QWidget):
         # макет для кнопок просмотра и открытия результатов тестирования
         self.__vbox_layout_push_button_result_testing = QtWidgets.QVBoxLayout()
         self.__vbox_layout_push_button_result_testing.setSpacing(0)
-        self.__vbox_layout_push_button_result_testing.setContentsMargins(0, 0, 0, 0)
+        self.__vbox_layout_push_button_result_testing.setContentsMargins(5, 5, 5, 0)
         self.__vbox_layout_push_button_result_testing.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
 
         self.__frame_push_button_result_testing.setLayout(self.__vbox_layout_push_button_result_testing)
 
         amount_results = len(self.__list_data_result_testing)
-        for i, element in enumerate(self.__list_data_result_testing):
-            push_button_result_testing = PushButtonResultTesting(data_result_testing = element, data_push_button_result_testing = self.__data_push_button_result_testing)
-            push_button_result_testing.push_button_result_testing_clicked.connect(self.__push_button_result_testing_press)
-            self.__list_push_button_result_testing.append(self.__push_button_result_testing_press)
-            
-            self.__vbox_layout_push_button_result_testing.insertWidget(0, push_button_result_testing)
+        if amount_results > 0:
+            for i, element in enumerate(self.__list_data_result_testing):
+                push_button_result_testing = PushButtonResultTesting(data_result_testing = element, data_push_button_result_testing = self.__data_push_button_result_testing)
+                push_button_result_testing.push_button_result_testing_clicked.connect(self.__push_button_result_testing_press)
+                self.__list_push_button_result_testing.append(push_button_result_testing)
+                
+                self.__vbox_layout_push_button_result_testing.insertWidget(0, push_button_result_testing)
 
-        # прослушивание изменений цветовой темы
-        GlobalSenderEvents.GlobalSenderEvents().addEventListener("change_data_push_button_result_testing", self.__change_data_push_button_result_testing)
+                if i < amount_results:
+                    self.__vbox_layout_push_button_result_testing.insertSpacing(1, 5)
+        else:
+            self.__widget_stub = WidgetStub()
+            self.__widget_stub.set_pixmap(QtGui.QPixmap(os.path.join(self.__path_images, r"box_empty.png")))
+            self.__widget_stub.set_text("Пока еще нет результатов тестирования")
 
-    def __change_data_push_button_result_testing(self, data_push_button_result_testing: DataPushButtonResultTesting):
+            self.__vbox_layout_push_button_result_testing.addWidget(self.__widget_stub)
+
+    def showEvent(self, event: QtGui.QShowEvent):
+        self.__scroll_area_push_button_result_testing.setMinimumWidth(self.__frame_push_button_result_testing.sizeHint().width() + 5 + 14)
+
+        super().showEvent(event)
+
+    def change_data_push_button_result_testing(self, data_push_button_result_testing: DataPushButtonResultTesting):
         self.__data_push_button_result_testing = data_push_button_result_testing
-        self.__page_result_testing.change_data_page_viewer_result_testing(self.__data_push_button_result_testing)
 
         for i in self.__list_push_button_result_testing:
             i.change_data_page_viewer_result_testing(self.__data_push_button_result_testing)
 
     def __push_button_result_testing_press(self, data_result_testing: PageTesting.DataResultTesting):
         self.push_button_result_testing_clicked.emit(data_result_testing)
+
+    def update_list_data_result_testing(self, list_data_result_testing: list[PageTesting.DataResultTesting]):
+        self.__list_data_result_testing = list_data_result_testing
+
+        for i in self.__list_push_button_result_testing:
+            i.deleteLater()
+
+        self.__list_push_button_result_testing = list()
+
+        amount_results = len(self.__list_data_result_testing)
+        if amount_results > 0:
+            for i, element in enumerate(self.__list_data_result_testing):
+                push_button_result_testing = PushButtonResultTesting(data_result_testing = element, data_push_button_result_testing = self.__data_push_button_result_testing)
+                push_button_result_testing.push_button_result_testing_clicked.connect(self.__push_button_result_testing_press)
+                self.__list_push_button_result_testing.append(push_button_result_testing)
+                
+                self.__vbox_layout_push_button_result_testing.insertWidget(0, push_button_result_testing)
+
+                if i < amount_results:
+                    self.__vbox_layout_push_button_result_testing.insertSpacing(1, 5)
+        else:
+            self.__widget_stub = WidgetStub()
+            self.__widget_stub.set_pixmap(QtGui.QPixmap(os.path.join(self.__path_images, r"box_empty.png")))
+            self.__widget_stub.set_text("Пока еще нет результатов тестирования")
+
+            self.__vbox_layout_push_button_result_testing.addWidget(self.__widget_stub)
