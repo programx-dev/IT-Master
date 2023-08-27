@@ -1,7 +1,7 @@
 {
     "amount_records": 50,
     "dir_theme": ".\\src\\themes",
-    "path_theme": ".\\src\\themes\\dark\\dark.json",
+    "path_theme": ".\\src\\themes\\light\\light.json",
     "path_images": ".\\src\\images",
     "path_courses": ".\\courses",
     "path_database": ".\\src\\history_results.db"

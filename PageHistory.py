@@ -1,14 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import os
-import datetime
 import xml.etree.ElementTree as ET
-import re
-import enum
-from PIL import Image
 from dataclasses import dataclass
-
-from PyQt6.QtCore import QEvent, QObject
-import Dialogs
 from PyQt6.QtCharts import QChart, QChartView, QPieSeries
 import PageTesting
 

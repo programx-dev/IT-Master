@@ -1,6 +1,4 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import sys
-import os
 import enum
 
 class Direction(enum.Enum):

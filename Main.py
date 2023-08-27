@@ -2,7 +2,6 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 import PageHome
 import PageTesting
 import PageResultTesting
-import StackTableResults
 import PageHistory
 import Window
 import Dialogs
@@ -19,6 +18,7 @@ from dataclasses import dataclass
 import xml.etree.ElementTree as ET
 import pickle
 import logging
+import traceback
 
 @dataclass
 class DataResult:
@@ -308,7 +308,7 @@ class Main(Window.Window):
         self.setObjectName("main")
         
         self.__text_info = """\
-Предметный тренажер по информатике, позволяющий изучить метериал и закрепить полученные знания, выполнив тест\n
+Предметный тренажер по информатике, позволяющий изучить теорию и закрепить полученные знания, выполнив тест\n
 Приложение написано на языке программирование Python, интерфейс на PyQt6"""
         self.__path_settings = r"settings.json"
         self.__test_started = False
@@ -349,7 +349,7 @@ class Main(Window.Window):
         self.__toolbar = ToolBar(self.__path_images, self.__data_theme["tool_bar"])
         self.add_widget(self.__toolbar)
 
-        self.setWindowTitle("IT Master")
+        self.setWindowTitle("IT-Master")
         self.setWindowIcon(QtGui.QIcon(self.__path_image_logo))
 
         # виджет стеков для страниц
@@ -2262,19 +2262,34 @@ class Main(Window.Window):
             }}
         """)
 
+def excepthook(exc_type, exc_value, exc_tb):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_tb)
+        return
+    
+    logger.error("Uncaught exception", exc_info = (exc_type, exc_value, exc_tb))
+    # logger.critical("".join(traceback.format_exception(exc_type, exc_value, exc_tb)))
+
+    dlg = QtWidgets.QMessageBox()
+    dlg.setWindowIcon(QtGui.QIcon("icon.ico"))
+    dlg.setWindowTitle("Ошибка!")
+    dlg.setText("Произошла непредвиденная ошибка")
+    dlg.setInformativeText(f"Лог ошибки записан в файл {os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), r'logs/log.log'))}")
+    dlg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok)
+    dlg.setIcon(QtWidgets.QMessageBox.Icon.Critical)
+    dlg.exec()
+
 if __name__ == "__main__": 
-    # получение пользовательского логгера и установка уровня логирования
-    py_logger = logging.getLogger(__name__)
-    py_logger.setLevel(logging.INFO)
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.ERROR)
 
-    # настройка обработчика и форматировщика в соответствии с нашими нуждами
-    py_handler = logging.FileHandler("LOG.log", mode = "w")
-    py_formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+    handler = logging.FileHandler(r"logs\log.log", mode = "w", encoding = "utf-8")
+    formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] > %(message)s")
 
-    # добавление форматировщика к обработчику 
-    py_handler.setFormatter(py_formatter)
-    # добавление обработчика к логгеру
-    py_logger.addHandler(py_handler)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    sys.excepthook = excepthook
 
     # https://doc.qt.io/qt-5/highdpi.html
     os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
@@ -2292,12 +2307,9 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     # app.setAttribute(QtCore.Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
 
-    try:
-        window_main = Main()
-        # window_main.set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.WindowMinimizeButtonHint)
-        window_main.show_maximized()
-        # window_main.show_normal()
+    main = Main()
+    # window_main.set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.WindowMinimizeButtonHint)
+    main.show_maximized()
+    # window_main.show_normal()
 
-        sys.exit(app.exec())
-    except Exception as error:
-        py_logger.exception(error)
+    sys.exit(app.exec())

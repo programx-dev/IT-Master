@@ -1,6 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import Window
-import re
 import os
 import json
 from glob import glob
@@ -245,7 +244,7 @@ class DialogAbout(Window.Dialog):
         # метка с названием программы
         self.__label_name = QtWidgets.QLabel()
         self.__label_name.setObjectName("label_name")
-        self.__label_name.setText("IT Master")
+        self.__label_name.setText("IT-Master")
         self.__label_name.setFont(QtGui.QFont("Segoe UI", 13))
         self.__label_name.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
@@ -266,6 +265,7 @@ class DialogAbout(Window.Dialog):
         self.__label_about.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.__label_about.setWordWrap(True)
         self.__label_about.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
+
 
         self.__vbox_layout_main.addWidget(self.__label_about)
         self.__vbox_layout_main.addSpacing(10)

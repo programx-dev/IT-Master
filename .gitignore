@@ -2,9 +2,6 @@ venv/
 .vscode
 __pycache__/
 build/
-IT Master Installer/
-Main.spec
+dist/
 resources/history_result.db
-LOG.jog
-
-deleted_code.py
+LOG.log

@@ -6,7 +6,6 @@ import re
 import enum
 from PIL import Image
 from dataclasses import dataclass
-import Dialogs
 
 class AnswerStatus(enum.Enum):
     wrong = 0
