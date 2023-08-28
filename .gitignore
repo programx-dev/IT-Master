@@ -1,0 +1,8 @@
+venv/
+.vscode
+__pycache__/
+build/
+dist/
+IT-Master Installer/IT-Master Installer.exe
+resources/history_result.db
+LOG.log
