@@ -1,7 +1,0 @@
-venv/
-.vscode
-__pycache__/
-build/
-dist/
-resources/history_result.db
-LOG.log
