@@ -9,7 +9,7 @@
 
 <!--  ![ ](https://raw.githubusercontent.com/ProgrammXCo/IT-Master/screenshots/screenshot1.png?token=GHSAT0AAAAAACGWHR2BQ2ZMDQTKJLZGA4DWZHM263Q) -->
 
-![ ](/../../../../github/docs/blob/screenshots/screenshot1.png)
+![ ](/../screenshots/screenshot1.png?raw=true)
 
 ## Установка
 | Версия  | Установщик |
