@@ -15,7 +15,8 @@
 | :warning: | Антивирус может реагировать на установщик как на вирус ([описание проблемы](https://qna.habr.com/q/553288)). |
 | :---: | :--- |
 
-![ ](/../screenshots/screenshot_virustotal.png?raw=true) ![ ](/../screenshots/screenshot_microsoft_defender.png?raw=true)
+| ![ ](/../screenshots/screenshot_virustotal.png?raw=true) | ![ ](/../screenshots/screenshot_microsoft_defender.png?raw=true) |
+| :---: | :--- |
 
 | Версия  | Установщик |
 |  :---:  |   :---:    |
