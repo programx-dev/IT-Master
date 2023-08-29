@@ -12,6 +12,11 @@
 ![ ](/../screenshots/screenshot1.png?raw=true)
 
 ## Установка
+| :warning: | Антивирус может реагировать на установщик как на вирус ([описание проблемы](https://qna.habr.com/q/553288)). |
+| :---: | :--- |
+
+![ ](/../screenshots/screenshot_virustotal.png?raw=true) ![ ](/../screenshots/screenshot_microsoft_defender.png?raw=true)
+
 | Версия  | Установщик |
 |  :---:  |   :---:    |
 |  3.5.2  | <a href="https://github.com/ProgrammXCo/IT-Master/releases/download/v3.5.2/IT-Master.Installer.exe"><img src="https://img.shields.io/badge/Скачать-brightgreen" alt=https://github.com/ProgrammXCo/IT-Master/releases/download/v3.5.2/IT-Master.Installer.exe/></a> |
