@@ -984,6 +984,8 @@ class Main(Window.Window):
             /* кнопка с флажком */
             #page_testing #page_question #radio_button_answer #push_button_flag {{
                 padding-left: 2px;
+                padding-top: 5px;
+                padding-bottom: 5px;
                 border-top-left-radius: 6px;
                 border-bottom-left-radius: 6px;
                 outline: 0;
@@ -997,6 +999,8 @@ class Main(Window.Window):
             /* кликабельная метка c текстом */
             #page_testing #page_question #radio_button_answer #label_text {{
                 padding-left: 5px;
+                padding-top: 5px;
+                padding-bottom: 5px;
                 border-top-right-radius: 6px;
                 border-bottom-right-radius: 6px;
                 background: transparent;
@@ -1012,6 +1016,8 @@ class Main(Window.Window):
             /* кнопка с флажком */
             #page_testing #page_question #checkbox_answer #push_button_flag {{
                 padding-left: 2px;
+                padding-top: 5px;
+                padding-bottom: 5px;
                 border-top-left-radius: 6px;
                 border-bottom-left-radius: 6px;
                 outline: 0;
@@ -1025,6 +1031,8 @@ class Main(Window.Window):
             /* кликабельная метка c текстом */
             #page_testing #page_question #checkbox_answer #label_text {{
                 padding-left: 5px;
+                padding-top: 5px;
+                padding-bottom: 5px;
                 border-top-right-radius: 6px;
                 border-bottom-right-radius: 6px;
                 background: transparent;

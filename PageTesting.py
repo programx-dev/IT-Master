@@ -193,7 +193,7 @@ class CheckboxAnswer(QtWidgets.QWidget):
     def __init__(self, text: str, path_images: str):
         super().__init__()
         self.setObjectName("checkbox_answer")
-        self.setFixedHeight(32)
+        # self.setFixedHeight(32)
 
         self.__text = text
         self.__path_images = path_images
@@ -295,14 +295,14 @@ class CheckboxAnswer(QtWidgets.QWidget):
 
         self.checkbox_answer_state_changed.emit(checked)
 
-class RadioButtonAnswer(QtWidgets.QWidget):
+class RadioButtonAnswer(QtWidgets.QFrame):
     """Класс для радиокнопок для ответов с возможностью переноса слов"""
     radio_button_answer_toggled = QtCore.pyqtSignal(bool)
 
     def __init__(self, text: str, path_images: str):
         super().__init__()
         self.setObjectName("radio_button_answer")
-        self.setFixedHeight(32)
+        # self.setFixedHeight(32)
 
         self.__text = text
         self.__path_images = path_images
