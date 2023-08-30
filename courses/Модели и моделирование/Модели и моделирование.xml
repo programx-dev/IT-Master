@@ -6,7 +6,7 @@
 	<exercise>
 		<title>Описания предметов, ситуаций, событий, процессов на естественных языках – это:</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>логические модели</question>
 			<question>алгебраические модели</question>
 			<question>геометрические модели</question>
@@ -20,7 +20,7 @@
 	<exercise>
 		<title>Модель - это...</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>копия реально существующего объекта</question>
 			<question>приближенная копия объекта</question>
 			<question>заменитель предмета, объекта или явления</question>
@@ -34,7 +34,7 @@
 	<exercise>
 		<title>Замена реального объекта его формальным описанием – это:</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>моделирование</question>
 			<question>анализ</question>
 			<question>формализация</question>
@@ -48,7 +48,7 @@
 	<exercise>
 		<title>Выберите знаковую модель:</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>таблица</question>
 			<question>формула</question>
 			<question>рисунок</question>
@@ -62,7 +62,7 @@
 	<exercise>
 		<title>Выберите элемент информационной модели учащегося, существенный для выставления ему оценки за контрольную работу по информатике:</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>Время, затраченное на выполнение контрольной работы</question>
 			<question>Наличие компьютера</question>
 			<question>Количество правильно выполненных заданий</question>
@@ -75,7 +75,7 @@
 	<exercise>
 		<title>Файловая система персонального компьютера наиболее адекватно может быть описана в виде:</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>иерархической модели</question>
 			<question>табличной модели</question>
 			<question>натурной модели</question>
@@ -88,7 +88,7 @@
 	<exercise>
 		<title>Модели, реализованные с помощью систем программирования, электронных таблиц, специализированных математических пакетов и программных средств для моделирования, называются:</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>имитационными моделями</question>
 			<question>экономическими моделями</question>
 			<question>математическими моделями</question>
@@ -102,7 +102,7 @@
 	<exercise>
 		<title>База данных – это:</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>набор данных, собранных на одной дискете</question>
 			<question>таблица, позволяющая хранить и обрабатывать данные и формулы</question>
 			<question>совокупность данных, организованных по определённым правилам, предназначенная для хранения во внешней памяти компьютера и постоянного применения</question>
@@ -115,7 +115,7 @@
 	<exercise>
 		<title>К вербальным моделям относится...</title>
 		<questions>
-			<type>checkbox</type>
+			<type>multiple_selectable_answers</type>
 			<question>пересказ сюжета книги</question>
 			<question>обдумывание решения задачи</question>
 			<question>схема технического устройства</question>
@@ -130,7 +130,7 @@
 	<exercise>
 		<title>К образным моделям относится...</title>
 		<questions>
-			<type>checkbox</type>
+			<type>multiple_selectable_answers</type>
 			<question>рисунок на доске</question>
 			<question>журнал успеваемости класса</question>
 			<question>макет здания</question>

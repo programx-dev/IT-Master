@@ -6,7 +6,7 @@
 	<exercise>
 		<title>Выберите верные обозначения истинности/ложности логических высказываний</title>
 		<questions>
-			<type>checkbox</type>
+			<type>multiple_selectable_answers</type>
 			<question>True/False</question>
 			<question>T/F</question>
 			<question>1/0</question>
@@ -28,7 +28,7 @@
 	<exercise>
 		<title>Дизъюнкция – это ...</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться ложным тогда и только тогда, когда оба исходных высказывания истинны</question>
 			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться истинным тогда и только тогда, когда оба исходных высказывания истинны</question>
 			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться истинным тогда и только тогда, когда оба исходных высказывания ложны</question>
@@ -42,7 +42,7 @@
 	<exercise>
 		<title>Конъюнкция – это ...</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться истинным тогда и только тогда, когда оба исходных высказывания истинны</question>
 			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться ложным тогда и только тогда, когда оба исходных высказывания истинны</question>
 			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться ложным тогда и только тогда, когда оба исходных высказывания ложны</question>
@@ -56,7 +56,7 @@
 	<exercise>
 		<title>Какое предложение НЕ является высказыванием?</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>Никакая причина не извиняет невежливость</question>
 			<question>Обязательно стань отличником</question>
 			<question>Логика - наука о законах и формах человеческого мышления</question>
@@ -70,7 +70,7 @@
 	<exercise>
 		<title>Для какого минимального натурального  числа Х истинно высказывание ((X &lt; 5) v (X &lt; 3)) ^ ((X &lt; 2) v (X &lt; 1))?</title>
 		<questions>
-			<type>input</type>
+			<type>input_answer</type>
 		</questions>
 		<answers>
 			<settings including_space = "False" type = "number"/>
@@ -81,7 +81,7 @@
 	<exercise>
 		<title>Вычислите значение логического выражения (не А или B) и не B при A=0 и B=1. В ответе введите результат: 0 или 1</title>
 		<questions>
-			<type>input</type>
+			<type>input_answer</type>
 		</questions>
 		<answers>
 			<settings including_space = "False" type = "number"/>
@@ -92,7 +92,7 @@
 	<exercise>
 		<title>Какие из этих логических выражений истинны независимо от логического значения A?</title>
 		<questions>
-			<type>checkbox</type>
+			<type>multiple_selectable_answers</type>
 			<question>A или 1</question>
 			<question>A и 1</question>
 			<question>(не А)  или 1</question>
@@ -110,7 +110,7 @@
 	<exercise>
 		<title>Для каких из приведённых имён ЛОЖНО высказывание: НЕ(Первая буква гласная) ИЛИ (Последняя буква гласная)?</title>
 		<questions>
-			<type>checkbox</type>
+			<type>multiple_selectable_answers</type>
 			<question>Анна</question>
 			<question>Максим</question>
 			<question>Татьяна</question>
@@ -126,7 +126,7 @@
 	<exercise>
 		<title>Какая фраза является отрицанием утверждения «На улице идет снег и ветрено»?</title>
 		<questions>
-			<type>radio_button</type>
+			<type>selectable_answer</type>
 			<question>На улице нет ни снега, ни ветра</question>
 			<question>На улице или нет снега, или безветрие</question>
 			<question>На улице нет снега и ветрено</question>
