@@ -7,3 +7,4 @@ IT-Master Installer/IT-Master Installer.exe
 src/history_results.db
 temp/
 .ruff_cache
+pyproject.toml
