@@ -4,5 +4,6 @@ __pycache__/
 build/
 dist/
 IT-Master Installer/IT-Master Installer.exe
-resources/history_results.db
-LOG.log
+src/history_results.db
+temp/
+.ruff_cache

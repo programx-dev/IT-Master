@@ -5,7 +5,8 @@
 #define MyAppVersion "3.5.2"
 #define MyAppPublisher "ProgrammX"
 #define MyAppURL "https://github.com/ProgrammXCo"
-#define MyAppExeName "IT-Master.exe"
+#define MyAppMainExeName "IT-Master.exe"
+#define MyAppConstructorTestsExeName "ConstructorTests.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -19,6 +20,7 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
+DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 LicenseFile=C:\Users\PC\Desktop\old\LICENSE.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
@@ -41,7 +43,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "{app}"; Permissions: users-full
 
 [Files]
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\{#MyAppMainExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\{#MyAppConstructorTestsExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\courses\*"; DestDir: "{app}\courses"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\logs\*"; DestDir: "{app}\logs"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\PIL\*"; DestDir: "{app}\PIL"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -72,9 +75,9 @@ Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\VCRUNTIME140_1.dl
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppMainExeName}"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppMainExeName}"; Tasks: desktopicon
+Name: "{group}\{#MyAppConstructorTestsExeName}"; Filename: "{app}\{#MyAppConstructorTestsExeName}"
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-
+Filename: "{app}\{#MyAppMainExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

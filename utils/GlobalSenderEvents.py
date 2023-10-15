@@ -1,4 +1,4 @@
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore
 
 class Singleton(type):
     _instances = {}
@@ -24,4 +24,5 @@ class GlobalSenderEvents(QtCore.QObject, metaclass = MetaclassCommon):
     def dispatchEvent(self, name, *args, **kvargs):
         functions = self.__events.get(name, [])
         for func in functions:
-            QtCore.QTimer.singleShot(0, lambda: func(*args, **kvargs))
+            # QtCore.QTimer.singleShot(0, lambda: func(*args, **kvargs))
+            func(*args, **kvargs)
