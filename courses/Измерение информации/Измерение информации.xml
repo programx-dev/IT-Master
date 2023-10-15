@@ -1,102 +1,135 @@
+<?xml version='1.0' encoding='utf-8'?>
 <main>
 	<type>IT Master course</type>
 	<name>Измерение информации</name>
-	<lesson>Измерение информации.png</lesson>
-	
-	<exercise>
-		<title>Определите информационный объём слова "разряд", если считать, что алфавит состоит из 10 букв</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>14</question>
-			<question>44</question>
-			<question>24</question>
-			<question>34</question>
-		</questions>
-		<answers>
-			<answer>24</answer>
-		</answers>
-	</exercise>
-
-    <exercise>
-		<title>Какое количество информации необходимо для кодирования каждого из 256 символов некоторого алфавита?</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>32</question>
-			<question>8</question>
-			<question>48</question>
-			<question>16</question>
-		</questions>
-		<answers>
-			<answer>8</answer>
-		</answers>
-	</exercise>
-
-    <exercise>
-		<title>Книга, набранная с помощью компьютера, содержит 150 страниц; на каждой странице - 40 строк, в каждой строке - 60 символов. Каков объём информации в книге в байтах? (1 символ кодируется 8 битами)</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>35100</question>
-			<question>351</question>
-			<question>360000</question>
-			<question>3600</question>
-		</questions>
-		<answers>
-			<answer>360000</answer>
-		</answers>
-	</exercise>
-
-    <exercise>
-		<title>Сообщение объёмом 1,5 Кбайта содержит 3072 символа. Какова мощность алфавита, при помощи которого было записано сообщение? В ответе укажите количество символов</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>16</answer>
-		</answers>
-	</exercise>
-
-    <exercise>
-		<title>Какое количество информации в битах содержится в сообщении из 20 символов, записанном буквами из 32-символьного алфавита? В ответе напишите число</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>100</answer>
-		</answers>
-	</exercise>
-
-    <exercise>
-		<title>Документ, набранный на компьютере, содержит 32 страницы, на каждой странице 40 строк, в каждой строке 48 символов. Определите информационный объём документа в килобайтах, если каждый символ кодируется 8 битами. В ответе укажите число</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>60</answer>
-		</answers>
-	</exercise>
-
-    <exercise>
-		<title>Первое электронное письмо содержит 50 символов из 32-символьного алфавита, второе - 40 символов из 64-символьного алфавита. На сколько бит объём одного письма больше другого? В ответе укажите число</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>10</answer>
-		</answers>
-	</exercise>
-
-    <exercise>
-		<title>Сколько символов в сообщении, если объём сообщения равен 100 Кбайт, а в алфавите 1024 символа?</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>81920</answer>
-		</answers>
-	</exercise>
+	<lesson>Измерение информации.pdf</lesson>
+	<!-- 1 -->
+	<question>
+		<title>Что такое кодировка?</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>Способ представления символов в компьютере</answer_option>
+		<answer_option>Способ сжатия информации</answer_option>
+		<answer_option>Единица измерения скорости передачи данных</answer_option>
+		<answer_option>Способ измерения информации</answer_option>
+		<correct_answer>Способ представления символов в компьютере</correct_answer>
+	</question>
+	<!-- 2 -->
+	<question>
+		<title>Сопоставьте каждый информационный объем с равным ему по количеству информации, но представленному в битах.
+1) 16 байт
+2) 3 килобайта
+3) 28 килобайт
+4) 1 мегабайт</title>
+		<image>None</image>
+		<type>comparison_table</type>
+		<header>24576 бит</header>
+		<header>229376 бит</header>
+		<header>128 бит</header>
+		<header>8388608 бит</header>
+		<row>
+			<cell type="input" />
+			<cell type="input" />
+			<cell type="input" />
+			<cell type="input" />
+			<correct_answer>2</correct_answer>
+			<correct_answer>3</correct_answer>
+			<correct_answer>1</correct_answer>
+			<correct_answer>4</correct_answer>
+		</row>
+	</question>
+	<!-- 3 -->
+	<question>
+		<title>Объем информационного сообщения «Краткость – сестра таланта», в котором вес каждого символа составляет 1 байт, равен (без учета кавычек):</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>26 бит</answer_option>
+		<answer_option>208 бит</answer_option>
+		<answer_option>256 бит</answer_option>
+		<answer_option>208 байт</answer_option>
+		<answer_option>208 бит</answer_option>
+		<correct_answer>208 бит</correct_answer>
+	</question>
+	<!-- 4 -->
+	<question>
+		<title>Для хранения текста требуется 84000 бит. Сколько страниц займёт этот текст, если на странице размещается 30 строк по 70 символов в строке и один символ занимает 1 байт?</title>
+		<image>None</image>
+		<type>input_answer</type>
+		<correct_answer>5</correct_answer>
+	</question>
+	<!-- 5 -->
+	<question>
+		<title>Какой формулой определяется информационный объем сообщения?</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>I=k*i</answer_option>
+		<answer_option>I=cmΔt</answer_option>
+		<answer_option>I=V*Q</answer_option>
+		<answer_option>I=k+i</answer_option>
+		<correct_answer>I=k*i</correct_answer>
+	</question>
+	<!-- 6 -->
+	<question>
+		<title>Какими из следующих единиц измерения измеряется количество информации?</title>
+		<image>None</image>
+		<type>multiple_selectable_answers</type>
+		<answer_option>Эксабайт</answer_option>
+		<answer_option>Терафлопс</answer_option>
+		<answer_option>Гигапаскаль</answer_option>
+		<answer_option>Зеттабайт</answer_option>
+		<correct_answer>Эксабайт</correct_answer>
+		<correct_answer>Зеттабайт</correct_answer>
+	</question>
+	<!-- 7 -->
+	<question>
+		<title>Выберите все номера истинных высказываний:</title>
+		<image>None</image>
+		<type>multiple_selectable_answers</type>
+		<answer_option>В одном килобайте содержится 1000 байт</answer_option>
+		<answer_option>Чтобы узнать информационный объем сообщения необходимо знать количество символов в сообщении и информационный объем одного символа</answer_option>
+		<answer_option>Бит — минимальная единица измерения количества информации</answer_option>
+		<answer_option>Сила — это количество символов в алфавите</answer_option>
+		<answer_option>При измерении информации не учитывается её смысловое содержание</answer_option>
+		<correct_answer>Чтобы узнать информационный объем сообщения необходимо знать количество символов в сообщении и информационный объем одного символа</correct_answer>
+		<correct_answer>Бит — минимальная единица измерения количества информации</correct_answer>
+		<correct_answer>При измерении информации не учитывается её смысловое содержание</correct_answer>
+	</question>
+	<!-- 8 -->
+	<question>
+		<title>Слово ИНФОРМАТИКА закодировано с помощью алфавита мощностью 16. Сколько весит данное слово? Ответ дайте в битах.</title>
+		<image>None</image>
+		<type>input_answer</type>
+		<correct_answer>44</correct_answer>
+	</question>
+	<!-- 9 -->
+	<question>
+		<title>Сопоставьте обозначение единицы измерения с объектом её измерения:
+1) Информационный объем сообщения
+2) Вес символа алфавита
+3) Количество символов в сообщении
+4) Мощность алфавита</title>
+		<image>None</image>
+		<type>comparison_table</type>
+		<header>I</header>
+		<header>N</header>
+		<header>k</header>
+		<header>i</header>
+		<row>
+			<cell type="input" />
+			<cell type="input" />
+			<cell type="input" />
+			<cell type="input" />
+			<correct_answer>1</correct_answer>
+			<correct_answer>4</correct_answer>
+			<correct_answer>3</correct_answer>
+			<correct_answer>2</correct_answer>
+		</row>
+	</question>
+	<!-- 10 -->
+	<question>
+		<title>В корзине лежат 16 шаров. Все шары разного цвета. Сколько информации несёт сообщение о том, что достали красный шар? Ответ дайте в битах.</title>
+		<image>None</image>
+		<type>input_answer</type>
+		<correct_answer>4</correct_answer>
+	</question>
 </main>

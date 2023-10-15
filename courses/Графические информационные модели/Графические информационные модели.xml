@@ -2,101 +2,141 @@
 	<type>IT Master course</type>
 	<name>Графические информационные модели</name>
 	<lesson>Графические информационные модели.pdf</lesson>
-
-	<exercise>
-		<title>Между населёнными пунктами A, B, C, D, E построены дороги, протяжённость которых (в километрах) приведена в таблице. Определите длину кратчайшего пути между пунктами B и E. Передвигаться можно только по дорогам, протяжённость которых указана в таблице</title>
-		<questions>
-			<image>01.png</image>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<answer>9</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>У Пети Иванова родственники живут в 5 разных городах России. Расстояния между городами внесены в таблицу. Петя перерисовал её в блокнот в виде графа. Считая, что мальчик не ошибся при копировании, укажите, какой граф у Пети в тетради. В ответе введите номер графа на рисунке</title>
-		<questions>
-			<image>02.png</image>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<answer>1</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>На рисунке – схема дорог, связывающих города А, Б, В, Г, Д, Е, Ж и К. По каждой дороге можно двигаться только в одном направлении, указанном стрелкой. Сколько существует различных путей из города А в город К?</title>
-		<questions>
-			<image>03.png</image>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<answer>12</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>На рисунке – схема дорог, связывающих города А, Б, В, Г, Д, Е, Ж, З, И, К и Л. По каждой дороге можно двигаться только в одном направлении, указанном стрелкой. Сколько существует различных путей из города А в город Л?</title>
-		<questions>
-			<image>04.png</image>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<answer>18</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>На рисунке – схема дорог, связывающих города A, B, C, D, E, F, G, H, I и J. По каждой дороге можно двигаться только в одном направлении, указанном стрелкой. Сколько существует различных путей из города A в город J?</title>
-		<questions>
-			<image>05.png</image>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<answer>14</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Путешественник пришел в 08:00 на автостанцию поселка ОЛЬГИНО и увидел показанное на рисунке расписание автобусов. Определите самое раннее время, когда путешественник сможет оказаться в пункте ПАВЛИНО согласно этому расписанию</title>
-		<questions>
-			<image>06.png</image>
-			<type>selectable_answer</type>
-			<question>08:40</question>
-			<question>10:45</question>
-			<question>11:20</question>
-			<question>12:15</question>
-		</questions>
-		<answers>
-			<answer>12:15</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>В соревнованиях по зимним видам спорта принимают участие лыжники (Л), конькобежцы (К) и хоккеисты (X). Спортсмены имеют разный уровень мастерства: каждый имеет либо III, либо II, либо I разряд, либо является мастером спорта (М). На первой диаграмме отражено количество спортсменов с различным уровнем спортивного мастерства, а на второй — распределение спортсменов по видам спорта. Какие из этих утверждений следуют из анализа обеих представленных диаграмм?</title>
-		<questions>
-			<image>07.png</image>
-			<type>multiple_selectable_answers</type>
-			<question>Все спортсмены I разряда могут быть конькобежцами</question>
-			<question>Все лыжники могут быть мастерами спорта</question>
-			<question>Все хоккеисты могут иметь II разряд</question>
-			<question>Все спортсмены I разряда могут быть хоккеистами</question>
-		</questions>
-		<answers>
-			<answer>Все спортсмены I разряда могут быть конькобежцами</answer>
-			<answer>Все хоккеисты могут иметь II разряд</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>На рисунке - схема дорог, связывающих города А, Б, В, Г, Д, Е, Ж, З, И, К. По каждой дороге можно двигаться только в одном направлении, указанном стрелкой. Сколько существует различных путей из города А в город К?</title>
-		<questions>
-			<image>08.png</image>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<answer>18</answer>
-		</answers>
-	</exercise>
+	<!-- 1 -->
+	<question>
+		<title>Сопоставьте понятие с его определением. К каждой позиции первого столбца подберите соответствующую позицию второго и запишите в таблицу выбранные цифры под соответствующими понятиями. 
+Определения
+1) граф, в котором нет циклов
+2) представление некоторого объекта в общих, главных чертах с помощью условных обозначений
+3) это набор вершин (узлов) и связей между ними — рёбер
+4) графическое изображение, дающее наглядное представление о характере зависимости одной величины от другой
+5) графическое изображение, дающее наглядное представление о соотношении каких-либо величин или нескольких значений одной величины, об изменении их значений</title>
+		<type>comparison_table</type>
+		<image>None</image>
+		<header>Схема</header>
+		<header>График</header>
+		<header>Диаграмма</header>
+		<header>Граф</header>
+		<header>Дерево</header>
+		<row>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<correct_answer>2</correct_answer>
+			<correct_answer>4</correct_answer>
+			<correct_answer>5</correct_answer>
+			<correct_answer>3</correct_answer>
+			<correct_answer>1</correct_answer>
+		</row>
+	</question>
+	<!-- 2 -->
+	<question>
+		<title>Укажите соответствие между классами графических информационных моделей. Запишите в таблицу выбранные цифры под соответствующими понятиями.</title>
+		<type>comparison_table</type>
+		<image>01.png</image>
+		<header>Схема</header>
+		<header>Диаграмма</header>
+		<header>Чертеж</header>
+		<header>Карта</header>
+		<header>График</header>
+		<header>Граф</header>
+		<row>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<correct_answer>4</correct_answer>
+			<correct_answer>3</correct_answer>
+			<correct_answer>2</correct_answer>
+			<correct_answer>6</correct_answer>
+			<correct_answer>5</correct_answer>
+			<correct_answer>1</correct_answer>
+		</row>
+	</question>
+	<!-- 3 -->
+	<question>
+		<title>Что из перечисленного относится к графическим информационным моделям?</title>
+		<type>multiple_selectable_answers</type>
+		<image>None</image>
+		<answer_option>схема</answer_option>
+		<answer_option>текст</answer_option>
+		<answer_option>игрушечная машинка</answer_option>
+		<answer_option>чертёж</answer_option>
+		<answer_option>график</answer_option>
+		<correct_answer>схема</correct_answer>
+		<correct_answer>чертёж</correct_answer>
+		<correct_answer>график</correct_answer>
+	</question>
+	<!-- 4 -->
+	<question>
+		<title>Отметьте все элементы, которые могут присутствовать в дереве.</title>
+		<type>multiple_selectable_answers</type>
+		<image>None</image>
+		<answer_option>корень</answer_option>
+		<answer_option>ствол</answer_option>
+		<answer_option>листья</answer_option>
+		<answer_option>дуги (ребра)</answer_option>
+		<answer_option>почки</answer_option>
+		<correct_answer>корень</correct_answer>
+		<correct_answer>листья</correct_answer>
+		<correct_answer>дуги (ребра)</correct_answer>
+	</question>
+	<!-- 5 -->
+	<question>
+		<title>Граф называют взвешенным, если:</title>
+		<type>selectable_answer</type>
+		<image>None</image>
+		<answer_option>его вершины или ребра характеризуются некоторой дополнительной информацией — весами вершин или ребер</answer_option>
+		<answer_option>есть циклы</answer_option>
+		<answer_option>между любыми двумя вершинами имеется единственный путь</answer_option>
+		<answer_option>указаны направления ребер графа</answer_option>
+		<correct_answer>его вершины или ребра характеризуются некоторой дополнительной информацией — весами вершин или ребер</correct_answer>
+	</question>
+	<!-- 6 -->
+	<question>
+		<title>В каком случае граф называют деревом?</title>
+		<type>selectable_answer</type>
+		<image>None</image>
+		<answer_option>его вершины или ребра характеризуются некоторой дополнительной информацией — весами вершин или ребер</answer_option>
+		<answer_option>между любыми двумя вершинами имеется единственный путь</answer_option>
+		<answer_option>указаны направления ребер графа</answer_option>
+		<answer_option>есть циклы</answer_option>
+		<correct_answer>между любыми двумя вершинами имеется единственный путь</correct_answer>
+	</question>
+	<!-- 7 -->
+	<question>
+		<title>Между населенными пунктами А, В, С, D, Е построены дороги, протяженность которых (в километрах) приведена в таблице. Определите длину кратчайшего пути между пунктами А и E. Передвигаться можно только по дорогам, протяженность которых указана в таблице.</title>
+		<type>input_answer</type>
+		<image>02.png</image>
+		<correct_answer>10</correct_answer>
+	</question>
+	<!-- 8 -->
+	<question>
+		<title>Между населенными пунктами А, В, С, D, Е, F построены дороги, протяженность которых (в километрах) приведена в таблице. Определите длину кратчайшего пути между пунктами А и F. Передвигаться можно только по дорогам, протяженность которых указана в таблице.</title>
+		<type>input_answer</type>
+		<image>03.png</image>
+		<correct_answer>13</correct_answer>
+	</question>
+	<!-- 9 -->
+	<question>
+		<title>На рисунке — схема дорог, связывающих города А, Б, В, Г, Д, Е, Ж и К. По каждой дороге можно двигаться только в одном направлении, указанном стрелкой. Сколько существует различных путей из города А в город К?</title>
+		<type>input_answer</type>
+		<image>04.png</image>
+		<correct_answer>7</correct_answer>
+	</question>
+	<!-- 10 -->
+	<question>
+		<title>Путешественник пришел в 08:00 на автостанцию поселка ЛЕСНОЕ и увидел следующее расписание автобусов. Определите самое раннее время, когда путешественник сможет оказаться в пункте ПОЛЕВОЕ согласно этому расписанию.</title>
+		<type>selectable_answer</type>
+		<image>05.png</image>
+		<answer_option>10:30</answer_option>
+		<answer_option>11:25</answer_option>
+		<answer_option>11:40</answer_option>
+		<answer_option>11:45</answer_option>
+		<correct_answer>11:40</correct_answer>
+	</question>
 </main>

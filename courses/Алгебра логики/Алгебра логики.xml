@@ -1,140 +1,147 @@
 <main>
 	<type>IT Master course</type>
 	<name>Алгебра логики</name>
-	<lesson>Алгебра логики.png</lesson>
-	
-	<exercise>
-		<title>Выберите верные обозначения истинности/ложности логических высказываний</title>
-		<questions>
-			<type>multiple_selectable_answers</type>
-			<question>True/False</question>
-			<question>T/F</question>
-			<question>1/0</question>
-			<question>Истинность/Ложность</question>
-			<question>Правильно/Неправильно</question>
-			<question>Верно/Неверно</question>
-			<question>Истина/Ложь</question>
-			<question>И/Л</question>
-		</questions>
-		<answers>
-			<answer>True/False</answer>
-			<answer>T/F</answer>
-			<answer>1/0</answer>
-			<answer>Истина/Ложь</answer>
-			<answer>И/Л</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Дизъюнкция – это ...</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться ложным тогда и только тогда, когда оба исходных высказывания истинны</question>
-			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться истинным тогда и только тогда, когда оба исходных высказывания истинны</question>
-			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться истинным тогда и только тогда, когда оба исходных высказывания ложны</question>
-			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться ложным тогда и только тогда, когда оба исходных высказывания ложны</question>
-		</questions>
-		<answers>
-			<answer>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться ложным тогда и только тогда, когда оба исходных высказывания ложны</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Конъюнкция – это ...</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться истинным тогда и только тогда, когда оба исходных высказывания истинны</question>
-			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться ложным тогда и только тогда, когда оба исходных высказывания истинны</question>
-			<question>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться ложным тогда и только тогда, когда оба исходных высказывания ложны</question>
-			<question>логическая операция, которая преобразует исходное высказывание в новое, значение которого противоположно исходному</question>
-		</questions>
-		<answers>
-			<answer>логическая операция, которая объединяет два высказывания в одно новое, которое будет являться истинным тогда и только тогда, когда оба исходных высказывания истинны</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Какое предложение НЕ является высказыванием?</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>Никакая причина не извиняет невежливость</question>
-			<question>Обязательно стань отличником</question>
-			<question>Логика - наука о законах и формах человеческого мышления</question>
-			<question>1011₂=1*2³+0*2²+1*2+1*1</question>
-		</questions>
-		<answers>
-			<answer>Обязательно стань отличником</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Для какого минимального натурального  числа Х истинно высказывание ((X &lt; 5) v (X &lt; 3)) ^ ((X &lt; 2) v (X &lt; 1))?</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>1</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Вычислите значение логического выражения (не А или B) и не B при A=0 и B=1. В ответе введите результат: 0 или 1</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>0</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Какие из этих логических выражений истинны независимо от логического значения A?</title>
-		<questions>
-			<type>multiple_selectable_answers</type>
-			<question>A или 1</question>
-			<question>A и 1</question>
-			<question>(не А)  или 1</question>
-			<question>(не А) или А</question>
-			<question>1 или (0 и А)</question>
-		</questions>
-		<answers>
-			<answer>A или 1</answer>
-			<answer>(не А)  или 1</answer>
-			<answer>(не А) или А</answer>
-			<answer>1 или (0 и А)</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Для каких из приведённых имён ЛОЖНО высказывание: НЕ(Первая буква гласная) ИЛИ (Последняя буква гласная)?</title>
-		<questions>
-			<type>multiple_selectable_answers</type>
-			<question>Анна</question>
-			<question>Максим</question>
-			<question>Татьяна</question>
-			<question>Егор</question>
-			<question>Антон</question>
-		</questions>
-		<answers>
-			<answer>Егор</answer>
-			<answer>Антон</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Какая фраза является отрицанием утверждения «На улице идет снег и ветрено»?</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>На улице нет ни снега, ни ветра</question>
-			<question>На улице или нет снега, или безветрие</question>
-			<question>На улице нет снега и ветрено</question>
-			<question>На улице идет снег и нет ветра</question>
-			<question>На улице идет снег или дует ветер</question>
-		</questions>
-		<answers>
-			<answer>На улице или нет снега, или безветрие</answer>
-		</answers>
-	</exercise>
+	<lesson>Алгебра логики.pdf</lesson>
+	<!-- 1 -->
+	<question>
+		<title>Что из перечисленного относится к логическим операциям?</title>
+		<type>multiple_selectable_answers</type>
+		<image>None</image>
+		<answer_option>Конъюнкция</answer_option>
+		<answer_option>Степень</answer_option>
+		<answer_option>Инверсия</answer_option>
+		<answer_option>Дизъюнкция</answer_option>
+		<answer_option>Переход </answer_option>
+		<correct_answer>Конъюнкция</correct_answer>
+		<correct_answer>Инверсия</correct_answer>
+		<correct_answer>Дизъюнкция</correct_answer>
+	</question>
+	<!-- 2 -->
+	<question>
+		<title>Сопоставьте понятие с его определением. К каждой позиции первого столбца подберите соответствующую позицию второго и запишите в таблицу выбранные цифры под соответствующими понятиями.
+Определения:
+1) Предложение на любом языке, содержание которого можно однозначно определить как истинное или ложное.
+2) Показывает, что для логической суммы и логического произведения порядок расположения переменных не играет никакой роли. 
+3) Показывают, что результат последовательного сложения или умножения нескольких переменных не зависит от порядка этих действий.
+4) Конструкция языка программирования, результатом вычисления которой является «истина» или «ложь».</title>
+		<type>comparison_table</type>
+		<image>None</image>
+		<header>Переместительный закон </header>
+		<header>Высказывание</header>
+		<header>Сочетательный закон</header>
+		<header>Логическое выражение</header>
+		<row>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<cell text="" type="input"></cell>
+			<correct_answer>2</correct_answer>
+			<correct_answer>1</correct_answer>
+			<correct_answer>3</correct_answer>
+			<correct_answer>4</correct_answer>
+		</row>
+	</question>
+	<!-- 3 -->
+	<question>
+		<title>Что такое таблица истинности?</title>
+		<type>selectable_answer</type>
+		<image>None</image>
+		<answer_option>Таблица, которая показывает все возможные результаты логической операции для разных значений операндов.</answer_option>
+		<answer_option>Таблица, которая показывает только истинные значения операндов.</answer_option>
+		<answer_option>Запись всех значений операндов в один столбец.</answer_option>
+		<correct_answer>Таблица, которая показывает все возможные результаты логической операции для разных значений операндов.</correct_answer>
+	</question>
+	<!-- 4 -->
+	<question>
+		<title>На числовой прямой даны два отрезка: P=[12,22] и Q=[7,17].
+Выберите такой отрезок A, что формула (x∉P) ∧ (x∈Q) ∧ (x∈A) тождественно ложна, то есть принимает значение 0 при любом значении переменной х.</title>
+		<type>selectable_answer</type>
+		<image>None</image>
+		<answer_option>[0, 5]</answer_option>
+		<answer_option>[7, 12]</answer_option>
+		<answer_option>[10, 20]</answer_option>
+		<answer_option>[5, 22]</answer_option>
+		<correct_answer>[0, 5]</correct_answer>
+	</question>
+	<!-- 5 -->
+	<question>
+		<title>На скольких операциях основана алгебра логики?</title>
+		<type>selectable_answer</type>
+		<image>None</image>
+		<answer_option>На двух</answer_option>
+		<answer_option>На трёх</answer_option>
+		<answer_option>На четырёх</answer_option>
+		<correct_answer>На трёх</correct_answer>
+	</question>
+	<!-- 6 -->
+	<question>
+		<title>Какие из следующих высказываний являются ложными:</title>
+		<type>multiple_selectable_answers</type>
+		<image>None</image>
+		<answer_option>XXI-XVIII=IV</answer_option>
+		<answer_option>Треугольник — геометрическая фигура</answer_option>
+		<answer_option>Информатика — наука, изучающая компьютеры</answer_option>
+		<answer_option>Пар — газообразное состояние воды</answer_option>
+		<answer_option>Клавиатура — устройство ввода информации </answer_option>
+		<correct_answer>XXI-XVIII=IV</correct_answer>
+		<correct_answer>Информатика — наука, изучающая компьютеры</correct_answer>
+	</question>
+	<!-- 7 -->
+	<question>
+		<title>Найдите наибольшее целое число N, для которого истинно высказывание: (N &#60; 20) И НЕ(N чётное).</title>
+		<type>input_answer</type>
+		<image>None</image>
+		<correct_answer>19</correct_answer>
+	</question>
+	<!-- 8 -->
+	<question>
+		<title>Заполните таблицу истинности:</title>
+		<type>comparison_table</type>
+		<image>None</image>
+		<header>a</header>
+		<header>b</header>
+		<header>(a и b) или b</header>
+		<row>
+			<cell text="0" type="label"></cell>
+			<cell text="0" type="label"></cell>
+			<cell text="" type="input"></cell>
+			<correct_answer>0</correct_answer>
+		</row>
+		<row>
+			<cell text="0" type="label"></cell>
+			<cell text="1" type="label"></cell>
+			<cell text="" type="input"></cell>
+			<correct_answer>1</correct_answer>
+		</row>
+		<row>
+			<cell text="1" type="label"></cell>
+			<cell text="0" type="label"></cell>
+			<cell text="" type="input"></cell>
+			<correct_answer>0</correct_answer>
+		</row>
+		<row>
+			<cell text="1" type="label"></cell>
+			<cell text="1" type="label"></cell>
+			<cell text="" type="input"></cell>
+			<correct_answer>1</correct_answer>
+		</row>
+	</question>
+	<!-- 9 -->
+	<question>
+		<title>Для какого названия реки истинно высказывание: (Вторая буква гласная ∧ Предпоследняя буква согласная) ∧ Первая буква стоит в алфавите раньше третьей.</title>
+		<type>selectable_answer</type>
+		<image>None</image>
+		<answer_option>Москва</answer_option>
+		<answer_option>Двина</answer_option>
+		<answer_option>Дунай</answer_option>
+		<answer_option>Ока </answer_option>
+		<correct_answer>Москва</correct_answer>
+	</question>
+	<!-- 10 -->
+	<question>
+		<title>Для какого наименьшего числа X истинно выражение (X &#62; 16) И НЕ(X &#62; 25)?</title>
+		<type>input_answer</type>
+		<image>None</image>
+		<correct_answer>17</correct_answer>
+	</question>
 </main>
