@@ -1,5 +1,6 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import enum
+import typing
 
 class Direction(enum.Enum):
     Left = 0
@@ -292,10 +293,12 @@ class TitileBarWindow(QtWidgets.QWidget):
 
 class AbstractWindow(QtWidgets.QWidget):
     """Класс для абстрактного окна"""
+
     Margins = 5
+    closing_window = QtCore.pyqtSignal()
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
         self.__pressed  = False
         self.__mouse_pos = None
@@ -469,7 +472,7 @@ class AbstractWindow(QtWidgets.QWidget):
             self.setCursor(QtCore.Qt.CursorShape.SizeVerCursor)
 
     def __resize_window(self, pos):
-        if self.__direction == None:
+        if self.__direction is None:
             return
         mpos = pos - self.__mouse_pos
         xPos, yPos = mpos.x(), mpos.y()
@@ -613,6 +616,8 @@ class AbstractWindow(QtWidgets.QWidget):
         return super().eventFilter(obj, event)
 
     def close_window(self):
+        self.closing_window.emit()
+        
         self.close()
 
     def set_resizeable(self, resizeable: bool):
@@ -662,13 +667,17 @@ class AbstractWindow(QtWidgets.QWidget):
 class Dialog(AbstractWindow):
     """Класс для базового диалогового окна"""
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent: typing.Optional[QtWidgets.QWidget] = None):
+        self.__parent = parent
+
+        super().__init__(parent = self.__parent)
         super().setWindowFlags(super().windowFlags() | QtCore.Qt.WindowType.Dialog)
 
 class Window(AbstractWindow):
     """Класс для главного окна"""
    
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent: typing.Optional[QtWidgets.QWidget] = None):
+        self.__parent = parent
+
+        super().__init__(parent = self.__parent)
         super().setWindowFlags(super().windowFlags() | QtCore.Qt.WindowType.Window)

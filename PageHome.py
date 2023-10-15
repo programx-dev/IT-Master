@@ -142,7 +142,7 @@ class PageHome(QtWidgets.QWidget):
             tree = ET.parse(f)
             root = tree.getroot()
 
-            if (type := root.find("type")) != None and type.text == "IT Master course":
+            if (type := root.find("type")) is not None and type.text == "IT Master course":
                 name = root.find("name").text
                 list_data_courses.append(DataCourse(name = name, path_course = f))
 

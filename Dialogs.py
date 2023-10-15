@@ -2,6 +2,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 import Window
 import os
 import json
+from utils import ImageViewer
 from glob import glob
 from dataclasses import dataclass
 import enum
@@ -24,7 +25,8 @@ class DataSettings:
 class Dialog(Window.Dialog):
     """Настраиваемое диалоговое окно"""
     
-    def __init__(self):
+    def __init__(self, parent: typing.Optional[QtWidgets.QWidget] = None):
+        self.__parent = parent
         self.__icon = None
         self.__text = None
         self.__description = None
@@ -33,9 +35,9 @@ class Dialog(Window.Dialog):
         self.__value = None
         self.__event_loop = None
 
-        super().__init__()
+        super().__init__(self.__parent)
         self.setObjectName("dialog")
-        super().set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint)
+        super().set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.Tool)
         super().setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         super().set_resizeable(False)
 
@@ -113,7 +115,7 @@ class Dialog(Window.Dialog):
         self.close()
         
     def close_window(self):
-        if self.__event_loop != None:
+        if self.__event_loop is not None:
             self.__event_loop.exit()
 
         super().close_window()
@@ -164,7 +166,7 @@ class Dialog(Window.Dialog):
         push_button.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
 
         push_button.clicked.connect(lambda: self.__push_button_pressed(role))
-        if self.__defaul_push_button == None:
+        if self.__defaul_push_button is None:
             self.__defaul_push_button = push_button
             push_button.setDefault(True)
         elif default:
@@ -194,12 +196,13 @@ class Dialog(Window.Dialog):
 class DialogAbout(Window.Dialog):
     """Диалоговое окно О программе"""
     
-    def __init__(self, pixmap: QtGui.QPixmap):
+    def __init__(self, parent: typing.Optional[QtWidgets.QWidget] = None, pixmap: QtGui.QPixmap = ...):
+        self.__parent = parent
         self.__pixmap = pixmap
 
-        super().__init__()
+        super().__init__(self.__parent)
         self.setObjectName("dialog_about")
-        super().set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint)
+        super().set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.Tool)
         super().setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         super().set_resizeable(False)
 
@@ -288,7 +291,7 @@ class DialogAbout(Window.Dialog):
         self.title_bar_window.window_close.connect(self.__exit_window)
 
     def close_window(self):
-        if self.__event_loop != None:
+        if self.__event_loop is not None:
             self.__event_loop.exit()
 
         super().close_window()
@@ -314,14 +317,16 @@ class DialogSettings(Window.Dialog):
     """Диалоговое окно Настройка"""
     push_button_clear_clicked = QtCore.pyqtSignal()
     
-    def __init__(self, dir_theme: str, data_settings: DataSettings, path_images: str):
+    def __init__(self, parent: typing.Optional[QtWidgets.QWidget] = None, dir_theme: str = ..., data_settings: DataSettings = ..., path_images: str = ...):
+        self.__parent = parent
         self.__data_settings = data_settings
         self.__dir_theme = dir_theme
         self.__path_images = path_images
+        self.__event_loop = None
 
-        super().__init__()
+        super().__init__(self.__parent)
         self.setObjectName("dialog_settings")
-        super().set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint)
+        super().set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.Tool)
         super().setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
         super().set_resizeable(False)
 
@@ -488,7 +493,7 @@ class DialogSettings(Window.Dialog):
 
     def close_window(self):
         self.__data_settings.path_theme = None
-        if self.__event_loop != None:
+        if self.__event_loop is not None:
             self.__event_loop.exit()
 
         super().close_window()
@@ -526,4 +531,62 @@ class DialogSettings(Window.Dialog):
     def __exit_window(self):
         if self.__event_loop:
             self.__event_loop.exit()
+        self.close()
+
+class DialogImageViewer(Window.Dialog):
+    """Диалоговое окно для просмотра изображений"""
+    
+    def __init__(self, parent: typing.Optional[QtWidgets.QWidget] = None):
+        self.__parent = parent
+        super().__init__(self.__parent)
+        self.setObjectName("dialog_image_viewer")
+        super().set_window_flags(QtCore.Qt.WindowType.WindowCloseButtonHint | QtCore.Qt.WindowType.Tool)
+        # super().setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
+        super().setMinimumSize(270, 250)
+
+        self.__path_image = None
+        self.__event_loop = None
+
+        # главная рамка
+        self.__frame_main = QtWidgets.QFrame()
+        self.__frame_main.setObjectName("frame_main")
+
+        self.add_widget(self.__frame_main)
+
+        # главный макет
+        self.__vbox_layout_main = QtWidgets.QVBoxLayout()
+        self.__vbox_layout_main.setSpacing(0)
+        self.__vbox_layout_main.setContentsMargins(0, 0, 0, 0)
+
+        self.__frame_main.setLayout(self.__vbox_layout_main)
+
+        # виджет просмотра изображений
+        self.__image_viewer = ImageViewer.ImageViewer()
+        self.__image_viewer.setObjectName("image_viewer")
+
+        self.__vbox_layout_main.addWidget(self.__image_viewer)
+
+        # подключение слотов к сигналам
+        self.title_bar_window.window_close.connect(self.__exit_window)
+
+    def load_image(self, path_image: str):
+        self.__path_image = path_image
+
+        self.__image_viewer.set_image(QtGui.QPixmap(self.__path_image))
+
+    def close_window(self):
+        if self.__event_loop is not None:
+            self.__event_loop.exit()
+
+        super().close_window()
+
+    def __exit_window(self):
+        if self.__event_loop:
+            self.__event_loop.exit()
+        self.close()
+
+    def run_modal(self):
+        self.__event_loop = QtCore.QEventLoop()
+        self.show()
+        self.__event_loop.exec()
         self.close()

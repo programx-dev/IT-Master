@@ -4,6 +4,8 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from PyQt6.QtCharts import QChart, QChartView, QPieSeries
 import PageTesting
+from utils import Logging
+import logging
 
 @dataclass
 class DataPushButtonResultTesting:
@@ -259,15 +261,19 @@ class PageHistory(QtWidgets.QWidget):
         amount_results = len(self.__list_data_result_testing)
         if amount_results > 0:
             for i, element in enumerate(self.__list_data_result_testing):
-                push_button_result_testing = PushButtonResultTesting(data_result_testing = element, data_push_button_result_testing = self.__data_push_button_result_testing)
-                push_button_result_testing.push_button_result_testing_clicked.connect(self.__push_button_result_testing_press)
-                self.__list_push_button_result_testing.append(push_button_result_testing)
-                
-                self.__vbox_layout_push_button_result_testing.insertWidget(0, push_button_result_testing)
+                try:
+                    push_button_result_testing = PushButtonResultTesting(data_result_testing = element, data_push_button_result_testing = self.__data_push_button_result_testing)
+                    push_button_result_testing.push_button_result_testing_clicked.connect(self.__push_button_result_testing_press)
+                    self.__list_push_button_result_testing.append(push_button_result_testing)
+                    
+                    self.__vbox_layout_push_button_result_testing.insertWidget(0, push_button_result_testing)
 
-                if i < amount_results:
-                    self.__vbox_layout_push_button_result_testing.insertSpacing(1, 5)
-        else:
+                    if i < amount_results:
+                        self.__vbox_layout_push_button_result_testing.insertSpacing(1, 5)
+                except Exception:
+                    Logging.logger.error("Не удается найти тест (тест удален или перемещен)", exc_info = True)
+                    
+        if len(self.__list_push_button_result_testing) == 0 or amount_results == 0:
             self.__widget_stub = WidgetStub()
             self.__widget_stub.set_pixmap(QtGui.QPixmap(os.path.join(self.__path_images, r"box_empty.png")))
             self.__widget_stub.set_text("Пока еще нет результатов тестирования")
@@ -307,9 +313,12 @@ class PageHistory(QtWidgets.QWidget):
 
                 if i < amount_results:
                     self.__vbox_layout_push_button_result_testing.insertSpacing(1, 5)
-        else:
+        elif not self.__widget_stub:
             self.__widget_stub = WidgetStub()
             self.__widget_stub.set_pixmap(QtGui.QPixmap(os.path.join(self.__path_images, r"box_empty.png")))
             self.__widget_stub.set_text("Пока еще нет результатов тестирования")
 
             self.__vbox_layout_push_button_result_testing.addWidget(self.__widget_stub)
+
+Logging.logger.setLevel(logging.DEBUG)
+Logging.c_handler.setLevel(logging.DEBUG)

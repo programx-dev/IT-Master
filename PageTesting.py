@@ -6,6 +6,7 @@ import re
 import enum
 from PIL import Image
 from dataclasses import dataclass
+from Dialogs import DialogImageViewer
 
 class AnswerStatus(enum.Enum):
     wrong = 0
@@ -23,6 +24,10 @@ class DataResultTesting:
     date_end: datetime.datetime
     path_course: str
     list_data_result: list[DataResult]
+
+class TypeCellTableAnswer(enum.Enum):
+    input = 0
+    label = 1
 
 @dataclass
 class DataPageTest:
@@ -48,7 +53,7 @@ class PushButtonNavigation(QtWidgets.QPushButton):
         self.setProperty("current", self.current())
 
     def push_button_navigation_press(self):
-        if self != PushButtonNavigation.push_button_navigation_current and PushButtonNavigation.push_button_navigation_current != None:
+        if self != PushButtonNavigation.push_button_navigation_current and PushButtonNavigation.push_button_navigation_current is not None:
             PushButtonNavigation.push_button_navigation_current.__set_current(False)
 
         if self != PushButtonNavigation.push_button_navigation_current:
@@ -253,7 +258,7 @@ class CheckboxAnswer(QtWidgets.QWidget):
     def __checkbox_clicked(self):
         if not self.is_enabled():
             return
-        if self.__checked == True:
+        if self.__checked:
             self.set_checked(checked = False)
         else:
             self.set_checked(checked = True)
@@ -283,12 +288,12 @@ class CheckboxAnswer(QtWidgets.QWidget):
         return super().leaveEvent(event)
 
     def set_checked(self, checked: bool):
-        if checked == True:
+        if checked:
             self.__checked = True
 
             self.__push_button_flag.setIcon(self.__image_checked)
 
-        elif checked == False:
+        else:
             self.__checked = False
 
             self.__push_button_flag.setIcon(self.__image_unchecked)
@@ -362,7 +367,7 @@ class RadioButtonAnswer(QtWidgets.QFrame):
     def __radio_button_clicked(self):
         if not self.is_enabled():
             return
-        if self.__checked == False:
+        if not self.__checked:
             self.set_checked(checked = True)
 
     def enterEvent(self, event: QtGui.QEnterEvent):
@@ -390,11 +395,11 @@ class RadioButtonAnswer(QtWidgets.QFrame):
         return super().leaveEvent(event)
 
     def set_checked(self, checked: bool):
-        if checked == True:
+        if checked:
             self.__checked = True
 
             self.__push_button_flag.setIcon(self.__image_checked)
-        elif checked == False:
+        else:
             self.__checked = False
 
             self.__push_button_flag.setIcon(self.__image_unchecked)
@@ -415,7 +420,7 @@ class GroupRadiobuttonsAnswer(QtCore.QObject):
         radio_button = self.sender()
 
         if radio_button.is_checked() and self.__checked_radio_button != radio_button:
-            if self.__checked_radio_button !=  None:
+            if self.__checked_radio_button is not None:
                 self.__checked_radio_button.set_checked(checked = False)
             self.__checked_radio_button = radio_button
 
@@ -455,6 +460,136 @@ class LineEditAnswer(QtWidgets.QLineEdit):
     def __line_edit_text_changed(self):
         self.line_edit_answer_text_changed.emit()
 
+class LineEditMinimizeable(QtWidgets.QLineEdit):
+    """Поле ввода с фиксированной подсказкой размера"""
+
+    def sizeHint(self):
+        return QtCore.QSize(super().fontMetrics().averageCharWidth() * 10, super().minimumSizeHint().height())
+
+@dataclass
+class DataCellTableAnswer:
+    cell: LineEditMinimizeable
+    type: TypeCellTableAnswer
+
+class TableAnswer(QtWidgets.QWidget):
+    """Класс для таблилы для ввода сопоставлений"""
+    table_answer_changed = QtCore.pyqtSignal()
+
+    def __init__(self, headers: list[str]):
+        super().__init__()
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Preferred)
+        self.setMinimumWidth(QtGui.QFontMetrics(QtGui.QFont("Segoe UI", 14)).averageCharWidth() * 50)
+        self.setObjectName("table_answer")
+
+        self.__headers = headers
+        self.__list_cell_table_answer = list()
+        self.__current_row = 0
+
+        # self.__enabled = True        
+
+        # главный макет
+        self.__grid_layout_main = QtWidgets.QGridLayout()
+        self.__grid_layout_main.setSpacing(0)
+        self.__grid_layout_main.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(self.__grid_layout_main)
+
+        self.__amount_columns = len(self.__headers)
+        # метки заголовка
+        for i, header in enumerate(self.__headers):
+            label_header = QtWidgets.QLabel()
+            label_header.setObjectName("label_header")
+            label_header.setText(header)
+            label_header.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            label_header.setFont(QtGui.QFont("Segoe UI", 14))
+            label_header.setFixedHeight(42)
+
+            if self.__amount_columns == 1:
+                label_header.setProperty("only-one", True)
+            elif i == 0:
+                label_header.setProperty("first", True)
+            elif i == self.__amount_columns - 1:
+                label_header.setProperty("last", True)
+
+            self.__grid_layout_main.addWidget(label_header, 0, i)
+
+    def is_enabled(self) -> bool:
+        # return self.__enabled
+        return super().isEnabled()
+
+    def set_enabled(self, enabled: bool):
+        # self.__enabled = enabled
+        if enabled:
+            for row in self.__list_cell_table_answer:
+                for element in row:
+                    element.cell.setPlaceholderText("Введите правильное значение...")
+        else:
+            for row in self.__list_cell_table_answer:
+                for element in row:
+                    element.cell.setPlaceholderText("")
+
+        super().setEnabled(enabled)
+
+    def __add_empty_row(self):
+        self.__current_row += 1
+        self.__list_cell_table_answer.append(list())
+
+        # поля ввода
+        for i in range(len(self.__headers)):
+            line_edit_answer = LineEditMinimizeable()
+            line_edit_answer.setObjectName("line_edit_answer")
+            line_edit_answer.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+            line_edit_answer.setFont(QtGui.QFont("Segoe UI", 14))
+            line_edit_answer.setSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Preferred)
+            line_edit_answer.setMinimumWidth(25)
+            line_edit_answer.setFixedHeight(42)
+            line_edit_answer.setPlaceholderText("Введите правильное значение...")
+
+            if self.__amount_columns == 1:
+                line_edit_answer.setProperty("only-one", True)
+            elif i == 0:
+                line_edit_answer.setProperty("first", True)
+            elif i == self.__amount_columns - 1:
+                line_edit_answer.setProperty("last", True)
+
+            self.__list_cell_table_answer[self.__current_row - 1].append(DataCellTableAnswer(cell = line_edit_answer, type = type))
+            self.__grid_layout_main.addWidget(line_edit_answer, self.__current_row, i)
+
+    def set_item(self, row: int, column: int, type: TypeCellTableAnswer, text: str = ""):
+        # добавить пустуые строку если row - self.__current_row + 1 > 0
+        for i in range(row - self.__current_row + 1):
+            self.__add_empty_row()
+
+        match type:
+            case TypeCellTableAnswer.input:    
+                self.__list_cell_table_answer[row][column].cell.setText(text)
+                self.__list_cell_table_answer[row][column].cell.textChanged.connect(self.__table_answer_changed)
+                self.__list_cell_table_answer[row][column].cell.setPlaceholderText("Введите правильное значение...")
+            case TypeCellTableAnswer.label:
+                self.__list_cell_table_answer[row][column].cell.setReadOnly(True)
+                self.__list_cell_table_answer[row][column].cell.setPlaceholderText("")
+                self.__list_cell_table_answer[row][column].cell.setText(text)
+
+        self.__list_cell_table_answer[row][column].type = type
+
+    def get_row_count(self) -> int:
+        return self.__current_row
+    
+    def get_column_count(self) -> int:
+        return self.__amount_columns
+
+    def __table_answer_changed(self):
+        self.table_answer_changed.emit()
+
+    def get_text(self, row: int, column: int) -> str:
+        return self.__list_cell_table_answer[row][column].cell.text()
+
+    def get_type_cell(self, row: int, column: int) -> TypeCellTableAnswer:
+        return self.__list_cell_table_answer[row][column].type
+
+    def insert_text(self, row: int, column: int, text: str):
+        self.__list_cell_table_answer[row][column].cell.setText(text)
+
 class PushButtonImage(QtWidgets.QPushButton):
     """Класс для кнопки с изображением"""
     push_button_image_clicked = QtCore.pyqtSignal()
@@ -464,11 +599,12 @@ class PushButtonImage(QtWidgets.QPushButton):
 
         self.setObjectName("push_button_image")
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
-        # self.clicked.connect(self.__push_button_image_press)
-        # self.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.clicked.connect(self.__push_button_image_press)
+        self.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
 
         self.__path_pixmap = path_pixmap
         self.__path_images = path_images
+        self.__dialog_image_viewer = None
 
         self.__min_size = QtCore.QSize(93, 93)
         self.__max_size = QtCore.QSize(393, 393)
@@ -528,7 +664,28 @@ class PushButtonImage(QtWidgets.QPushButton):
         self.__grid_layout_push_button_save.addWidget(self.__push_buttton_save_image, 0, 1)
         
     def __push_button_image_press(self):
+        self.__show_image()
+        
         self.push_button_image_clicked.emit()
+
+    def __show_image(self):
+        if not self.__dialog_image_viewer:
+            self.__dialog_image_viewer = DialogImageViewer(self)
+            self.__dialog_image_viewer.set_window_title("Просмотр изображения")
+            self.__dialog_image_viewer.set_window_icon(QtGui.QIcon(os.path.join(self.__path_images, r"image.png")))
+            self.__dialog_image_viewer.load_image(self.__path_pixmap)
+            self.__dialog_image_viewer.closing_window.connect(self.__closed_dialog_image_viewer)
+
+            self.__dialog_image_viewer.show()
+
+    def __closed_dialog_image_viewer(self):
+        self.__dialog_image_viewer = None
+
+    def close_dialog_image_viewer(self):
+        if self.__dialog_image_viewer is not None:
+            self.__dialog_image_viewer.close_window()
+            
+            self.__dialog_image_viewer = None
 
     def enterEvent(self, event):
         self.__push_buttton_save_image.show()
@@ -584,6 +741,7 @@ class PageQuestion(QtWidgets.QWidget):
         self.__started_passing = started_passing
         self.__path_images = path_images
         self.__path_pixmap = None
+        self.__push_button_image = None
         
         # главный макет
         self.__vbox_layout_main = QtWidgets.QGridLayout()
@@ -632,7 +790,7 @@ class PageQuestion(QtWidgets.QWidget):
         self.__vbox_layout_internal.addSpacing(5)
 
         # добавление кнопки с изображением, если оно присутствует
-        if (path_pixmap := self.__question.find("questions").find("image")) != None:
+        if (path_pixmap := self.__question.find("image")) is not None and path_pixmap.text != "None":
             self.__path_pixmap = os.path.join(os.path.split(self.__path_course)[0], path_pixmap.text) # .replace("\\", "/")
 
             self.__push_button_image = PushButtonImage(path_pixmap = self.__path_pixmap, path_images = self.__path_images)
@@ -641,15 +799,14 @@ class PageQuestion(QtWidgets.QWidget):
             self.__vbox_layout_internal.addSpacing(5)
 
         # создание виджетов выбора или ввода ответов
-        match self.__question.find("questions").find("type").text:
+        match self.__question.find("type").text:
             case "selectable_answer":
                 self.__label_type_question.setText("Укажите правильный вариант ответа:")
 
                 # группа радио кнопок
                 self.__group_radio_buttons = GroupRadiobuttonsAnswer()
 
-                list_questions = self.__question.find("questions").findall("question")
-                amount_questions = len(list_questions)
+                list_questions = self.__question.findall("answer_option")
 
                 self.__list_radio_buttons = list()
 
@@ -675,8 +832,7 @@ class PageQuestion(QtWidgets.QWidget):
             case "multiple_selectable_answers":
                 self.__label_type_question.setText("Укажите правильные варианты ответа:")
 
-                list_questions = self.__question.find("questions").findall("question")
-                amount_questions = len(list_questions)
+                list_questions = self.__question.findall("answer_option")
 
                 self.__list_checkboxes = list()
 
@@ -719,6 +875,29 @@ class PageQuestion(QtWidgets.QWidget):
                 if self.__started_passing:
                     self.__line_edit_answer.insert(self.__answer)
 
+            case "comparison_table":
+                self.__label_type_question.setText("Заполните пустые ячейки таблицы:")
+
+                list_questions = list(element.text for element in self.__question.findall("header"))
+
+                self.__table_answer = TableAnswer(list_questions)
+                self.__table_answer.table_answer_changed.connect(self.__table_answer_changed)
+
+                for i_row, row in enumerate(self.__question.findall("row")):
+                    for i_column, element in enumerate(row.findall("cell")):
+                        match element.attrib["type"]:
+                            case "label":
+                                type = TypeCellTableAnswer.label
+                                self.__table_answer.set_item(row = i_row, column = i_column, type = type, text = element.attrib["text"])
+                            case "input":
+                                type = TypeCellTableAnswer.input
+                                if self.__started_passing:
+                                    self.__table_answer.set_item(row = i_row, column = i_column, type = type, text = self.__answer[i_row][i_column - len(row.findall("cell"))])
+                                else:
+                                    self.__table_answer.set_item(row = i_row, column = i_column, type = type, text = "")
+
+                self.__vbox_layout_internal.addWidget(self.__table_answer)
+
         self.__vbox_layout_internal.addStretch(1)
         
     def answer(self) -> str | list | None:
@@ -749,6 +928,21 @@ class PageQuestion(QtWidgets.QWidget):
 
         self.answer_changed.emit(self.__number, True if self.__answer != "" else False)
 
+    def __table_answer_changed(self):
+        self.__answer = list()
+
+        for row in range(self.__table_answer.get_row_count()):
+            self.__answer.append(list())
+            for column in range(self.__table_answer.get_column_count()):
+                if self.__table_answer.get_type_cell(row, column) == TypeCellTableAnswer.input:
+                    self.__answer[row].append(self.__table_answer.get_text(row, column))
+
+        self.answer_changed.emit(self.__number, any(list(any(i) for i in self.__answer)))
+
+    def close_dialog_image_viewer(self):
+        if self.__push_button_image is not None:  
+            self.__push_button_image.close_dialog_image_viewer()
+
 class PageTesting(QtWidgets.QWidget):
     """Главный класс тестирования"""
     push_button_finish_cliced = QtCore.pyqtSignal(DataResultTesting)
@@ -765,22 +959,24 @@ class PageTesting(QtWidgets.QWidget):
         self.__root = self.__tree.getroot()
 
         lesson = self.__root.find("lesson")
-        if lesson != None:
+        if lesson is not None:
             self.__path_lesson = os.path.abspath(os.path.join(os.path.split(self.__path_course)[0], lesson.text))
+            if lesson.text == "None":
+                self.__path_lesson = None
         
         self.__page_question = None
         self.__page_lesson = None
         self.__current_number_question = 0
 
         self.__time_start = datetime.datetime.now()
-        self.__len_course = len(self.__root.findall("exercise"))
+        self.__len_course = len(self.__root.findall("question"))
         self.__list_data_page_test: list[DataPageTest] = list()
         self.__list_push_button_questions = list()
         self.__dict_questions_started_passing = {i: False for i in range(self.__len_course)}
 
         for i in range(self.__len_course):
-            type_question = self.__root.findall("exercise")[i].find("questions").find("type").text
-            if type_question == "multiple_selectable_answers":
+            type_question = self.__root.findall("question")[i].find("type").text
+            if type_question in ("multiple_selectable_answers", "comparison_table"):
                 self.__list_data_page_test.append(DataPageTest(list()))
             elif type_question in ("selectable_answer", "input_answer"):
                 self.__list_data_page_test.append(DataPageTest(None))
@@ -898,7 +1094,7 @@ class PageTesting(QtWidgets.QWidget):
 
     def __open_lesson(self):
         # создание и упаковка новой страницы для просмотра урока в формате .pdf
-        if self.__page_lesson == None:
+        if self.__page_lesson is None:
             self.__page_lesson = LessonViewer(path_lesson = self.__path_lesson)
 
             self.__stacked_widget.addWidget(self.__page_lesson)
@@ -906,7 +1102,8 @@ class PageTesting(QtWidgets.QWidget):
         self.__stacked_widget.setCurrentWidget(self.__page_lesson)
 
     def __finish_test(self):
-        if self.__page_question != None:
+        if self.__page_question is not None:
+            self.__page_question.close_dialog_image_viewer()
             # получение ответа текущей страницы
             self.__list_data_page_test[self.__current_number_question].answer = self.__page_question.answer()
 
@@ -914,8 +1111,15 @@ class PageTesting(QtWidgets.QWidget):
 
         for i in range(self.__len_course):
             user_answer = self.__list_data_page_test[i].answer
-            right_answer = list(i.text for i in self.__root.findall("exercise")[i].find("answers").findall("answer"))
-            type_question = self.__root.findall("exercise")[i].find("questions").find("type").text
+            type_question = self.__root.findall("question")[i].find("type").text
+            if type_question != "comparison_table":
+                right_answer = list(i.text for i in self.__root.findall("question")[i].findall("correct_answer"))
+            else:
+                right_answer = list()
+                for i_row, row in enumerate(self.__root.findall("question")[i].findall("row")):
+                    right_answer.append(list())
+                    for element in row.findall("correct_answer"):
+                        right_answer[i_row].append(element.text)
             status = None
 
             if self.__dict_questions_started_passing[i]:
@@ -947,6 +1151,13 @@ class PageTesting(QtWidgets.QWidget):
                             status = AnswerStatus.right
                         else:
                             status = AnswerStatus.wrong
+
+                    # если сопоставление
+                    case "comparison_table":
+                        if right_answer == user_answer:
+                            status = AnswerStatus.right
+                        else:
+                            status = AnswerStatus.wrong
             else:
                 status = AnswerStatus.skip
 
@@ -965,9 +1176,11 @@ class PageTesting(QtWidgets.QWidget):
         self.push_button_finish_cliced.emit(data_result_testing)
 
     def __switch_question(self, number: int):
-        current_question = self.__root.findall("exercise")[number]
+        current_question = self.__root.findall("question")[number]
 
-        if self.__page_question != None:
+        if self.__page_question is not None:
+            self.__page_question.close_dialog_image_viewer()
+
             # сохранение ответа текущей страницы в список ответов
             self.__list_data_page_test[self.__current_number_question].answer = self.__page_question.answer()
             self.__list_data_page_test[self.__current_number_question].horizontal_scrollbar_value = self.__scroll_area_page_test.horizontalScrollBar().value()
@@ -997,3 +1210,7 @@ class PageTesting(QtWidgets.QWidget):
     def __on_change_answer(self, number: int, answered: bool):
         self.__list_push_button_questions[number].set_answered(answered)
         self.__dict_questions_started_passing[number] = answered
+
+    def close_dialog_image_viewer(self):
+        if self.__page_question is not None:
+            self.__page_question.close_dialog_image_viewer()

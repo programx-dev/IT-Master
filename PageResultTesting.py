@@ -360,7 +360,10 @@ class PageResultQuestion(QtWidgets.QWidget):
         self.__path_images = path_images
         self.__path_pixmap = None
 
-        self.__rigth_answer = list(i.text for i in self.__question.find("answers").findall("answer"))
+        if self.__question.find("type").text != "comparison_table":
+            self.__rigth_answer = list(i.text for i in self.__question.findall("correct_answer"))
+        else:
+            self.__rigth_answer = list(element.text for element in self.__question.findall("row")[0].findall("correct_answer"))
         
         # главный макет
         self.__vbox_layout_main = QtWidgets.QGridLayout()
@@ -438,7 +441,7 @@ class PageResultQuestion(QtWidgets.QWidget):
         self.__vbox_layout_internal.addSpacing(5)
 
         # добавление кнопки с изображением, если оно присутствует
-        if (path_pixmap := self.__question.find("questions").find("image")) != None:
+        if (path_pixmap := self.__question.find("image")) is not None and path_pixmap.text != "None":
             self.__path_pixmap = os.path.join(os.path.split(self.__path_course)[0], path_pixmap.text) # .replace("\\", "/")
 
             self.__push_button_image = PageTesting.PushButtonImage(path_pixmap = self.__path_pixmap, path_images = self.__path_images)
@@ -461,15 +464,14 @@ class PageResultQuestion(QtWidgets.QWidget):
         self.__label_user_answer.setText("Ваш ответ:")
 
         # создание виджетов выбора или ввода ответов
-        match self.__question.find("questions").find("type").text:
+        match self.__question.find("type").text:
             case "selectable_answer":
                 self.__label_type_question.setText("Укажите правильный вариант ответа:")
 
                 # группа радио кнопок
                 self.__group_radio_buttons_rigth_answer = PageTesting.GroupRadiobuttonsAnswer()
 
-                list_questions = self.__question.find("questions").findall("question")
-                amount_questions = len(list_questions)
+                list_questions = self.__question.findall("answer_option")
 
                 self.__list_radio_buttons_right_answer = list()
 
@@ -521,8 +523,7 @@ class PageResultQuestion(QtWidgets.QWidget):
             case "multiple_selectable_answers":
                 self.__label_type_question.setText("Укажите правильные варианты ответа:")
 
-                list_questions = self.__question.find("questions").findall("question")
-                amount_questions = len(list_questions)
+                list_questions = self.__question.findall("answer_option")
 
                 self.__list_checkboxes_right = list()
 
@@ -582,8 +583,47 @@ class PageResultQuestion(QtWidgets.QWidget):
 
                 self.__vbox_layout_internal.addWidget(self.__line_edit_user_answer)
 
-                if self.__answer != None:
+                if self.__answer is not None:
                     self.__line_edit_user_answer.insert(self.__answer)
+
+            case "comparison_table":
+                self.__label_type_question.setText("Заполните пустые ячейки таблицы:")
+
+                list_headers = list(element.text for element in self.__question.findall("header"))
+
+                # создание и упаковка таблицы верных ответов
+                self.__table_right_answer = PageTesting.TableAnswer(list_headers)
+                self.__table_right_answer.set_enabled(False)
+
+                self.__vbox_layout_internal.addWidget(self.__table_right_answer)
+                self.__vbox_layout_internal.addSpacing(5)
+
+                self.__vbox_layout_internal.addWidget(self.__label_user_answer)
+
+                for i_row, row in enumerate(self.__question.findall("row")):
+                    for i_column, element in enumerate(row.findall("cell")):
+                        type = PageTesting.TypeCellTableAnswer.label
+                        match element.attrib["type"]:
+                            case "label":
+                                self.__table_right_answer.set_item(row = i_row, column = i_column, type = type, text = element.attrib["text"])
+                            case "input":
+                                self.__table_right_answer.set_item(row = i_row, column = i_column, type = type, text = row.findall("correct_answer")[i_column - len(row.findall("cell"))].text)
+
+                # создание и упаковка таблицы пользовательских ответов
+                self.__table_user_answer = PageTesting.TableAnswer(list_headers)
+                self.__table_user_answer.set_enabled(False)
+
+                for i_row, row in enumerate(self.__question.findall("row")):
+                    for i_column, element in enumerate(row.findall("cell")):
+                        type = PageTesting.TypeCellTableAnswer.label
+                        match element.attrib["type"]:
+                            case "label":
+                                self.__table_user_answer.set_item(row = i_row, column = i_column, type = type, text = element.attrib["text"])
+                            case "input":
+                                    if self.__answer != list():
+                                        self.__table_user_answer.set_item(row = i_row, column = i_column, type = type, text = self.__answer[i_row][i_column - len(row.findall("cell"))])
+
+                self.__vbox_layout_internal.addWidget(self.__table_user_answer)
 
         self.__vbox_layout_internal.addStretch(1)
         
@@ -608,7 +648,7 @@ class PageResultTesting(QtWidgets.QWidget):
         self.__page_result_testing = None
         self.__current_number_page_result_question = 0
 
-        self.__len_course = len(self.__root.findall("exercise"))
+        self.__len_course = len(self.__root.findall("question"))
         self.__list_data_page_result_test: list[DataPageResultTest] = list()
         self.__list_push_button_questions = list()
 
@@ -714,16 +754,16 @@ class PageResultTesting(QtWidgets.QWidget):
         self.__page_result_testing.change_data_page_viewer_result_testing(self.__data_page_viewer_result_testing)
 
     def __open_result_testing(self):
-        if self.__page_result_testing == None:
+        if self.__page_result_testing is None:
             self.__page_result_testing = PageViewerResultTesting(self.__data_result_testing, self.__data_page_viewer_result_testing)
             self.__stacked_widget.addWidget(self.__page_result_testing)
 
         self.__stacked_widget.setCurrentWidget(self.__page_result_testing)
 
     def __switch_result_question(self, number: int):
-        current_question = self.__root.findall("exercise")[number]
+        current_question = self.__root.findall("question")[number]
 
-        if self.__page_result_question != None:
+        if self.__page_result_question is not None:
             # сохранение информации о текущей страницы в список
             self.__list_data_page_result_test[self.__current_number_page_result_question].horizontal_scrollbar_value = self.__scroll_area_page_result_test.horizontalScrollBar().value()
             self.__list_data_page_result_test[self.__current_number_page_result_question].vertical__scrollbar_value = self.__scroll_area_page_result_test.verticalScrollBar().value()
