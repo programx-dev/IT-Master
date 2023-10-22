@@ -601,19 +601,22 @@ class PageResultQuestion(QtWidgets.QWidget):
                 self.__vbox_layout_internal.addWidget(self.__label_user_answer)
 
                 for i_row, row in enumerate(self.__question.findall("row")):
+                    count_cell_input = 0
                     for i_column, element in enumerate(row.findall("cell")):
                         type = PageTesting.TypeCellTableAnswer.label
                         match element.attrib["type"]:
                             case "label":
                                 self.__table_right_answer.set_item(row = i_row, column = i_column, type = type, text = element.attrib["text"])
                             case "input":
-                                self.__table_right_answer.set_item(row = i_row, column = i_column, type = type, text = row.findall("correct_answer")[i_column - len(row.findall("cell"))].text)
+                                self.__table_right_answer.set_item(row = i_row, column = i_column, type = type, text = row.findall("correct_answer")[count_cell_input].text)
+                                count_cell_input += 1
 
                 # создание и упаковка таблицы пользовательских ответов
                 self.__table_user_answer = PageTesting.TableAnswer(list_headers)
                 self.__table_user_answer.set_enabled(False)
 
                 for i_row, row in enumerate(self.__question.findall("row")):
+                    count_cell_input = 0
                     for i_column, element in enumerate(row.findall("cell")):
                         type = PageTesting.TypeCellTableAnswer.label
                         match element.attrib["type"]:
@@ -621,7 +624,8 @@ class PageResultQuestion(QtWidgets.QWidget):
                                 self.__table_user_answer.set_item(row = i_row, column = i_column, type = type, text = element.attrib["text"])
                             case "input":
                                     if self.__answer != list():
-                                        self.__table_user_answer.set_item(row = i_row, column = i_column, type = type, text = self.__answer[i_row][i_column - len(row.findall("cell"))])
+                                        self.__table_user_answer.set_item(row = i_row, column = i_column, type = type, text = self.__answer[i_row][count_cell_input])
+                                        count_cell_input += 1
 
                 self.__vbox_layout_internal.addWidget(self.__table_user_answer)
 

@@ -1,138 +1,145 @@
+<?xml version='1.0' encoding='utf-8'?>
 <main>
 	<type>IT Master course</type>
 	<name>Компьютерная графика</name>
-	<lesson>Компьютерная графика.png</lesson>
-	
-	<exercise>
+	<lesson>Компьютерная графика.pdf</lesson>
+	<!-- 1 -->
+	<question>
+		<title>Что такое растровая графика?</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>Графика, представленная векторами</answer_option>
+		<answer_option>Графика, представленная пикселями</answer_option>
+		<answer_option>Графика, созданная в 3D программах</answer_option>
+		<answer_option>Графика, использующая графические карты</answer_option>
+		<correct_answer>Графика, представленная пикселями</correct_answer>
+	</question>
+	<!-- 2 -->
+	<question>
+		<title>Соотнесите формат с его предназначением
+1) Графические файлы в этом формате имеют большой информационный объём, так как в них на хранение информации о цвете каждого пикселя отводится 24 бита.
+2) Универсальный растровый формат позволяет отбросить «избыточное» для человеческого восприятия разнообразие цветов соседних пикселей.
+3) Универсальный векторный графический формат, используемый для хранения коллекции картинок Microsoft.
+4) Формат имеет очень маленький вес и позволяет демонстрировать короткую зацикленную анимацию.</title>
+		<image>None</image>
+		<type>comparison_table</type>
+		<header>GIF</header>
+		<header>BMP</header>
+		<header>WMF</header>
+		<header>JPEG</header>
+		<row>
+			<cell type="input" />
+			<cell type="input" />
+			<cell type="input" />
+			<cell type="input" />
+			<correct_answer>4</correct_answer>
+			<correct_answer>1</correct_answer>
+			<correct_answer>3</correct_answer>
+			<correct_answer>2</correct_answer>
+		</row>
+	</question>
+	<!-- 3 -->
+	<question>
+		<title>Какой вид графики лучше всего подходит для создания логотипов и других элементов с высокой степенью масштабируемости?</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>Растровая графика</answer_option>
+		<answer_option>Векторная графика</answer_option>
+		<answer_option>Трехмерная графика</answer_option>
+		<answer_option>Матричная графика</answer_option>
+		<correct_answer>Векторная графика</correct_answer>
+	</question>
+	<!-- 4 -->
+	<question>
+		<title>Для хранения растрового изображения размером 128*128 пикселей отвели 4 Кбайт памяти. Каково максимально возможное число цветов в палитре изображения?</title>
+		<image>None</image>
+		<type>input_answer</type>
+		<correct_answer>4</correct_answer>
+	</question>
+	<!-- 5 -->
+	<question>
+		<title>Какое устройство используется для ввода растровых изображений в компьютер?</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>Сканер</answer_option>
+		<answer_option>Принтер</answer_option>
+		<answer_option>Графический планшет</answer_option>
+		<answer_option>Мышь</answer_option>
+		<correct_answer>Сканер</correct_answer>
+	</question>
+	<!-- 6 -->
+	<question>
+		<title>Какие из данных цветов содержатся в цветовой модели RGB?</title>
+		<image>None</image>
+		<type>multiple_selectable_answers</type>
+		<answer_option>Синий</answer_option>
+		<answer_option>Голубой</answer_option>
+		<answer_option>Желтый</answer_option>
+		<answer_option>Зеленый</answer_option>
+		<answer_option>Красный</answer_option>
+		<answer_option>Черный</answer_option>
+		<correct_answer>Синий</correct_answer>
+		<correct_answer>Зеленый</correct_answer>
+		<correct_answer>Красный</correct_answer>
+	</question>
+	<!-- 7 -->
+	<question>
+		<title>Выберите в ответ номера, под которыми обозначены достоинства растровой графики.</title>
+		<image>None</image>
+		<type>multiple_selectable_answers</type>
+		<answer_option>Масштабирование без потери качества</answer_option>
+		<answer_option>Большой объем файла с разрешением высокой четкости</answer_option>
+		<answer_option>Естественные цвета и переходы тонов</answer_option>
+		<answer_option>Фотографическое качество картинки</answer_option>
+		<answer_option>Возможность существенных изменений рисунка</answer_option>
+		<answer_option>Сложность получения растровых изображений</answer_option>
+		<correct_answer>Естественные цвета и переходы тонов</correct_answer>
+		<correct_answer>Фотографическое качество картинки</correct_answer>
+	</question>
+	<!-- 8 -->
+	<question>
+		<title>Укажите минимальный объем памяти (в килобайтах), достаточный для хранения любого растрового изображения размером 576 х 160 пикселей, если известно, что в изображении используется палитра из 216 цветов. Саму палитру хранить не нужно.</title>
+		<image>None</image>
+		<type>input_answer</type>
+		<correct_answer>90</correct_answer>
+	</question>
+	<!-- 9 -->
+	<question>
+		<title>Распределите данные устройства в два столбца таблицы (в каждом столбце в порядке возрастания):
+1) Принтер
+2) Фотокамера
+3) Монитор
+4) Графический планшет
+5) 3D принтер
+6) Сканер</title>
+		<image>None</image>
+		<type>comparison_table</type>
+		<header>Устройства ввода</header>
+		<header>Устройства вывода</header>
+		<row>
+			<cell type="input" />
+			<cell type="input" />
+			<correct_answer>2</correct_answer>
+			<correct_answer>1</correct_answer>
+		</row>
+		<row>
+			<cell type="input" />
+			<cell type="input" />
+			<correct_answer>4</correct_answer>
+			<correct_answer>3</correct_answer>
+		</row>
+		<row>
+			<cell type="input" />
+			<cell type="input" />
+			<correct_answer>6</correct_answer>
+			<correct_answer>5</correct_answer>
+		</row>
+	</question>
+	<!-- 10 -->
+	<question>
 		<title>Векторное  изображение, информационный объём которого равен 3 килобайтам, уменьшили по  высоте в 3 раза, а по  ширине – в 2 раза. Определите информационный объём полученного изображения в килобайтах. В ответе  укажите только число.</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>3</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Определите  информационный объём графического файла в килобайтах с разрешением 256 х 128 пикселей и количеством цветов, равным 64. Сжатие данных не используется. В ответе  укажите только число.</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>24</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Ниже представлены шесть файлов. Укажите все графические файлы.</title>
-		<questions>
-			<type>multiple_selectable_answers</type>
-			<question>image.mp3</question>
-			<question>system.jpg</question>
-			<question>song.exe</question>
-			<question>document.rar</question>
-			<question>table.bmp</question>
-			<question>sound.png</question>
-		</questions>
-		<answers>
-			<answer>system.jpg</answer>
-			<answer>table.bmp</answer>
-			<answer>sound.png</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Сколько цветов (N) насчитывается в палитре, соответствующей глубине цвета (i), равной 6?</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>64</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Что называется графическим примитивом?</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>простейшая геометрическая фигура</question>
-			<question>пиксель</question>
-			<question>изображение на мониторе</question>
-			<question>участок изображения</question>
-		</questions>
-		<answers>
-			<answer>простейшая геометрическая фигура</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Палитра – это</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>количество пикселей, из которых складывается изображение</question>
-			<question>набор цветов, которые могут быть воспроизведены при выводе изображения на монитор</question>
-			<question>точечный элемент на экране монитора</question>
-			<question>длина двоичного кода, который используется для кодирования цвета пикселя</question>
-		</questions>
-		<answers>
-			<answer>набор цветов, которые могут быть воспроизведены при выводе изображения на монитор</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Сканер имеет разрешение 256 х 512 dpi (точек на дюйм). Отсканированное изображение размеров 4 х 4 дюйма занимает 6 Мбайт памяти. Чему равна глубина цвета точки отсканированного изображения? Ответ дайте в битах.</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>4</question>
-			<question>8</question>
-			<question>16</question>
-			<question>24</question>
-		</questions>
-		<answers>
-			<answer>24</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Некое растровое изображение было сохранено в файле p1.bmp как 8-разрядный рисунок. Во сколько раз будет меньше информационный объем файла p2.bmp, если в нём это же изображение сохранить как 32-цветный рисунок?</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>4</question>
-			<question>3</question>
-			<question>2</question>
-			<question>1,6</question>
-		</questions>
-		<answers>
-			<answer>1,6</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Глубина цвета – это количество:</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>цветов в палитре</question>
-			<question>базовых цветов</question>
-			<question>пикселей изображения</question>
-			<question>информации которое используется для кодирования цвета пикселя</question>
-		</questions>
-		<answers>
-			<answer>информации которое используется для кодирования цвета пикселя</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Деформация изображения при изменении размера рисунка - один из недостатков:</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>векторной графики</question>
-			<question>растровой графики</question>
-		</questions>
-		<answers>
-			<answer>растровой графики</answer>
-		</answers>
-	</exercise>
+		<image>None</image>
+		<type>input_answer</type>
+		<correct_answer>3</correct_answer>
+	</question>
 </main>

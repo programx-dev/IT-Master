@@ -262,13 +262,15 @@ class DialogAbout(Window.Dialog):
         self.__vbox_layout_info.addWidget(self.__label_version)
 
         # метка о программе
-        self.__label_about  = QtWidgets.QLabel()
+        self.__label_about = QtWidgets.QLabel()
         self.__label_about.setObjectName("label_about")
         self.__label_about.setFont(QtGui.QFont("Segoe UI", 11))
         self.__label_about.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.__label_about.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
         self.__label_about.setWordWrap(True)
-        self.__label_about.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
-
+        self.__label_about.setOpenExternalLinks(True)
+        self.__label_about.setTextFormat(QtCore.Qt.TextFormat.RichText)
+        self.__label_about.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse | QtCore.Qt.TextInteractionFlag.LinksAccessibleByMouse)
 
         self.__vbox_layout_main.addWidget(self.__label_about)
         self.__vbox_layout_main.addSpacing(10)

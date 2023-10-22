@@ -182,7 +182,8 @@
         "label_about": {
           "color": "#FFFFFF",
           "selection_color": "#FFFFFF",
-          "selection_background_color": "#39404F"
+          "selection_background_color": "#39404F",
+          "color_hyperlink": "#3087EF"
         },
         "push_button": {
           "normal": {
@@ -770,7 +771,6 @@
               "color": "#FFFFFF"
             },
             "chart": {
-              "background": "#23272E",
               "pie_slice_right": {
                 "color": "#68D145"
               },
@@ -833,7 +833,6 @@
             "background": "#23272E",
             "border_color": "#C3C3C3",
             "chart": {
-              "background": "#23272E",
               "pie_slice_right": {
                 "color": "#68D145"
               },
@@ -864,58 +863,6 @@
             "background": "#888888"
           }
         }
-      }
-    }
-  },
-  "dialog_exit_test": {
-    "frame_main": {
-      "background": "#F5F5F5",
-      "label_header": {
-        "color": "#000000"
-      },
-      "label_hint": {
-        "color": "#000000"
-      },
-      "push_button_cancel": {
-        "background": "#DCDCDC",
-        "color": "#000000"
-      },
-      "push_button_exit": {
-        "background": "#037BFB",
-        "color": "#FFFFFF"
-      }
-    }
-  },
-  "dialog_table_results_empty": {
-    "frame_main": {
-      "background": "#F5F5F5",
-      "label_header": {
-        "color": "#000000"
-      },
-      "label_hint": {
-        "color": "#000000"
-      },
-      "push_button_ok": {
-        "background": "#037BFB",
-        "color": "#FFFFFF"
-      }
-    }
-  },
-  "dialog_info": {
-    "frame_main": {
-      "background": "#F5F5F5",
-      "label_header": {
-        "color": "#000000"
-      },
-      "label_version": {
-        "color": "#000000"
-      },
-      "label_text_info": {
-        "color": "#000000"
-      },
-      "push_button_ok": {
-        "background": "#037BFB",
-        "color": "#FFFFFF"
       }
     }
   },
@@ -1024,50 +971,6 @@
         "label_number_skip": {
           "color": "#FFFFFF",
           "background": "#C3C3C3"
-        }
-      },
-      "frame_tools": {
-        "background": "#5A99FF",
-        "push_button_to_main": {
-          "background": "#037BFB",
-          "color": "#FFFFFF"
-        }
-      }
-    }
-  },
-  "stack_table_result": {
-    "frame_main": {
-      "background": "#FFFFFF",
-      "frame_header": {
-        "background": "#5A99FF",
-        "label_header": {
-          "color": "#FFFFFF"
-        }
-      },
-      "table_results": {
-        "background": "#FFFFFF",
-        "color_gridline": "#646464",
-        "header": {
-          "background": "#5A99FF",
-          "color": "#FFFFFF"
-        },
-        "even_item": {
-          "background": "#DEEAF6",
-          "color": "#000000"
-        },
-        "odd_item": {
-          "background": "#FFFFFF",
-          "color": "#000000"
-        },
-        "frame_mainted_item": {
-          "background": "#037BFB",
-          "color": "#FFFFFF"
-        },
-        "scrollbar": {
-          "background": "#FFFFFF",
-          "handle": {
-            "background": "#037BFF"
-          }
         }
       },
       "frame_tools": {

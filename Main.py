@@ -19,7 +19,9 @@ import pickle
 from utils import Logging
 import logging
 
-__version__ = "3.6.1"
+__version__ = "3.6.2"
+
+__text_about__ = """Предметный тренажер по информатике, позволяющий изучить теорию и закрепить полученные знания, выполнив тест.<br/><br/>Эта программа лицензирована под <a href="https://github.com/ProgrammXCo/IT-Master/blob/main/LICENSE" style="text-decoration: underline; color: {color}">General Public License v3.0</a>. Исходный код доступен на <a href="https://github.com/ProgrammXCo/IT-Master/tree/main" style="text-decoration: underline; color: {color}">GitHub</a>."""
 
 @dataclass
 class DataResult:
@@ -563,7 +565,7 @@ class Main(Window.Window):
         dialog.setWindowTitle("О программе")
         dialog.setWindowIcon(QtGui.QIcon(os.path.join(self.__path_images, r"info.png")))
         dialog.set_version(f"версия {__version__}")
-        dialog.set_text_about(self.__text_info)
+        dialog.set_text_about(__text_about__.format(color = self.__data_theme["dialog_about"]["frame_widgets"]["frame_main"]["label_about"]["color_hyperlink"]))
         dialog.run_modal()
 
     def __open_dialog_clear_database(self):

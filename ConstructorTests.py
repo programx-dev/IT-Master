@@ -12,12 +12,19 @@ def uniquify(path: str):
 
     return path
 
+def save():
+    # Запись в файл:
+    output_file = open(path_file , "wb")
+    ET.indent(tree, space = "\t", level = 0)
+    tree.write(output_file, encoding = "utf-8", xml_declaration = True)
+
 path_documents = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Documents" , "OutputTests")
 
 if not os.path.exists(path_documents): 
     os.makedirs(path_documents) 
 
 root = ET.Element("main")
+tree = ET.ElementTree(root)
 
 # тип документа
 type_sub = ET.SubElement(root, "type")
@@ -28,7 +35,15 @@ name_sub = ET.SubElement(root, "name")
 name_test = input("Наименование теста: ")
 name_sub.text = name_test
 
-path_file = uniquify(os.path.normpath(os.path.join(path_documents, name_test + ".xml")))
+path_dir = uniquify(os.path.normpath(os.path.join(path_documents, name_test)))
+os.makedirs(path_dir) 
+
+path_file = uniquify(os.path.normpath(os.path.join(path_dir, name_test + ".xml")))
+
+save()
+print(f"\nТест сохранен в: {path_file}\n")
+print("ВАЖНО!")
+print(f"Все последующие ресурсы (изображения, теоретическую чать) сохраняйте в \"{path_dir}\" и указывайте путь к ним относительно этой директории\n")
 
 # путь к .pdf уроку
 lesson_sub = ET.SubElement(root, "lesson")
@@ -37,11 +52,11 @@ if lesson == "":
     lesson = "None"
 lesson_sub.text = lesson
 
-tree = ET.ElementTree(root)
-
 count_question = 0
 
 _continue = ""
+
+print()
 
 while True:
     count_question += 1
@@ -101,6 +116,7 @@ while True:
 
                 answer_option_sub = ET.SubElement(question_sub, "answer_option")
                 answer_option_sub.text = answer_option
+            print()
 
             # верный ответ
             correct_answer = input("Верный ответ: ")
@@ -120,6 +136,7 @@ while True:
 
                 answer_option_sub = ET.SubElement(question_sub, "answer_option")
                 answer_option_sub.text = answer_option
+            print()
 
             amount_correct_answer = int(input("Количество верных ответов: "))
 
@@ -186,6 +203,7 @@ while True:
 
             for i in range(amount_row):
                 print(f"Cтрока {i + 1}")
+                j = 0
                 for j in list_label[i]:
                     text = input(f"Cтолбец {j + 1} текст ячейки: ")
 
@@ -202,12 +220,10 @@ while True:
                 print()
 
     # Запись в файл:
-    output_file = open(path_file , "wb")
-    ET.indent(tree, space = "\t", level = 0)
-    tree.write(output_file, encoding = "utf-8", xml_declaration = True)
+    save()
 
     print(f"Тест сохранен в: {path_file}\n")
 
-    _continue = input("любой символ - для продолжения (\"-\" - чтобы выйти): ")
+    _continue = input("Любой символ - для продолжения (\"-\" - чтобы выйти): ")
     if _continue == "-":
         break

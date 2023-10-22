@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "IT-Master"
-#define MyAppVersion "3.5.2"
+#define MyAppVersion "3.6.2"
 #define MyAppPublisher "ProgrammX"
 #define MyAppURL "https://github.com/ProgrammXCo"
 #define MyAppMainExeName "IT-Master.exe"
@@ -22,12 +22,11 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=C:\Users\PC\Desktop\old\LICENSE.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputDir=C:\MyScripts\Python\Projects\IT-Master\IT-Master Installer
-OutputBaseFilename=IT-Master Installer
-SetupIconFile=C:\MyScripts\Python\Projects\IT-Master\IT-Master Installer\installer icon.ico
+OutputBaseFilename=IT-Master.Installer.x64
+SetupIconFile=C:\MyScripts\Python\Projects\IT-Master\IT-Master Installer\IconInstaller.ico
 UninstallDisplayIcon={app}\{#MyAppName}.exe
 Compression=lzma
 SolidCompression=yes
