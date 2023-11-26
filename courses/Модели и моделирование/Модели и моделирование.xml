@@ -1,144 +1,119 @@
+<?xml version='1.0' encoding='utf-8'?>
 <main>
 	<type>IT Master course</type>
 	<name>Модели и моделирование</name>
-	<lesson>Модели и моделирование.png</lesson>
-	
-	<exercise>
-		<title>Описания предметов, ситуаций, событий, процессов на естественных языках – это:</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>логические модели</question>
-			<question>алгебраические модели</question>
-			<question>геометрические модели</question>
-			<question>словесные модели</question>
-		</questions>
-		<answers>
-			<answer>словесные модели</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Модель - это...</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>копия реально существующего объекта</question>
-			<question>приближенная копия объекта</question>
-			<question>заменитель предмета, объекта или явления</question>
-			<question>точная копия чего бы то ни былоо</question>
-		</questions>
-		<answers>
-			<answer>заменитель предмета, объекта или явления</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Замена реального объекта его формальным описанием – это:</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>моделирование</question>
-			<question>анализ</question>
-			<question>формализация</question>
-			<question>алгоритмизация</question>
-		</questions>
-		<answers>
-			<answer>формализация</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Выберите знаковую модель:</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>таблица</question>
-			<question>формула</question>
-			<question>рисунок</question>
-			<question>схема</question>
-		</questions>
-		<answers>
-			<answer>формула</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Выберите элемент информационной модели учащегося, существенный для выставления ему оценки за контрольную работу по информатике:</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>Время, затраченное на выполнение контрольной работы</question>
-			<question>Наличие компьютера</question>
-			<question>Количество правильно выполненных заданий</question>
-		</questions>
-		<answers>
-			<answer>Количество правильно выполненных заданий</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Файловая система персонального компьютера наиболее адекватно может быть описана в виде:</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>иерархической модели</question>
-			<question>табличной модели</question>
-			<question>натурной модели</question>
-		</questions>
-		<answers>
-			<answer>иерархической модели</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Модели, реализованные с помощью систем программирования, электронных таблиц, специализированных математических пакетов и программных средств для моделирования, называются:</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>имитационными моделями</question>
-			<question>экономическими моделями</question>
-			<question>математическими моделями</question>
-			<question>натурными моделями</question>
-		</questions>
-		<answers>
-			<answer>имитационными моделями</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>База данных – это:</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>набор данных, собранных на одной дискете</question>
-			<question>таблица, позволяющая хранить и обрабатывать данные и формулы</question>
-			<question>совокупность данных, организованных по определённым правилам, предназначенная для хранения во внешней памяти компьютера и постоянного применения</question>
-		</questions>
-		<answers>
-			<answer>совокупность данных, организованных по определённым правилам, предназначенная для хранения во внешней памяти компьютера и постоянного применения</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>К вербальным моделям относится...</title>
-		<questions>
-			<type>multiple_selectable_answers</type>
-			<question>пересказ сюжета книги</question>
-			<question>обдумывание решения задачи</question>
-			<question>схема технического устройства</question>
-			<question>расписание проведения консультаций к экзаменам</question>
-		</questions>
-		<answers>
-			<answer>пересказ сюжета книги</answer>
-			<answer>обдумывание решения задачи</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>К образным моделям относится...</title>
-		<questions>
-			<type>multiple_selectable_answers</type>
-			<question>рисунок на доске</question>
-			<question>журнал успеваемости класса</question>
-			<question>макет здания</question>
-			<question>изображение радуги на асфальте</question>
-		</questions>
-		<answers>
-			<answer>рисунок на доске</answer>
-			<answer>изображение радуги на асфальте</answer>
-		</answers>
-	</exercise>
+	<lesson>Модели и моделирование.pdf</lesson>
+	<!-- 1 -->
+	<question>
+		<title>Для чего используется моделирование?</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>Для развлечения</answer_option>
+		<answer_option>Для прогнозирования и изучения сложных моделей</answer_option>
+		<answer_option>Для созданий произведений искусства</answer_option>
+		<correct_answer>Для прогнозирования и изучения сложных моделей</correct_answer>
+	</question>
+	<!-- 2 -->
+	<question>
+		<title>Сопоставьте каждое описание вида модели с видом модели.
+1) Такие модели становятся необходимыми при намерении накапливать и обрабатывать информацию с помощью ЭВМ.
+2) Такие модели выражаются в наглядных зрительных образах.
+3) Такие модели базируются на понятиях и представляются набором предложений.
+4) Эти модели строятся на основе количественных характеристик объектов, а также на основе уравнений и функций.</title>
+		<image>None</image>
+		<type>comparison_table</type>
+		<header>Графические</header>
+		<header>Словесные</header>
+		<header>Информационно-логические</header>
+		<header>Математические</header>
+		<row>
+			<cell type="input" />
+			<cell type="input" />
+			<cell type="input" />
+			<cell type="input" />
+			<correct_answer>2</correct_answer>
+			<correct_answer>3</correct_answer>
+			<correct_answer>1</correct_answer>
+			<correct_answer>4</correct_answer>
+		</row>
+	</question>
+	<!-- 3 -->
+	<question>
+		<title>Какая из следующих задач НЕ может быть решена с помощью моделирования?</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>Прогнозирование погоды</answer_option>
+		<answer_option>Строительство моста</answer_option>
+		<answer_option>Рисование картины</answer_option>
+		<answer_option>Проектирование нового автомобиля</answer_option>
+		<correct_answer>Рисование картины</correct_answer>
+	</question>
+	<!-- 4 -->
+	<question>
+		<title>В таблице приведена стоимость перевозок между соседними железнодорожными станциями. Укажите схему, соответствующую таблице.</title>
+		<image>01.png</image>
+		<type>input_answer</type>
+		<correct_answer>4</correct_answer>
+	</question>
+	<!-- 5 -->
+	<question>
+		<title>Какова цель моделирование как метода познания?</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>Понимание и объяснение явлений в мире</answer_option>
+		<answer_option>Точное предсказание будущего</answer_option>
+		<answer_option>Упрощение задачи</answer_option>
+		<answer_option>Сокращение расходов</answer_option>
+		<correct_answer>Понимание и объяснение явлений в мире</correct_answer>
+	</question>
+	<!-- 6 -->
+	<question>
+		<title>Выберите условия, когда уместно применять моделирование для решения задач:</title>
+		<image>None</image>
+		<type>multiple_selectable_answers</type>
+		<answer_option>Исследуемый объект слишком мал</answer_option>
+		<answer_option>Чтобы сократить время выполнения задачи</answer_option>
+		<answer_option>Для представления задачи в другой форме</answer_option>
+		<answer_option>Когда исследуемый процесс протекает слишком быстро</answer_option>
+		<answer_option>Для исследования запахов</answer_option>
+		<answer_option>Когда создание реального объекта очень дорого</answer_option>
+		<correct_answer>Исследуемый объект слишком мал</correct_answer>
+		<correct_answer>Когда исследуемый процесс протекает слишком быстро</correct_answer>
+		<correct_answer>Когда создание реального объекта очень дорого</correct_answer>
+	</question>
+	<!-- 7 -->
+	<question>
+		<title>Выберите неверные утверждения:</title>
+		<image>None</image>
+		<type>multiple_selectable_answers</type>
+		<answer_option>Натурные модели - реальные объекты в уменьшенном или увеличенном виде воспроизводящие внешний вид, структуру или поведение моделируемого объекта</answer_option>
+		<answer_option>Информационные модели описывают объект-оригинал на одном из языков кодирования информации</answer_option>
+		<answer_option>Динамические модели отражают процессы изменения и развития объектов во времени</answer_option>
+		<answer_option>За основу классификации моделей может быть взята только предметная область, к которой они относятся</answer_option>
+		<answer_option>На любой модели можно отразить все качества реального объекта</answer_option>
+		<correct_answer>За основу классификации моделей может быть взята только предметная область, к которой они относятся</correct_answer>
+		<correct_answer>На любой модели можно отразить все качества реального объекта</correct_answer>
+	</question>
+	<!-- 8 -->
+	<question>
+		<title>В языке запросов поискового сервера для обозначения логической операции «ИЛИ» используется символ «|», а для логической операции «И» — символ «&amp;». В таблице приведены запросы и количество найденных по ним страниц некоторого сегмента сети Интернет.
+Какое количество страниц (в тысячах) будет найдено по запросу Вега &amp; Арктур? Считается, что все запросы выполнялись практически одновременно, так что набор страниц, содержащих все искомые слова, не изменялся за время выполнения запросов.</title>
+		<image>02.png</image>
+		<type>input_answer</type>
+		<correct_answer>326</correct_answer>
+	</question>
+	<!-- 9 -->
+	<question>
+		<title>Между населенными пунктами А, В, С, D, Е построены дороги, протяженность которых (в километрах) приведена в таблице. Определите длину кратчайшего пути между пунктами А и E. Передвигаться можно только по дорогам, протяженность которых указана в таблице:</title>
+		<image>03.png</image>
+		<type>input_answer</type>
+		<correct_answer>6</correct_answer>
+	</question>
+	<!-- 10 -->
+	<question>
+		<title>Дан фрагмент электронной таблицы. После выполнения вычислений была построена диаграмма по значениям диапазона ячеек A1:A4 Укажите получившуюся диаграмму.</title>
+		<image>04.png</image>
+		<type>input_answer</type>
+		<correct_answer>2</correct_answer>
+	</question>
 </main>

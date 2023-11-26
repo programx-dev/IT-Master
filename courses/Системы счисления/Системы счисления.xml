@@ -1,137 +1,122 @@
+<?xml version='1.0' encoding='utf-8'?>
 <main>
 	<type>IT Master course</type>
 	<name>Системы счисления</name>
-	<lesson>Системы счисления.png</lesson>
-
-	<exercise>
-		<title>Непозиционная система счисления – это ...</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>система счисления, в которой количественный эквивалент цифры в числе зависит от её положения в записи числа</question>
-			<question>система счисления, у которой в каждом разряде (позиции) числа набор допустимых символов (цифр) может отличаться от наборов других разрядов</question>
-			<question>система счисления, в которой количественный эквивалент цифры в числе не зависит от её положения в записи числа</question>
-			<question>это система счисления, где для всех разрядов (позиций) числа набор допустимых символов (цифр) одинаков</question>
-		</questions>
-		<answers>
-			<answer>система счисления, в которой количественный эквивалент цифры в числе не зависит от её положения в записи числа</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Чему будет равен результат вычитания двух чисел 110001₂ и 1011₂? Ответ запишите в восьмеричной системе счисления.</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>46</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Какой алфавит у шестнадцатеричной системы счисления?</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>от 1 до 10 и буквы А, В, С, D, E, F</question>
-			<question>от 0 до 9 и буквы A, B, C, D, E, F</question>
-			<question>от 0 до 16 включительно</question>
-			<question>от 0 до 10 и буквы А, В, С, D, E, F</question>
-		</questions>
-		<answers>
-			<answer>от 0 до 10 и буквы А, В, С, D, E, F</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Сколько единиц в двоичной записи числа 151?</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>5</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Система счисления – это ...</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>система, в которой числа записываются с помощью заданного набора фигур</question>
-			<question>знаковая система, в которой приняты определенные правила записи чисел</question>
-			<question>компьютерная программа для арифметических вычислений</question>
-			<question>представление чисел с постоянным положением запятой</question>
-		</questions>
-		<answers>
-			<answer>знаковая система, в которой приняты определенные правила записи чисел</answer>
-		</answers>
-	</exercise>
-	
-	<exercise>
-		<title>Переведите число 45 из восьмеричной системы счисления в десятичную</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>37</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Какой  алфавит восьмеричной системы счисления?</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>от 0 до 7 включительно</question>
-			<question>от 0 до 8</question>
-			<question>от 0 до 8 включительно</question>
-			<question>от 1 до 8 включительно</question>
-		</questions>
-		<answers>
-			<answer>от 0 до 7 включительно</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Переведите число F5 из шестнадцатеричной системы счисления в десятичную</title>
-		<questions>
-			<type>input_answer</type>
-		</questions>
-		<answers>
-			<settings including_space = "False" type = "number"/>
-			<answer>245</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Переведите десятичное число 189 в шестнадцатеричную систему счисления</title>
-		<questions>
-			<type>selectable_answer</type>
-			<question>BF</question>
-			<question>15D</question>
-			<question>AD</question>
-			<question>BD</question>
-		</questions>
-		<answers>
-			<answer>BD</answer>
-		</answers>
-	</exercise>
-
-	<exercise>
-		<title>Выберите верный перевод одного и того же десятичного числа 321 в двоичную, восьмеричную и шестнадцатеричную системы счисления</title>
-		<questions>
-			<type>multiple_selectable_answers</type>
-			<question>501₈</question>
-			<question>152₁₆</question>
-			<question>602₈</question>
-			<question>141₁₆</question>
-			<question>10100001₂</question>
-			<question>101000001₂</question>
-		</questions>
-		<answers>
-			<answer>101000001₂</answer>
-			<answer>501₈</answer>
-			<answer>141₁₆</answer>
-		</answers>
-	</exercise>
+	<lesson>Системы счисления.pdf</lesson>
+	<!-- 1 -->
+	<question>
+		<title>Какое количество цифр содержит десятичная система счисления?</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>8</answer_option>
+		<answer_option>10</answer_option>
+		<answer_option>12</answer_option>
+		<answer_option>16</answer_option>
+		<correct_answer>10</correct_answer>
+	</question>
+	<!-- 2 -->
+	<question>
+		<title>Сопоставьте основание системы счисления с диапазоном чисел в ней:
+1) Восьмеричная
+2) Шестнадцатеричная
+3) Двадцатиодноричная
+4) Одиннадцатеричная</title>
+		<image>None</image>
+		<type>comparison_table</type>
+		<header>0-15</header>
+		<header>0-10</header>
+		<header>0-7</header>
+		<header>0-K</header>
+		<row>
+			<cell type="input" />
+			<cell type="input" />
+			<cell type="input" />
+			<cell type="input" />
+			<correct_answer>2</correct_answer>
+			<correct_answer>4</correct_answer>
+			<correct_answer>1</correct_answer>
+			<correct_answer>3</correct_answer>
+		</row>
+	</question>
+	<!-- 3 -->
+	<question>
+		<title>Переведите число 111 из десятиричной системы счисления в восьмеричную?</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>157</answer_option>
+		<answer_option>666</answer_option>
+		<answer_option>87</answer_option>
+		<answer_option>1334</answer_option>
+		<correct_answer>157</correct_answer>
+	</question>
+	<!-- 4 -->
+	<question>
+		<title>Решите пример: A2₁₆ + 1F₁₆ ответ запишите в шестнадцатеричной системе счисления (ЗАГЛАВНЫМИ латинскими буквами)</title>
+		<image>None</image>
+		<type>input_answer</type>
+		<correct_answer>C1</correct_answer>
+	</question>
+	<!-- 5 -->
+	<question>
+		<title>Сравните числа: 2C₁₆ и 42₈ выберите подходящий знак:</title>
+		<image>None</image>
+		<type>selectable_answer</type>
+		<answer_option>&lt;</answer_option>
+		<answer_option>&gt;</answer_option>
+		<answer_option>=</answer_option>
+		<correct_answer>&gt;</correct_answer>
+	</question>
+	<!-- 6 -->
+	<question>
+		<title>В каких системах счисления может существовать число 12A41?</title>
+		<image>None</image>
+		<type>multiple_selectable_answers</type>
+		<answer_option>Семеричная</answer_option>
+		<answer_option>Десятеричная</answer_option>
+		<answer_option>Шестнадцатеричная</answer_option>
+		<answer_option>Двенадцатеричная</answer_option>
+		<answer_option>Пятеричная</answer_option>
+		<answer_option>Сторичная</answer_option>
+		<correct_answer>Шестнадцатеричная</correct_answer>
+		<correct_answer>Двенадцатеричная</correct_answer>
+		<correct_answer>Сторичная</correct_answer>
+	</question>
+	<!-- 7 -->
+	<question>
+		<title>Выберите верные утверждения:</title>
+		<image>None</image>
+		<type>multiple_selectable_answers</type>
+		<answer_option>Двоичная система счисления состоит из цифр 0 и 1.</answer_option>
+		<answer_option>В восьмеричной системе счисления цифры от 0 до 8 используются для представления чисел.</answer_option>
+		<answer_option>В шестнадцатеричной системе счисления цифры от 0 до 15 используются для представления чисел.</answer_option>
+		<answer_option>Двоичная система счисления используется в компьютере для представления информации и данных.</answer_option>
+		<answer_option>Десятичная система счисления использует 11 цифр: от 0 до 10.</answer_option>
+		<answer_option>В восьмеричной системе счисления цифры от 0 до 7 используются для представления чисел.</answer_option>
+		<correct_answer>Двоичная система счисления состоит из цифр 0 и 1.</correct_answer>
+		<correct_answer>Двоичная система счисления используется в компьютере для представления информации и данных.</correct_answer>
+		<correct_answer>В восьмеричной системе счисления цифры от 0 до 7 используются для представления чисел.</correct_answer>
+	</question>
+	<!-- 8 -->
+	<question>
+		<title>Переведите двоичное число 1100110 в десятичную систему счисления.</title>
+		<image>None</image>
+		<type>input_answer</type>
+		<correct_answer>102</correct_answer>
+	</question>
+	<!-- 9 -->
+	<question>
+		<title>Среди приведенных ниже трех чисел найдите минимальное число и запишите его в ответе в десятичной системе счисления.
+41₁₆, 77₈, 1000010₂</title>
+		<image>None</image>
+		<type>input_answer</type>
+		<correct_answer>63</correct_answer>
+	</question>
+	<!-- 10 -->
+	<question>
+		<title>Среди приведенных ниже трех чисел, записанных в десятичной системе счисления, найдите число, сумма цифр которого в восьмеричной записи наименьшая. В ответе запишите сумму цифр в восьмеричной записи этого числа.
+55₁₀, 83₁₀, 91₁₀</title>
+		<image>None</image>
+		<type>input_answer</type>
+		<correct_answer>6</correct_answer>
+	</question>
 </main>
