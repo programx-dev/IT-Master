@@ -4,7 +4,7 @@ __pycache__/
 build/
 dist/
 IT-Master Installer/IT-Master.Installer.x64.exe
-src/history_results.db
 temp/
 .ruff_cache
 pyproject.toml
+src/history_results.db
