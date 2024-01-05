@@ -46,7 +46,7 @@ TestCreator_a = Analysis(
     excludes=[],
     noarchive=False,
 )
-TestCreator_pyz = PYZ(a.pure)
+TestCreator_pyz = PYZ(TestCreator_a.pure)
 
 TestCreator_exe = EXE(
     TestCreator_pyz,
