@@ -19,9 +19,9 @@ import pickle
 from utils import Logging
 import logging
 
-__version__ = "3.6.2"
+__version__ = "3.6.3"
 
-__text_about__ = """Предметный тренажер по информатике, позволяющий изучить теорию и закрепить полученные знания, выполнив тест.<br/><br/>Эта программа лицензирована под <a href="https://github.com/ProgrammXCo/IT-Master/blob/main/LICENSE" style="text-decoration: underline; color: {color}">General Public License v3.0</a>. Исходный код доступен на <a href="https://github.com/ProgrammXCo/IT-Master/tree/main" style="text-decoration: underline; color: {color}">GitHub</a>."""
+__text_about__ = """Предметный тренажер по информатике, позволяющий изучить теорию и закрепить полученные знания, выполнив тест.<br/><br/>Эта программа лицензирована под General Public License v3.0."""
 
 @dataclass
 class DataResult:

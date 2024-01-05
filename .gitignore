@@ -8,3 +8,7 @@ temp/
 .ruff_cache
 pyproject.toml
 src/history_results.db
+
+old
+distold
+buildold

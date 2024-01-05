@@ -6,7 +6,7 @@
 #define MyAppPublisher "ProgrammX"
 #define MyAppURL "https://github.com/ProgrammXCo"
 #define MyAppMainExeName "IT-Master.exe"
-#define MyAppConstructorTestsExeName "ConstructorTests.exe"
+#define MyAppTestCreatorExeName "TestCreator.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -24,9 +24,9 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir=C:\MyScripts\Python\Projects\IT-Master\IT-Master Installer
+OutputDir=D:\MyScripts\Python\Projects\IT-Master\IT-Master Installer
 OutputBaseFilename=IT-Master.Installer.x64
-SetupIconFile=C:\MyScripts\Python\Projects\IT-Master\IT-Master Installer\IconInstaller.ico
+SetupIconFile=D:\MyScripts\Python\Projects\IT-Master\IT-Master Installer\IconInstaller.ico
 UninstallDisplayIcon={app}\{#MyAppName}.exe
 Compression=lzma
 SolidCompression=yes
@@ -42,41 +42,19 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "{app}"; Permissions: users-full
 
 [Files]
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\{#MyAppMainExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\{#MyAppConstructorTestsExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\courses\*"; DestDir: "{app}\courses"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\logs\*"; DestDir: "{app}\logs"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\PIL\*"; DestDir: "{app}\PIL"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\PyQt6\*"; DestDir: "{app}\PyQt6"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\src\*"; DestDir: "{app}\src"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\_bz2.pyd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\_decimal.pyd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\_elementtree.pyd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\_hashlib.pyd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\_lzma.pyd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\_socket.pyd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\_sqlite3.pyd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\_ssl.pyd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\base_library.zip"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\libcrypto-1_1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\libssl-1_1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\pyexpat.pyd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\python3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\python311.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\README"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\select.pyd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\settings.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\sqlite3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\unicodedata.pyd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\VCRUNTIME140.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\VCRUNTIME140_1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\{#MyAppMainExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\{#MyAppTestCreatorExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\courses\*"; DestDir: "{app}\courses"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\logs\*"; DestDir: "{app}\logs"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\src\*"; DestDir: "{app}\src"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\MyScripts\Python\Projects\IT-Master\dist\IT-Master\settings.json"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppMainExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppMainExeName}"; Tasks: desktopicon
-Name: "{group}\{#MyAppConstructorTestsExeName}"; Filename: "{app}\{#MyAppConstructorTestsExeName}"
+Name: "{group}\{#MyAppTestCreatorExeName}"; Filename: "{app}\{#MyAppTestCreatorExeName}"
 
 [Run]
 Filename: "{app}\{#MyAppMainExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
