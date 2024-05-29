@@ -3,12 +3,6 @@ venv/
 __pycache__/
 build/
 dist/
-IT-Master Installer/IT-Master.Installer.x64.exe
-temp/
-.ruff_cache
-pyproject.toml
+installer/IT-Master.Installer.x64.exe
 src/history_results.db
-
-old
-distold
-buildold
+Доп. материалы/
