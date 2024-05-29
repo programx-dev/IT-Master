@@ -1,0 +1,12 @@
+pyi-makespec TestCreator.py
+pyi-makespec Main.py
+
+# Добавить иконки в TestCreator.py и Main.py
+
+# Объединить TestCreator.spec и Main.spec в Common.spec
+
+pyinstaller Common.spec
+
+# Переместить courses/. logs/. src/. settings.json в крневую папку с *.exe
+
+# Запустить installer.iss
